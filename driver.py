@@ -1,0 +1,240 @@
+"""
+Driver - The Orchestrator
+=========================
+Main entry point for the Modular Snapshot Scraper.
+
+This script:
+1. Scans the /workers folder for Python modules
+2. Imports each worker and executes its scrape() function
+3. Handles worker failures individually (one crash doesn't stop others)
+4. Aggregates results into the central CSV
+
+Designed to be run every 5 minutes via Windows Task Scheduler.
+"""
+
+import os
+import sys
+import importlib.util
+import logging
+from datetime import datetime
+from typing import Dict, Any, List, Tuple
+import traceback
+
+# Add the script directory to path for imports
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
+
+from common_utils import process_worker_result, get_output_path
+
+# Configure logging
+LOG_DIR = os.path.join(SCRIPT_DIR, 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)
+
+log_filename = os.path.join(LOG_DIR, f"driver_{datetime.now().strftime('%Y%m%d')}.log")
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(log_filename),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger('driver')
+
+# Configuration
+WORKERS_DIR = os.path.join(SCRIPT_DIR, 'workers')
+
+
+def discover_workers() -> List[str]:
+    """
+    Scan the /workers folder for Python modules.
+    
+    Returns:
+        List of worker module file paths
+    """
+    workers = []
+    
+    if not os.path.exists(WORKERS_DIR):
+        logger.warning(f"Workers directory not found: {WORKERS_DIR}")
+        os.makedirs(WORKERS_DIR, exist_ok=True)
+        logger.info(f"Created workers directory: {WORKERS_DIR}")
+        return workers
+    
+    for filename in os.listdir(WORKERS_DIR):
+        if filename.endswith('.py') and not filename.startswith('_'):
+            worker_path = os.path.join(WORKERS_DIR, filename)
+            workers.append(worker_path)
+            logger.info(f"Discovered worker: {filename}")
+    
+    return workers
+
+
+def load_worker_module(worker_path: str):
+    """
+    Dynamically import a worker module.
+    
+    Args:
+        worker_path: Full path to the worker .py file
+        
+    Returns:
+        Loaded module object, or None if failed
+    """
+    try:
+        module_name = os.path.splitext(os.path.basename(worker_path))[0]
+        spec = importlib.util.spec_from_file_location(module_name, worker_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        return module
+    except Exception as e:
+        logger.error(f"Failed to load worker {worker_path}: {e}")
+        logger.error(traceback.format_exc())
+        return None
+
+
+def execute_worker(module) -> Tuple[str, Dict[str, Any], bool]:
+    """
+    Execute a worker's scrape function.
+    
+    Args:
+        module: The loaded worker module
+        
+    Returns:
+        Tuple of (source_name, data_dict, success_bool)
+    """
+    try:
+        # Check if module has a Worker class (preferred) or scrape function
+        if hasattr(module, 'Worker'):
+            worker_instance = module.Worker()
+            source_name = worker_instance.SOURCE_NAME
+            data = worker_instance.run()
+        elif hasattr(module, 'scrape'):
+            # Fallback to simple scrape() function
+            source_name = getattr(module, 'SOURCE_NAME', module.__name__)
+            data = module.scrape()
+        else:
+            logger.error(f"Worker {module.__name__} has no Worker class or scrape() function")
+            return (module.__name__, {}, False)
+        
+        if data:
+            logger.info(f"Worker {source_name} returned: {data}")
+            return (source_name, data, True)
+        else:
+            logger.warning(f"Worker {source_name} returned no data")
+            return (source_name, {}, False)
+            
+    except Exception as e:
+        logger.error(f"Worker execution failed: {e}")
+        logger.error(traceback.format_exc())
+        return (getattr(module, '__name__', 'unknown'), {}, False)
+
+
+def run_all_workers() -> Dict[str, Any]:
+    """
+    Main orchestration function.
+    Discovers, loads, and executes all workers.
+    
+    Returns:
+        Summary dict with results
+    """
+    start_time = datetime.now()
+    logger.info("=" * 60)
+    logger.info(f"DRIVER STARTED - {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info("=" * 60)
+    
+    summary = {
+        'start_time': start_time.isoformat(),
+        'workers_found': 0,
+        'workers_succeeded': 0,
+        'workers_failed': 0,
+        'results': {}
+    }
+    
+    # Discover workers
+    worker_paths = discover_workers()
+    summary['workers_found'] = len(worker_paths)
+    
+    if not worker_paths:
+        logger.warning("No workers found in /workers directory")
+        logger.info("Add worker modules to the /workers folder to start scraping")
+        return summary
+    
+    # Execute each worker independently
+    for worker_path in worker_paths:
+        worker_name = os.path.basename(worker_path)
+        logger.info(f"\n--- Processing: {worker_name} ---")
+        
+        try:
+            # Load module
+            module = load_worker_module(worker_path)
+            if module is None:
+                summary['workers_failed'] += 1
+                summary['results'][worker_name] = {'status': 'load_failed'}
+                continue
+            
+            # Execute worker
+            source_name, data, success = execute_worker(module)
+            
+            if success and data:
+                # Process and save results
+                save_success = process_worker_result(source_name, data)
+                
+                if save_success:
+                    summary['workers_succeeded'] += 1
+                    summary['results'][worker_name] = {
+                        'status': 'success',
+                        'source': source_name,
+                        'data': data
+                    }
+                else:
+                    summary['workers_failed'] += 1
+                    summary['results'][worker_name] = {'status': 'save_failed'}
+            else:
+                summary['workers_failed'] += 1
+                summary['results'][worker_name] = {'status': 'no_data'}
+                
+        except Exception as e:
+            # Catch-all to ensure one worker can't crash the entire process
+            logger.error(f"Unexpected error with {worker_name}: {e}")
+            logger.error(traceback.format_exc())
+            summary['workers_failed'] += 1
+            summary['results'][worker_name] = {
+                'status': 'error',
+                'error': str(e)
+            }
+    
+    # Log summary
+    end_time = datetime.now()
+    duration = (end_time - start_time).total_seconds()
+    summary['end_time'] = end_time.isoformat()
+    summary['duration_seconds'] = duration
+    
+    logger.info("\n" + "=" * 60)
+    logger.info("DRIVER COMPLETED")
+    logger.info(f"  Duration: {duration:.2f} seconds")
+    logger.info(f"  Workers Found: {summary['workers_found']}")
+    logger.info(f"  Succeeded: {summary['workers_succeeded']}")
+    logger.info(f"  Failed: {summary['workers_failed']}")
+    logger.info("=" * 60)
+    
+    return summary
+
+
+def main():
+    """Entry point for the driver."""
+    try:
+        summary = run_all_workers()
+        
+        # Exit with error code if any workers failed
+        if summary['workers_failed'] > 0:
+            sys.exit(1)
+        sys.exit(0)
+        
+    except Exception as e:
+        logger.critical(f"Driver crashed: {e}")
+        logger.critical(traceback.format_exc())
+        sys.exit(2)
+
+
+if __name__ == '__main__':
+    main()
