@@ -183,10 +183,11 @@ def process_worker_result_long(
         # Save
         save_csv(df, output_dir)
         
-        # Check for new metric titles and update data dictionary
-        new_metrics = set(item.get('metric_title', '') for item in data) - existing_metrics
-        if new_metrics:
-            update_data_dictionary_long(new_metrics, source_name, output_dir)
+        # Check for ANY current metrics and ensure they are in the data dictionary
+        # We pass ALL current metrics to the updater, and let it filter out what's already documented.
+        current_metrics = set(item.get('metric_title', '') for item in data)
+        if current_metrics:
+            update_data_dictionary_long(current_metrics, source_name, output_dir)
         
         return True
         
@@ -198,19 +199,20 @@ def process_worker_result_long(
 
 
 def update_data_dictionary_long(
-    new_metrics: Set[str],
+    metrics_to_check: Set[str],
     source_name: str,
     output_dir: str = None
 ):
     """
     Update DATA_DICTIONARY.md with new metric titles (long format).
+    Checks if metrics are ALREADY inside the file before appending.
     
     Args:
-        new_metrics: Set of new metric title names
+        metrics_to_check: Set of metric title names to verify/add
         source_name: The source worker that introduced these metrics
         output_dir: Directory for the data dictionary file
     """
-    if not new_metrics:
+    if not metrics_to_check:
         return
     
     dict_path = get_output_path(DATA_DICTIONARY_FILENAME, output_dir)
@@ -218,6 +220,7 @@ def update_data_dictionary_long(
     current_time = datetime.now().strftime('%H:%M:%S')
     
     # Check if file exists and read existing content
+    existing_content = ""
     if os.path.exists(dict_path):
         with open(dict_path, 'r', encoding='utf-8') as f:
             existing_content = f.read()
@@ -228,6 +231,10 @@ def update_data_dictionary_long(
 
 This file is **automatically generated** by the Snapshot Scraper system.
 New metrics are documented here as they are detected.
+
+### 📊 How to use in Power BI
+When creating visuals, you must filter by **Metric Title**.
+Use the table below to find the exact name of the metric you want to display.
 
 ### CSV Structure
 | Column | Description |
@@ -250,17 +257,35 @@ New metrics are documented here as they are detected.
     
     # Append new metric entries
     new_entries = []
-    for metric in sorted(new_metrics):
-        if metric:  # Skip empty strings
+    for metric in sorted(metrics_to_check):
+        if not metric:
+            continue
+            
+        # Check if this metric is already documented in the text
+        # We look for the exact table format: "| metric |" or "| **metric** |"
+        # This prevents re-adding it if it's already there
+        is_documented = (f"| {metric} |" in existing_content) or \
+                        (f"| **{metric}** |" in existing_content)
+        
+        if not is_documented:
             description = f"Report from {source_name}. [Add description]"
-            entry = f"| {metric} | {source_name} | {description} | {current_date} {current_time} |"
+            entry = f"| **{metric}** | {source_name} | {description} | {current_date} {current_time} |"
             new_entries.append(entry)
     
     if new_entries:
+        # If file didn't exist, start with header. If it did, append.
+        mode = 'w' if not os.path.exists(dict_path) else 'w' 
+        # Actually we need to rewrite the whole thing if we are appending to existing content 
+        # (since we read it all into existing_content)
+        
+        # Ensure there is a newline before appending
+        if existing_content and not existing_content.endswith('\n'):
+            existing_content += '\n'
+
+        final_content = existing_content + '\n'.join(new_entries) + '\n'
+        
         with open(dict_path, 'w', encoding='utf-8') as f:
-            f.write(existing_content)
-            f.write('\n'.join(new_entries))
-            f.write('\n')
+            f.write(final_content)
         
         logger.info(f"Updated data dictionary with {len(new_entries)} new metric(s)")
         for entry in new_entries:

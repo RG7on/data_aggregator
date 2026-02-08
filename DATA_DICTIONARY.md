@@ -4,6 +4,10 @@
 This file is **automatically generated** by the Snapshot Scraper system.
 New metrics are documented here as they are detected.
 
+### 📊 How to use in Power BI
+When creating visuals, you must filter by **Metric Title**.
+Use the table below to find the exact name of the metric you want to display.
+
 ### CSV Structure
 | Column | Description |
 | :--- | :--- |
@@ -21,15 +25,7 @@ New metrics are documented here as they are detected.
 
 | Metric Title | Source | Description | First Detected |
 | :--- | :--- | :--- | :--- |
-| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 11:40:15 |
-| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 11:40:15 |
-| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 11:40:15 |
-| Aging Requests | smax | Report from smax. [Add description] | 2026-02-08 11:53:32 |
-| Aging Requests | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
-| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
-| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
-| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
-| Aging Requests | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
-| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
-| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
-| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
+| **Aging Requests** | smax | Backlog aging summary (Month + Phase) | 2026-02-08 11:53:32 |
+| **BIA Requests** | smax | Business Impact Analysis requests by status | 2026-02-08 11:40:15 |
+| **ISC: First Touch Response <1 hour** | smax | Compliance percentage (True/False) | 2026-02-08 11:40:15 |
+| **SLA -FCR This Month - 80% - Incident Excluded** | smax | First Contact Resolution stats | 2026-02-08 11:40:15 |
