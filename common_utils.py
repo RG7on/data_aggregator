@@ -2,12 +2,16 @@
 Common Utilities for Modular Snapshot Scraper
 ==============================================
 Handles CSV operations, snapshot logic, and automatic data dictionary generation.
+
+Supports two data formats:
+1. Wide format (legacy): One row per source per day, multiple KPI columns
+2. Long format (new): Multiple rows per source, with Date/Source/Metric Title/Category/Value columns
 """
 
 import os
 import pandas as pd
 from datetime import datetime
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List, Set, Union
 import logging
 
 # Configure logging
@@ -22,8 +26,12 @@ DEFAULT_OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_FILENAME = "kpi_snapshots.csv"
 DATA_DICTIONARY_FILENAME = "DATA_DICTIONARY.md"
 
-# Core columns that are always present
-CORE_COLUMNS = ['date', 'timestamp', 'source_name']
+# Core columns for LONG format (new structure)
+LONG_FORMAT_COLUMNS = ['date', 'timestamp', 'source', 'metric_title', 'category', 'value']
+
+# Core columns for WIDE format (legacy structure)
+WIDE_FORMAT_COLUMNS = ['date', 'timestamp', 'source_name']
+
 
 
 def get_output_path(filename: str, output_dir: str = None) -> str:
@@ -33,14 +41,19 @@ def get_output_path(filename: str, output_dir: str = None) -> str:
     return os.path.join(output_dir, filename)
 
 
-def load_or_create_csv(output_dir: str = None) -> pd.DataFrame:
+def load_or_create_csv(output_dir: str = None, use_long_format: bool = True) -> pd.DataFrame:
     """
     Load existing CSV or create a new one with base columns.
     
+    Args:
+        output_dir: Directory for CSV file
+        use_long_format: If True, use Date/Source/Metric Title/Category/Value format
+    
     Returns:
-        pandas DataFrame with at least the core columns
+        pandas DataFrame with the appropriate columns
     """
     csv_path = get_output_path(CSV_FILENAME, output_dir)
+    columns = LONG_FORMAT_COLUMNS if use_long_format else WIDE_FORMAT_COLUMNS
     
     if os.path.exists(csv_path):
         try:
@@ -49,11 +62,11 @@ def load_or_create_csv(output_dir: str = None) -> pd.DataFrame:
             return df
         except Exception as e:
             logger.error(f"Error loading CSV: {e}")
-            # Return empty dataframe if load fails
-            return pd.DataFrame(columns=CORE_COLUMNS)
+            return pd.DataFrame(columns=columns)
     else:
         logger.info("Creating new CSV file")
-        return pd.DataFrame(columns=CORE_COLUMNS)
+        return pd.DataFrame(columns=columns)
+
 
 
 def save_csv(df: pd.DataFrame, output_dir: str = None):
@@ -61,6 +74,199 @@ def save_csv(df: pd.DataFrame, output_dir: str = None):
     csv_path = get_output_path(CSV_FILENAME, output_dir)
     df.to_csv(csv_path, index=False)
     logger.info(f"Saved CSV to {csv_path}")
+
+
+# ============================================================
+# LONG FORMAT FUNCTIONS (New - Date/Source/Metric Title/Category/Value)
+# ============================================================
+
+def update_snapshot_long(
+    df: pd.DataFrame,
+    source_name: str,
+    data: List[Dict[str, Any]],
+    current_date: str = None
+) -> pd.DataFrame:
+    """
+    Update or insert snapshot rows using LONG format (idempotent).
+    
+    Logic for each metric:
+    - Look for row matching [date] AND [source] AND [metric_title] AND [category]
+    - If found: Overwrite the value
+    - If not found: Append a new row
+    
+    Args:
+        df: Existing DataFrame
+        source_name: Identifier for the data source (e.g., 'smax')
+        data: List of dicts with keys: metric_title, category, value
+        current_date: Date string (YYYY-MM-DD), defaults to today
+        
+    Returns:
+        Updated DataFrame
+    """
+    if current_date is None:
+        current_date = datetime.now().strftime('%Y-%m-%d')
+    
+    current_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Ensure all required columns exist
+    for col in LONG_FORMAT_COLUMNS:
+        if col not in df.columns:
+            df[col] = None
+    
+    for item in data:
+        metric_title = item.get('metric_title', '')
+        category = item.get('category', '')
+        value = item.get('value', 0)
+        
+        # Check if row exists for this date/source/metric/category combo
+        mask = (
+            (df['date'] == current_date) & 
+            (df['source'] == source_name) &
+            (df['metric_title'] == metric_title) &
+            (df['category'] == category)
+        )
+        
+        if mask.any():
+            # Update existing row
+            row_idx = df[mask].index[0]
+            df.at[row_idx, 'timestamp'] = current_timestamp
+            df.at[row_idx, 'value'] = value
+            logger.debug(f"Updated: {source_name}/{metric_title}/{category} = {value}")
+        else:
+            # Create new row
+            new_row = {
+                'date': current_date,
+                'timestamp': current_timestamp,
+                'source': source_name,
+                'metric_title': metric_title,
+                'category': category,
+                'value': value
+            }
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+            logger.debug(f"Added: {source_name}/{metric_title}/{category} = {value}")
+    
+    logger.info(f"Processed {len(data)} metrics for {source_name} on {current_date}")
+    return df
+
+
+def process_worker_result_long(
+    source_name: str,
+    data: List[Dict[str, Any]],
+    output_dir: str = None
+) -> bool:
+    """
+    Process worker results in LONG format (Date/Source/Metric Title/Category/Value).
+    
+    Args:
+        source_name: Worker identifier (e.g., 'smax')
+        data: List of dicts with keys: metric_title, category, value
+        output_dir: Output directory (defaults to script directory)
+        
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        # Load DataFrame
+        df = load_or_create_csv(output_dir, use_long_format=True)
+        
+        # Track new metric titles for documentation
+        existing_metrics = set()
+        if not df.empty and 'metric_title' in df.columns:
+            existing_metrics = set(df['metric_title'].dropna().unique())
+        
+        # Update with new data
+        df = update_snapshot_long(df, source_name, data)
+        
+        # Save
+        save_csv(df, output_dir)
+        
+        # Check for new metric titles and update data dictionary
+        new_metrics = set(item.get('metric_title', '') for item in data) - existing_metrics
+        if new_metrics:
+            update_data_dictionary_long(new_metrics, source_name, output_dir)
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error processing worker result: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
+def update_data_dictionary_long(
+    new_metrics: Set[str],
+    source_name: str,
+    output_dir: str = None
+):
+    """
+    Update DATA_DICTIONARY.md with new metric titles (long format).
+    
+    Args:
+        new_metrics: Set of new metric title names
+        source_name: The source worker that introduced these metrics
+        output_dir: Directory for the data dictionary file
+    """
+    if not new_metrics:
+        return
+    
+    dict_path = get_output_path(DATA_DICTIONARY_FILENAME, output_dir)
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    current_time = datetime.now().strftime('%H:%M:%S')
+    
+    # Check if file exists and read existing content
+    if os.path.exists(dict_path):
+        with open(dict_path, 'r', encoding='utf-8') as f:
+            existing_content = f.read()
+    else:
+        # Create new file with header for long format
+        existing_content = """# Data Dictionary
+## KPI Snapshots Schema Documentation
+
+This file is **automatically generated** by the Snapshot Scraper system.
+New metrics are documented here as they are detected.
+
+### CSV Structure
+| Column | Description |
+| :--- | :--- |
+| date | The date of the snapshot (YYYY-MM-DD) |
+| timestamp | Last update timestamp for the row |
+| source | Identifier of the data source/worker |
+| metric_title | Name of the report/metric being tracked |
+| category | Category within the metric (e.g., 'total', 'true', 'false') |
+| value | The numeric value (count or percentage) |
+
+---
+
+### Tracked Metrics
+
+| Metric Title | Source | Description | First Detected |
+| :--- | :--- | :--- | :--- |
+"""
+    
+    # Append new metric entries
+    new_entries = []
+    for metric in sorted(new_metrics):
+        if metric:  # Skip empty strings
+            description = f"Report from {source_name}. [Add description]"
+            entry = f"| {metric} | {source_name} | {description} | {current_date} {current_time} |"
+            new_entries.append(entry)
+    
+    if new_entries:
+        with open(dict_path, 'w', encoding='utf-8') as f:
+            f.write(existing_content)
+            f.write('\n'.join(new_entries))
+            f.write('\n')
+        
+        logger.info(f"Updated data dictionary with {len(new_entries)} new metric(s)")
+        for entry in new_entries:
+            logger.info(f"  New metric documented: {entry.split('|')[1].strip()}")
+
+
+# ============================================================
+# WIDE FORMAT FUNCTIONS (Legacy - one row per source with KPI columns)
+# ============================================================
+
 
 
 def update_snapshot(

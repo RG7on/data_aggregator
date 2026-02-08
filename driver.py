@@ -24,7 +24,7 @@ import traceback
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, SCRIPT_DIR)
 
-from common_utils import process_worker_result, get_output_path
+from common_utils import process_worker_result, process_worker_result_long, get_output_path
 
 # Configure logging
 LOG_DIR = os.path.join(SCRIPT_DIR, 'logs')
@@ -177,7 +177,13 @@ def run_all_workers() -> Dict[str, Any]:
             
             if success and data:
                 # Process and save results
-                save_success = process_worker_result(source_name, data)
+                # Detect format: list = long format, dict = wide format
+                if isinstance(data, list):
+                    # Long format: List of {metric_title, category, value}
+                    save_success = process_worker_result_long(source_name, data)
+                else:
+                    # Wide format: Dict of {column_name: value}
+                    save_success = process_worker_result(source_name, data)
                 
                 if save_success:
                     summary['workers_succeeded'] += 1

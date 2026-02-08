@@ -43,20 +43,53 @@ class BaseWorker(ABC):
         self.page: Optional[Page] = None
         self._playwright = None
     
-    def setup_browser(self, headless: bool = True) -> Page:
+    def setup_browser(self, headless: bool = True, use_system_chrome: bool = True) -> Page:
         """
         Initialize Playwright browser with common settings.
+        
+        Args:
+            headless: Run browser in headless mode
+            use_system_chrome: Use system Chrome instead of Playwright's Chromium
+            
         Returns a Page object ready for navigation.
         """
         self._playwright = sync_playwright().start()
-        self.browser = self._playwright.chromium.launch(
-            headless=headless,
-            args=[
-                '--disable-blink-features=AutomationControlled',
-                '--no-sandbox',
-                '--disable-dev-shm-usage'
-            ]
-        )
+        
+        # Try to use system Chrome first (better compatibility)
+        if use_system_chrome:
+            try:
+                self.browser = self._playwright.chromium.launch(
+                    channel="chrome",  # Use system Chrome
+                    headless=headless,
+                    args=[
+                        '--disable-blink-features=AutomationControlled',
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage'
+                    ]
+                )
+                self.logger.info("Using system Chrome browser")
+            except Exception as e:
+                self.logger.warning(f"Could not launch system Chrome: {e}")
+                self.logger.info("Falling back to Playwright Chromium")
+                self.browser = self._playwright.chromium.launch(
+                    headless=headless,
+                    args=[
+                        '--disable-blink-features=AutomationControlled',
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage'
+                    ]
+                )
+        else:
+            # Use Playwright's bundled Chromium
+            self.browser = self._playwright.chromium.launch(
+                headless=headless,
+                args=[
+                    '--disable-blink-features=AutomationControlled',
+                    '--no-sandbox',
+                    '--disable-dev-shm-usage'
+                ]
+            )
+        
         self.context = self.browser.new_context(
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -66,19 +99,27 @@ class BaseWorker(ABC):
         return self.page
     
     def teardown_browser(self):
-        """Clean up browser resources."""
-        try:
-            if self.page:
-                self.page.close()
-            if self.context:
-                self.context.close()
-            if self.browser:
-                self.browser.close()
-            if self._playwright:
-                self._playwright.stop()
-            self.logger.info("Browser closed successfully")
-        except Exception as e:
-            self.logger.warning(f"Error during browser teardown: {e}")
+        """
+        Clean up browser resources. Each step is wrapped individually
+        so a failure in one doesn't leave the others as zombies.
+        """
+        for name, obj, method in [
+            ("page",     self.page,        "close"),
+            ("context",  self.context,     "close"),
+            ("browser",  self.browser,     "close"),
+            ("playwright", self._playwright, "stop"),
+        ]:
+            if obj is not None:
+                try:
+                    getattr(obj, method)()
+                except Exception as e:
+                    self.logger.warning(f"Error closing {name}: {e}")
+        
+        self.page = None
+        self.context = None
+        self.browser = None
+        self._playwright = None
+        self.logger.info("Browser closed successfully")
     
     def login_with_form(
         self,
