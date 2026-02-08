@@ -27,7 +27,7 @@ CSV_FILENAME = "kpi_snapshots.csv"
 DATA_DICTIONARY_FILENAME = "DATA_DICTIONARY.md"
 
 # Core columns for LONG format (new structure)
-LONG_FORMAT_COLUMNS = ['date', 'timestamp', 'source', 'metric_title', 'category', 'value']
+LONG_FORMAT_COLUMNS = ['date', 'timestamp', 'source', 'metric_title', 'category', 'sub_category', 'value']
 
 # Core columns for WIDE format (legacy structure)
 WIDE_FORMAT_COLUMNS = ['date', 'timestamp', 'source_name']
@@ -116,14 +116,16 @@ def update_snapshot_long(
     for item in data:
         metric_title = item.get('metric_title', '')
         category = item.get('category', '')
+        sub_category = item.get('sub_category', '')
         value = item.get('value', 0)
         
-        # Check if row exists for this date/source/metric/category combo
+        # Check if row exists for this date/source/metric/category/sub_category combo
         mask = (
             (df['date'] == current_date) & 
             (df['source'] == source_name) &
             (df['metric_title'] == metric_title) &
-            (df['category'] == category)
+            (df['category'] == category) &
+            (df['sub_category'].fillna('') == sub_category)
         )
         
         if mask.any():
@@ -131,7 +133,7 @@ def update_snapshot_long(
             row_idx = df[mask].index[0]
             df.at[row_idx, 'timestamp'] = current_timestamp
             df.at[row_idx, 'value'] = value
-            logger.debug(f"Updated: {source_name}/{metric_title}/{category} = {value}")
+            logger.debug(f"Updated: {source_name}/{metric_title}/{category}/{sub_category} = {value}")
         else:
             # Create new row
             new_row = {
@@ -140,10 +142,11 @@ def update_snapshot_long(
                 'source': source_name,
                 'metric_title': metric_title,
                 'category': category,
+                'sub_category': sub_category,
                 'value': value
             }
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-            logger.debug(f"Added: {source_name}/{metric_title}/{category} = {value}")
+            logger.debug(f"Added: {source_name}/{metric_title}/{category}/{sub_category} = {value}")
     
     logger.info(f"Processed {len(data)} metrics for {source_name} on {current_date}")
     return df
@@ -233,7 +236,8 @@ New metrics are documented here as they are detected.
 | timestamp | Last update timestamp for the row |
 | source | Identifier of the data source/worker |
 | metric_title | Name of the report/metric being tracked |
-| category | Category within the metric (e.g., 'total', 'true', 'false') |
+| category | Primary grouping (e.g., 'Feb 2026', 'Close', 'true') |
+| sub_category | Secondary grouping when table has 3+ columns (e.g., 'First line support') |
 | value | The numeric value (count or percentage) |
 
 ---

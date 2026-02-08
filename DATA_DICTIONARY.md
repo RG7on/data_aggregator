@@ -11,7 +11,8 @@ New metrics are documented here as they are detected.
 | timestamp | Last update timestamp for the row |
 | source | Identifier of the data source/worker |
 | metric_title | Name of the report/metric being tracked |
-| category | Category within the metric (e.g., 'total', 'true', 'false') |
+| category | Primary grouping (e.g., 'Feb 2026', 'Close', 'true') |
+| sub_category | Secondary grouping when table has 3+ columns (e.g., 'First line support') |
 | value | The numeric value (count or percentage) |
 
 ---
@@ -20,13 +21,15 @@ New metrics are documented here as they are detected.
 
 | Metric Title | Source | Description | First Detected |
 | :--- | :--- | :--- | :--- |
-| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 08:22:07 |
-| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 08:22:07 |
-| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 08:22:07 |
-| Unknown Report | smax | Report from smax. [Add description] | 2026-02-08 08:52:26 |
-| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 08:55:21 |
-| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 08:55:21 |
-| Unknown Report | smax | Report from smax. [Add description] | 2026-02-08 08:55:21 |
-| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 09:10:26 |
-| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 09:10:26 |
-| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 09:10:26 |
+| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 11:40:15 |
+| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 11:40:15 |
+| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 11:40:15 |
+| Aging Requests | smax | Report from smax. [Add description] | 2026-02-08 11:53:32 |
+| Aging Requests | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
+| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
+| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
+| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 13:53:55 |
+| Aging Requests | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
+| BIA Requests | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
+| ISC: First Touch Response <1 hour | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
+| SLA -FCR This Month - 80% - Incident Excluded | smax | Report from smax. [Add description] | 2026-02-08 13:55:39 |
