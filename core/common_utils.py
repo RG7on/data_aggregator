@@ -14,6 +14,13 @@ from datetime import datetime
 from typing import Dict, Any, List, Set, Union
 import logging
 
+try:
+    from core.config import get_output_dir, get_docs_dir, PROJECT_ROOT
+except ImportError:
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    def get_output_dir(): return PROJECT_ROOT
+    def get_docs_dir(): return PROJECT_ROOT
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -21,8 +28,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger('common_utils')
 
-# Configuration - Update this path to your OneDrive/SharePoint synced folder
-DEFAULT_OUTPUT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Configuration
 CSV_FILENAME = "kpi_snapshots.csv"
 DATA_DICTIONARY_FILENAME = "DATA_DICTIONARY.md"
 
@@ -30,14 +36,14 @@ DATA_DICTIONARY_FILENAME = "DATA_DICTIONARY.md"
 LONG_FORMAT_COLUMNS = ['date', 'timestamp', 'source', 'metric_title', 'category', 'sub_category', 'value']
 
 # Core columns for WIDE format (legacy structure)
-WIDE_FORMAT_COLUMNS = ['date', 'timestamp', 'source_name']
+CORE_COLUMNS = WIDE_FORMAT_COLUMNS = ['date', 'timestamp', 'source_name']
 
 
 
 def get_output_path(filename: str, output_dir: str = None) -> str:
     """Get the full path for an output file."""
     if output_dir is None:
-        output_dir = DEFAULT_OUTPUT_DIR
+        output_dir = get_output_dir()
     return os.path.join(output_dir, filename)
 
 
@@ -70,9 +76,11 @@ def load_or_create_csv(output_dir: str = None, use_long_format: bool = True) -> 
 
 
 def save_csv(df: pd.DataFrame, output_dir: str = None):
-    """Save DataFrame to CSV file."""
+    """Save DataFrame to CSV file (atomic write to prevent partial reads)."""
     csv_path = get_output_path(CSV_FILENAME, output_dir)
-    df.to_csv(csv_path, index=False)
+    tmp_path = csv_path + ".tmp"
+    df.to_csv(tmp_path, index=False)
+    os.replace(tmp_path, csv_path)  # atomic on same filesystem
     logger.info(f"Saved CSV to {csv_path}")
 
 
@@ -215,7 +223,7 @@ def update_data_dictionary_long(
     if not metrics_to_check:
         return
     
-    dict_path = get_output_path(DATA_DICTIONARY_FILENAME, output_dir)
+    dict_path = os.path.join(get_docs_dir(), DATA_DICTIONARY_FILENAME)
     current_date = datetime.now().strftime('%Y-%m-%d')
     current_time = datetime.now().strftime('%H:%M:%S')
     
@@ -388,7 +396,7 @@ def update_data_dictionary(
     if not new_columns:
         return
     
-    dict_path = get_output_path(DATA_DICTIONARY_FILENAME, output_dir)
+    dict_path = os.path.join(get_docs_dir(), DATA_DICTIONARY_FILENAME)
     current_date = datetime.now().strftime('%Y-%m-%d')
     current_time = datetime.now().strftime('%H:%M:%S')
     

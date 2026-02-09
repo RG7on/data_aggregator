@@ -40,10 +40,11 @@ python_installer/get-pip.py
 *.swo
 *~
 
-# Environment Variables
+# Environment Variables / Secrets
 .env
 .env.local
 *.env
+config/credentials.json
 
 # Logs
 logs/
@@ -64,3 +65,5 @@ desktop.ini
 # Test Files
 *test*.py
 test_*.py
+
+FL_Monitoring_Dashboard/

@@ -1,0 +1,39 @@
+{
+  "global": {
+    "headless": true,
+    "use_system_chrome": true,
+    "screenshot_steps": false,
+    "screenshot_errors": true,
+    "log_level": "INFO",
+    "output_dir": "output",
+    "log_dir": "logs",
+    "data_retention_days": 90
+  },
+  "workers": {
+    "cuic": {
+      "enabled": true,
+      "url": "https://148.151.32.77:8444/cuicui/Main.jsp",
+      "report_folder": "Test",
+      "report_name": "Z Call Type Historical All Fields",
+      "timeout_nav_ms": 30000,
+      "timeout_short_ms": 1500,
+      "timeout_medium_ms": 2500,
+      "timeout_long_ms": 8000
+    },
+    "smax": {
+      "enabled": false,
+      "base_url": "https://smax.corp.pdo.om",
+      "report_urls": [
+        "https://smax.corp.pdo.om/reports/report/69808de7e4b05f4efa3fa48f",
+        "https://smax.corp.pdo.om/reports/report/6721c16be4b07e954f2bcb7e",
+        "https://smax.corp.pdo.om/reports/report/60238f97e4b04b36af700a76",
+        "https://smax.corp.pdo.om/reports/report/684a818ae4b07b034c72581b",
+        "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640"
+      ],
+      "page_load_timeout_ms": 120000,
+      "element_wait_timeout_ms": 30000,
+      "tab_stagger_delay_ms": 2000,
+      "max_retries": 2
+    }
+  }
+}

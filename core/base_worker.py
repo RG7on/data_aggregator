@@ -7,9 +7,17 @@ Handles common operations like browser setup, login patterns, and error handling
 
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
 import logging
+import os
+
+try:
+    from core.config import get_global_settings, get_log_dir
+except ImportError:
+    # Fallback if imported before project root is on sys.path
+    def get_global_settings(): return {}
+    def get_log_dir(): return 'logs'
 
 # Configure logging
 logging.basicConfig(
@@ -43,16 +51,18 @@ class BaseWorker(ABC):
         self.page: Optional[Page] = None
         self._playwright = None
     
-    def setup_browser(self, headless: bool = True, use_system_chrome: bool = True) -> Page:
+    def setup_browser(self, headless: bool = None, use_system_chrome: bool = None, ignore_https_errors: bool = True) -> Page:
         """
         Initialize Playwright browser with common settings.
-        
-        Args:
-            headless: Run browser in headless mode
-            use_system_chrome: Use system Chrome instead of Playwright's Chromium
-            
-        Returns a Page object ready for navigation.
+        Settings are read from config/settings.json unless explicitly overridden.
         """
+        cfg = get_global_settings()
+        if headless is None:
+            headless = cfg.get('headless', True)
+        if use_system_chrome is None:
+            use_system_chrome = cfg.get('use_system_chrome', True)
+        self._screenshot_steps = cfg.get('screenshot_steps', False)
+        self._screenshot_errors = cfg.get('screenshot_errors', True)
         self._playwright = sync_playwright().start()
         
         # Try to use system Chrome first (better compatibility)
@@ -64,7 +74,8 @@ class BaseWorker(ABC):
                     args=[
                         '--disable-blink-features=AutomationControlled',
                         '--no-sandbox',
-                        '--disable-dev-shm-usage'
+                        '--disable-dev-shm-usage',
+                        '--ignore-certificate-errors'  # CLI arg for Chrome itself
                     ]
                 )
                 self.logger.info("Using system Chrome browser")
@@ -76,7 +87,8 @@ class BaseWorker(ABC):
                     args=[
                         '--disable-blink-features=AutomationControlled',
                         '--no-sandbox',
-                        '--disable-dev-shm-usage'
+                        '--disable-dev-shm-usage',
+                        '--ignore-certificate-errors'
                     ]
                 )
         else:
@@ -86,13 +98,15 @@ class BaseWorker(ABC):
                 args=[
                     '--disable-blink-features=AutomationControlled',
                     '--no-sandbox',
-                    '--disable-dev-shm-usage'
+                    '--disable-dev-shm-usage',
+                    '--ignore-certificate-errors'
                 ]
             )
         
         self.context = self.browser.new_context(
             viewport={'width': 1920, 'height': 1080},
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            ignore_https_errors=ignore_https_errors
         )
         self.page = self.context.new_page()
         self.logger.info("Browser initialized successfully")
@@ -217,6 +231,20 @@ class BaseWorker(ABC):
         """
         pass
     
+    def screenshot(self, name: str, is_step: bool = True):
+        """Take a screenshot. Respects screenshot_steps / screenshot_errors config."""
+        if is_step and not getattr(self, '_screenshot_steps', False):
+            return
+        if not is_step and not getattr(self, '_screenshot_errors', True):
+            return
+        try:
+            log_dir = get_log_dir()
+            path = os.path.join(log_dir, f"{self.SOURCE_NAME}_{name}.png")
+            self.page.screenshot(path=path, full_page=True)
+            self.logger.info(f"Screenshot: {path}")
+        except Exception as e:
+            self.logger.debug(f"Screenshot '{name}' failed: {e}")
+
     def run(self) -> Dict[str, Any]:
         """
         Execute the worker with proper setup and teardown.
@@ -229,7 +257,7 @@ class BaseWorker(ABC):
         try:
             self.setup_browser(headless=True)
             result = self.scrape()
-            self.logger.info(f"Scrape completed: {result}")
+            self.logger.info(f"Scrape completed: {len(result) if isinstance(result, list) else result}")
         except Exception as e:
             self.logger.error(f"Worker failed: {e}")
             result = {}

@@ -1,0 +1,103 @@
+<html lang="en"><head><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>
+<title>Cisco Unified Intelligence Center</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<script src="/cuicui/scripts/js/ccbu-third-party.js"></script>
+<script src="/cuicui/scripts/js/ccbu-ui.min.js"></script>
+<script src="/cuicui/js/ns.js"></script>
+<script src="/cuicui/js/utils.js"></script>
+<script src="/cuicui/js/cuicNet.js"></script>
+<script src="/cuicui/js/common.js"></script>
+
+<script src="/cuicui/js/Login.js"></script>
+<script src="/cuicui/js/IdPageUtil.js"></script>
+<script src="/cuicui/js/common.js"></script>
+<script src="/cuicui/js/identity.js"></script>
+<script type="text/javascript" src="/cuicui/js/URLEncodeDecodeUtf8.js"></script>
+<script type="text/javascript">
+	function encodeUserName(){
+		var username = document.getElementById("rawUserName").value;
+		document.getElementById("username").value = Url.encode(username);
+		var identityForm = document.forms[0];
+		var origUrl = window.location.href;
+		if(origUrl.includes("/permalink/")) {
+			addHiddenField("r_url",
+					encodeURIComponent(origUrl), identityForm);
+		}
+		submitForm();
+	}
+	function addHiddenField(key, value, formName) {
+		var hiddenField = document.createElement("input");
+		hiddenField.setAttribute("type", "hidden");
+		hiddenField.setAttribute("name", key);
+		hiddenField.setAttribute("value", value);
+		formName.appendChild(hiddenField);
+	}
+	function onload(){
+		if(document.all && !document.querySelector){//IE Compatibility Mode
+			document.body.innerHTML = '<div style="color:#4e4f51;border-top:3px #fb634c solid;background:#fedbd6;font-size:14px;padding:10px;text-align:center;">The <b>Reports</b> interface in Cisco Unified Intelligence Center is not supported running in compatibility view.<br/>Contact your administrator to change the browser settings to a non-compatibility view.</div>';
+		}
+       
+        try{
+            if(window.top.location.pathname.indexOf("/cuic/") !== -1) {
+                if(!window.top.location.href.indexOf("cuic/permalink")>1){
+                    window.top.location.reload(true);
+                    }
+		          }           
+            }catch(e){ 
+               if(e instanceof DOMException){
+                   console.log("caught CORS exception in finesee DOM");
+                   
+               }
+           }
+        
+		
+	}
+					
+</script>
+<link rel="icon" href="images/favicon.ico">
+<link rel="stylesheet" type="text/css" href="/cuicui/css/Login.css">
+
+</head>
+
+<body onload="onload()">
+	<form class="loginmargin" method="POST" name="identityForm" action="/cuicui/j_identity_check">
+		<div ng-app="Login" ng-controller="IdentityController" class="ng-scope">
+      <div class="messagebox-backdrop" role="main">
+        <div class="login-box-container">
+          <div class="message-box">
+            <div class="message-box__content">
+              <div class="unified">
+                <span class="h3 identityName ng-binding">Cisco Unified</span><br> <span class="h3 identityName ng-binding">Intelligence Center</span>
+              </div>
+
+              <div style="margin-top: 120px"></div>
+              <!-- rawUserName is un-Encoded -->
+              <div class="typeahead-group ng-dirty ng-valid-required ng-invalid ng-invalid-remove">
+                <input id="rawUserName" name="rawUserName" ng-class="{userinput: isValidInput, emptyinput: isInvalidInput}" class="underline ng-touched ng-dirty ng-valid-required ng-invalid underlinedinputuser ng-pristine ng-untouched ng-valid ng-empty emptyinput" type="text" placeholder="Enter Username" ng-model="rawUserName" ng-change="validateUsername()" autofocus="autofocus" autocomplete="off" style="">
+                                <!-- hidden field because otherwise the encoded value will be visible on the Identity.jsp's input field for a moment -->
+                                <input type="hidden" name="username" id="username" autocomplete="off" style="">
+              </div>
+
+            </div>
+            <div>
+              <button ng-show="showNext" cs-btn="" ng-class="{validInput: isValidInput, invalidInput: isInvalidInput}" id="identitySubmitBtn" name="identitySubmitBtn" class="btn btn--primary btn--large btn--expand messagebox-btn loginbutton invalidInput" loading="login.loading" ng-disabled="disableNextButton" ng-click="toggleProgress()" onclick="encodeUserName()" disabled="disabled">
+                <span class="buttonlabel ng-binding">Next</span>
+              </button>
+              <button ng-show="showProgress" disabled="disabled" class="btn btn--primary btn--large btn--expand messagebox-btn buttonloader ng-hide">
+    
+                <div class="loading ng-scope">
+                  <span class="icon icon-circle"></span>&nbsp; <span class="icon icon-circle"></span>&nbsp; <span class="icon icon-circle"></span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+        <i class="icon icon-2x icon-cisco-logo ciscologo"></i>
+        <h6 class="privacy-statement ng-binding">By using Cisco Unified Intelligence Center, you accept the documented Terms of Service and Privacy Statements.</h6>
+        <h6 class="copy-right ng-binding" ng-bind-html="copy_right">Copyright © 2010 - 2023 Cisco Systems, Inc. All rights reserved.</h6>
+      </div>
+		</div>
+	</form>
+
+
+</body></html>

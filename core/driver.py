@@ -20,14 +20,16 @@ from datetime import datetime
 from typing import Dict, Any, List, Tuple
 import traceback
 
-# Add the script directory to path for imports
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, SCRIPT_DIR)
+# Ensure project root is on path
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
-from common_utils import process_worker_result, process_worker_result_long, get_output_path
+from core.common_utils import process_worker_result, process_worker_result_long
+from core.config import get_global_settings, get_worker_settings, get_log_dir, PROJECT_ROOT as CFG_ROOT
 
 # Configure logging
-LOG_DIR = os.path.join(SCRIPT_DIR, 'logs')
+LOG_DIR = get_log_dir()
 os.makedirs(LOG_DIR, exist_ok=True)
 
 log_filename = os.path.join(LOG_DIR, f"driver_{datetime.now().strftime('%Y%m%d')}.log")
@@ -42,7 +44,7 @@ logging.basicConfig(
 logger = logging.getLogger('driver')
 
 # Configuration
-WORKERS_DIR = os.path.join(SCRIPT_DIR, 'workers')
+WORKERS_DIR = os.path.join(CFG_ROOT, 'workers')
 
 
 def discover_workers() -> List[str]:
@@ -162,6 +164,7 @@ def run_all_workers() -> Dict[str, Any]:
     # Execute each worker independently
     for worker_path in worker_paths:
         worker_name = os.path.basename(worker_path)
+        module_stem = os.path.splitext(worker_name)[0]  # e.g. "cuic_worker" → "cuic_worker"
         logger.info(f"\n--- Processing: {worker_name} ---")
         
         try:
@@ -171,6 +174,15 @@ def run_all_workers() -> Dict[str, Any]:
                 summary['workers_failed'] += 1
                 summary['results'][worker_name] = {'status': 'load_failed'}
                 continue
+            
+            # Check if worker is enabled in settings
+            source_name = getattr(module, 'Worker', None)
+            if source_name and hasattr(source_name, 'SOURCE_NAME'):
+                ws = get_worker_settings(source_name.SOURCE_NAME)
+                if ws and ws.get('enabled') is False:
+                    logger.info(f"  Worker '{source_name.SOURCE_NAME}' is disabled in settings. Skipping.")
+                    summary['results'][worker_name] = {'status': 'disabled'}
+                    continue
             
             # Execute worker
             source_name, data, success = execute_worker(module)
