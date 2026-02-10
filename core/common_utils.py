@@ -16,6 +16,7 @@ import logging
 
 try:
     from core.config import get_output_dir, get_docs_dir, PROJECT_ROOT
+    from core.database import init_db, upsert_metrics, export_csv, cleanup_old_data, migrate_csv_to_db
 except ImportError:
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     def get_output_dir(): return PROJECT_ROOT
@@ -166,7 +167,8 @@ def process_worker_result_long(
     output_dir: str = None
 ) -> bool:
     """
-    Process worker results in LONG format (Date/Source/Metric Title/Category/Value).
+    Process worker results: write to SQLite (source of truth).
+    CSV export happens once at the end of the driver run, not per-worker.
     
     Args:
         source_name: Worker identifier (e.g., 'smax')
@@ -177,22 +179,13 @@ def process_worker_result_long(
         True if successful, False otherwise
     """
     try:
-        # Load DataFrame
-        df = load_or_create_csv(output_dir, use_long_format=True)
+        # Ensure DB exists
+        init_db()
+
+        # Upsert into SQLite (single transaction, instant)
+        upsert_metrics(source_name, data)
         
-        # Track new metric titles for documentation
-        existing_metrics = set()
-        if not df.empty and 'metric_title' in df.columns:
-            existing_metrics = set(df['metric_title'].dropna().unique())
-        
-        # Update with new data
-        df = update_snapshot_long(df, source_name, data)
-        
-        # Save
-        save_csv(df, output_dir)
-        
-        # Check for ANY current metrics and ensure they are in the data dictionary
-        # We pass ALL current metrics to the updater, and let it filter out what's already documented.
+        # Update data dictionary for any new metrics
         current_metrics = set(item.get('metric_title', '') for item in data)
         if current_metrics:
             update_data_dictionary_long(current_metrics, source_name, output_dir)

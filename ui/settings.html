@@ -144,6 +144,11 @@
           <input type="text" id="g-log-dir" value="logs">
         </div>
       </div>
+      <div class="field">
+        <label>Shared Drive CSV Path</label>
+        <input type="text" id="g-shared-drive" value="" placeholder="\\\\server\\share\\kpi_snapshots.csv">
+        <div class="hint">UNC path to auto-export CSV for Power BI. Leave empty to disable.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -329,7 +334,8 @@ function buildSettings() {
       log_level:            document.getElementById('g-log-level').value,
       output_dir:           document.getElementById('g-output-dir').value,
       log_dir:              document.getElementById('g-log-dir').value,
-      data_retention_days:  parseInt(document.getElementById('g-retention').value) || 90
+      data_retention_days:  parseInt(document.getElementById('g-retention').value) || 90,
+      shared_drive_csv:     document.getElementById('g-shared-drive').value
     },
     workers: {
       cuic: {
@@ -404,6 +410,7 @@ function populateSettings(s) {
   setVal('g-output-dir', g.output_dir || 'output');
   setVal('g-log-dir', g.log_dir || 'logs');
   setVal('g-retention', g.data_retention_days || 90);
+  setVal('g-shared-drive', g.shared_drive_csv || '');
 
   const cuic = (s.workers || {}).cuic || {};
   setBool('cuic-enabled', cuic.enabled, true);
@@ -441,7 +448,7 @@ function setVal(id, val) { document.getElementById(id).value = val; }
 function resetDefaults() {
   populateSettings({
     global: { headless: true, use_system_chrome: true, screenshot_steps: false, screenshot_errors: true,
-              log_level: 'INFO', output_dir: 'output', log_dir: 'logs', data_retention_days: 90 },
+              log_level: 'INFO', output_dir: 'output', log_dir: 'logs', data_retention_days: 90, shared_drive_csv: '' },
     workers: {
       cuic: { enabled: true, url: 'https://148.151.32.77:8444/cuicui/Main.jsp', report_folder: 'Test',
               report_name: 'Z Call Type Historical All Fields', timeout_nav_ms: 30000, timeout_short_ms: 1500,

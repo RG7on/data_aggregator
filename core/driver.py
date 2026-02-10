@@ -27,6 +27,7 @@ if PROJECT_ROOT not in sys.path:
 
 from core.common_utils import process_worker_result, process_worker_result_long
 from core.config import get_global_settings, get_worker_settings, get_log_dir, PROJECT_ROOT as CFG_ROOT
+from core.database import init_db, export_csv, cleanup_old_data, migrate_csv_to_db
 
 # Configure logging
 LOG_DIR = get_log_dir()
@@ -144,6 +145,15 @@ def run_all_workers() -> Dict[str, Any]:
     logger.info(f"DRIVER STARTED - {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info("=" * 60)
     
+    # Initialise SQLite database (creates table if first run)
+    init_db()
+    
+    # One-time migration: import existing CSV rows into SQLite
+    try:
+        migrate_csv_to_db()
+    except Exception as e:
+        logger.debug(f"CSV migration check: {e}")
+    
     summary = {
         'start_time': start_time.isoformat(),
         'workers_found': 0,
@@ -221,6 +231,20 @@ def run_all_workers() -> Dict[str, Any]:
                 'error': str(e)
             }
     
+    # ── Post-run: export CSV + retention cleanup ──────────────────────
+    if summary['workers_succeeded'] > 0:
+        try:
+            export_csv()  # writes local CSV + shared drive if configured
+            logger.info("CSV export complete")
+        except Exception as e:
+            logger.error(f"CSV export failed: {e}")
+
+        try:
+            cleanup_old_data()
+            logger.info("Retention cleanup complete")
+        except Exception as e:
+            logger.error(f"Retention cleanup failed: {e}")
+
     # Log summary
     end_time = datetime.now()
     duration = (end_time - start_time).total_seconds()

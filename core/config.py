@@ -122,7 +122,8 @@ def _default_settings() -> dict:
             "log_level": "INFO",
             "output_dir": "output",
             "log_dir": "logs",
-            "data_retention_days": 90
+            "data_retention_days": 90,
+            "shared_drive_csv": ""
         },
         "workers": {
             "cuic": {
