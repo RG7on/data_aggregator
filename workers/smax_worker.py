@@ -704,17 +704,20 @@ class Worker(BaseWorker):
         """
         Read the display value from a SlickGrid cell.
         
-        Handles two cell types:
-        1. Text cells: just read inner_text()
-        2. Boolean/checkbox cells: look for li > label > span pattern
-           (SMAX renders booleans as checkbox icons inside this structure)
+        Handles multiple cell types:
+        1. Boolean/checkbox cells: look for li > label > span pattern
+        2. Percentage cells: preserve % symbol from display text
+        3. Text cells: read all visible text content
+        
+        Uses text_content() instead of inner_text() to capture ALL text,
+        including percentage symbols that might be in separate elements.
         """
         # First check for the checkbox/boolean pattern: li > label > span
         # (This is how SMAX renders boolean fields in the grid)
         label_span = cell.query_selector('li label span')
         if label_span:
             # Try to read text from the span (might be ✓, ☐, etc.)
-            text = label_span.inner_text().strip()
+            text = label_span.text_content().strip()
             if text:
                 return text
             
@@ -734,8 +737,9 @@ class Worker(BaseWorker):
         if checkbox:
             return 'true' if checkbox.is_checked() else 'false'
         
-        # Standard text cell — just read the text
-        return cell.inner_text().strip()
+        # Standard text cell — use text_content() to capture ALL text including % symbols
+        # text_content() captures text from all child nodes, even if % is in a separate span
+        return cell.text_content().strip()
     
     # ============================================================
     # Header Extraction (Title & Total)
