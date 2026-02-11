@@ -165,6 +165,24 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .filter-clear { font-size: 11px; color: var(--muted); cursor: pointer; margin-left: auto; }
   .filter-clear:hover { color: var(--red); }
+
+  /* ── SMAX Properties ──────────────────────────────────────────────── */
+  .smax-prop-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; }
+  .smax-prop-label { font-weight: 600; color: var(--muted); min-width: 110px; }
+  .smax-prop-badge { background: rgba(88,166,255,0.15); color: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+  .smax-filter-row { display: flex; align-items: flex-start; gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .smax-filter-row:last-child { border-bottom: none; }
+  .smax-filter-label { font-weight: 600; color: var(--accent); min-width: 120px; flex-shrink: 0; }
+  .smax-filter-sep { color: var(--muted); }
+  .smax-filter-value { color: var(--fg); }
+  .smax-presets { margin-top: 4px; }
+  .smax-preset-tag { display: inline-block; font-size: 11px; padding: 1px 6px; background: rgba(88,166,255,0.1); color: var(--accent); border-radius: 3px; margin: 2px 2px 0 0; }
+  .smax-chip { display: inline-block; font-size: 12px; padding: 2px 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; margin: 2px 2px 0 0; }
+  .smax-neg-badge { font-size: 10px; font-weight: 700; color: var(--red); background: rgba(248,81,73,0.15); padding: 1px 5px; border-radius: 3px; }
+  .smax-op-badge { font-size: 10px; font-weight: 600; color: var(--accent); background: rgba(88,166,255,0.1); padding: 1px 5px; border-radius: 3px; }
+  .smax-enum-opts { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .smax-enum-opt { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
+  .smax-enum-opt.active { background: rgba(63,185,80,0.15); color: var(--green); border-color: var(--green); }
 </style>
 </head>
 <body>
@@ -361,13 +379,21 @@
       <div class="field"><label>Username</label><input type="text" id="smax-user" value=""></div>
       <div class="field"><label>Password</label><input type="password" id="smax-pass" value=""></div>
     </div>
+  </div>
 
-    <h3>Report URLs</h3>
-    <div class="field">
-      <label>One URL per line</label>
-      <textarea id="smax-urls" rows="6"></textarea>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="margin:0">Reports</h2>
+      <button class="btn btn-secondary btn-sm" onclick="addSmaxReport()">+ Add Report</button>
     </div>
+    <div class="help">
+      Each report needs a <strong>URL</strong> (the full SMAX report link) and a <strong>label</strong> (short unique identifier for tracking).
+      Use <strong>Discover Properties</strong> to read the report's filters, group-by, function, and other settings from the live page.
+    </div>
+    <div id="smax-reports-list"></div>
+  </div>
 
+  <div class="card">
     <h3>Timeouts (ms)</h3>
     <div class="row">
       <div class="field"><label>Page Load</label><input type="number" id="smax-t-load" value="120000"></div>
@@ -430,6 +456,7 @@
 //  STATE
 // ══════════════════════════════════════════════════════════════════════════
 let cuicReports = [];
+let smaxReports = [];
 let scrapeStatus = {};
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -1002,14 +1029,197 @@ async function discoverFilters(reportIdx) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+//  SMAX REPORT CARDS
+// ══════════════════════════════════════════════════════════════════════════
+function renderSmaxReports() {
+  const container = document.getElementById('smax-reports-list');
+  if (!container) return;
+  if (smaxReports.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">No reports configured. Click "+ Add Report" to get started.</p>';
+    return;
+  }
+  container.innerHTML = smaxReports.map((r, i) => {
+    const st = scrapeStatus['smax:' + r.label];
+    let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
+    if (st) {
+      const icon = st.status === 'success' ? '\u2705' : st.status === 'error' ? '\u274C' : '\u26A0\uFE0F';
+      const dur = st.duration_s ? st.duration_s.toFixed(1) + 's' : '';
+      const msg = st.message ? ' \u2014 ' + esc(st.message) : '';
+      statusHtml = `<div class="status-bar"><span class="status-dot ${st.status}"></span>
+        <span>${icon} ${esc(st.timestamp)} \u00B7 ${st.row_count || 0} rows \u00B7 ${dur}${msg}</span></div>`;
+    }
+    const propsHtml = renderSmaxPropertiesPanel(r, i);
+    return `<div class="report-card ${r.enabled ? '' : 'disabled'}">
+      <div class="report-card-header">
+        <span class="label-tag">${esc(r.label || 'unnamed')}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div class="toggle-switch" style="margin:0">
+            <input type="checkbox" id="smax-rpt-en-${i}" ${r.enabled ? 'checked' : ''}
+              onchange="smaxReports[${i}].enabled=this.checked;renderSmaxReports()">
+            <label for="smax-rpt-en-${i}" style="font-size:12px">Enabled</label>
+          </div>
+          <button class="btn btn-icon btn-sm" onclick="removeSmaxReport(${i})" title="Remove">\uD83D\uDDD1\uFE0F</button>
+        </div>
+      </div>
+      <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="smaxReports[${i}].label=this.value" placeholder="e.g. sla_fcr_month"></div>
+      <div class="inline-row"><label>Report URL</label><input value="${attr(r.url)}" onchange="smaxReports[${i}].url=this.value" placeholder="https://smax.corp.pdo.om/reports/report/..."></div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+        <button class="btn-discover" id="smax-discover-btn-${i}" onclick="discoverSmaxProperties(${i})">
+          \u25B6 Discover Properties
+        </button>
+        <span style="font-size:11px;color:var(--muted)">Opens browser to read report properties (filters, group-by, etc.)</span>
+      </div>
+      ${propsHtml}
+      ${statusHtml}
+    </div>`;
+  }).join('');
+}
+
+function addSmaxReport() {
+  smaxReports.push({ label: '', url: '', enabled: true, properties: {} });
+  renderSmaxReports();
+  document.getElementById('smax-reports-list').lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function removeSmaxReport(i) {
+  smaxReports.splice(i, 1);
+  renderSmaxReports();
+}
+
+function renderSmaxPropertiesPanel(report, idx) {
+  const props = report.properties || {};
+  if (!props.report_name && !props.filters) return '';
+
+  let html = '<div class="filter-panel"><h4>\uD83D\uDCC4 Report Properties</h4>';
+
+  // Report metadata
+  if (props.report_name) html += `<div class="smax-prop-row"><span class="smax-prop-label">Report Name</span><span>${esc(props.report_name)}</span></div>`;
+  if (props.record_type) html += `<div class="smax-prop-row"><span class="smax-prop-label">Record Type</span><span class="smax-prop-badge">${esc(props.record_type)}</span></div>`;
+  if (props.group_by && props.group_by.length) html += `<div class="smax-prop-row"><span class="smax-prop-label">Group By</span><span>${props.group_by.map(g => esc(g)).join(', ')}</span></div>`;
+  if (props.func && (props.func.main || props.func.secondary)) {
+    const funcStr = [props.func.main, props.func.secondary].filter(Boolean).join(' by ');
+    html += `<div class="smax-prop-row"><span class="smax-prop-label">Function</span><span>${esc(funcStr)}</span></div>`;
+  }
+  if (props.chart_function) html += `<div class="smax-prop-row"><span class="smax-prop-label">Chart Function</span><span>${esc(props.chart_function)}</span></div>`;
+
+  // Filters
+  const filters = props.filters || [];
+  if (filters.length) {
+    html += '<div style="margin-top:10px"><strong style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Filters</strong></div>';
+    filters.forEach(f => {
+      const negBadge = f.negated ? '<span class="smax-neg-badge">NOT</span> ' : '';
+      const opBadge = f.operator && f.operator !== 'Is' ? `<span class="smax-op-badge">${esc(f.operator)}</span> ` : '';
+      let valueHtml = '';
+
+      if (f.type === 'date') {
+        valueHtml = `<span class="smax-filter-value">${esc(f.display_value || '')}</span>`;
+        if (f.date_presets && f.date_presets.length) {
+          valueHtml += `<div class="smax-presets">Presets: ${f.date_presets.map(p => '<span class="smax-preset-tag">' + esc(p.label) + '</span>').join(' ')}</div>`;
+        }
+      } else if (f.type === 'dropdown' || f.type === 'entity_picker') {
+        const vals = f.selected_values || [];
+        valueHtml = vals.map(v => '<span class="smax-chip">' + esc(v) + '</span>').join(' ');
+      } else if (f.type === 'enum') {
+        valueHtml = negBadge + esc(f.display_value || '');
+        if (f.enum_options && f.enum_options.length) {
+          valueHtml += '<div class="smax-enum-opts">' + f.enum_options.map(o =>
+            `<span class="smax-enum-opt${o.checked ? ' active' : ''}">${esc(o.label)}</span>`
+          ).join(' ') + '</div>';
+        }
+      } else {
+        valueHtml = esc(f.display_value || '');
+      }
+
+      html += `<div class="smax-filter-row">
+        <span class="smax-filter-label">${esc(f.field_label || f.field_id || '?')}</span>
+        <span class="smax-filter-sep">:</span>
+        <span>${opBadge}${f.type !== 'enum' ? negBadge : ''}${valueHtml}</span>
+      </div>`;
+    });
+  }
+
+  // Chart legend
+  if (props.chart_legend && props.chart_legend.length) {
+    html += '<div style="margin-top:10px"><strong style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Chart Legend</strong></div>';
+    props.chart_legend.forEach(item => {
+      html += `<div class="smax-prop-row"><span>${esc(item.label)}</span><span style="color:var(--accent)">${esc(item.value || '')}</span></div>`;
+    });
+  }
+
+  html += `<div style="margin-top:8px"><button class="btn-discover" style="font-size:11px;padding:4px 10px" onclick="discoverSmaxProperties(${idx})">\u25B6 Re-discover</button>
+    <button class="btn-discover" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="clearSmaxProperties(${idx})">\u2716 Clear</button></div>`;
+  html += '</div>';
+  return html;
+}
+
+function clearSmaxProperties(idx) {
+  smaxReports[idx].properties = {};
+  renderSmaxReports();
+  showToast('Properties cleared', 'info');
+}
+
+async function discoverSmaxProperties(idx) {
+  const report = smaxReports[idx];
+  const btn = document.getElementById('smax-discover-btn-' + idx);
+
+  if (!report.url) {
+    showToast('Set the report URL first', 'error');
+    return;
+  }
+
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> Discovering...';
+  btn.disabled = true;
+  showToast('Launching browser to read report properties... This may take 30-60s.', 'info');
+
+  try {
+    const res = await fetch('/api/discover-smax-properties', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ url: report.url })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      showToast('Discovery error: ' + data.error, 'error');
+      return;
+    }
+
+    // Store discovered properties
+    report.properties = data;
+
+    // Auto-set label from report name if label is empty
+    if (!report.label && data.report_name) {
+      report.label = data.report_name.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 30);
+    }
+
+    const filterCount = (data.filters || []).length;
+    showToast(`Discovered: "${data.report_name || 'report'}" with ${filterCount} filter(s)!`, 'success');
+    renderSmaxReports();
+
+  } catch(e) {
+    showToast('Discovery failed: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = origHtml;
+    btn.disabled = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 //  BUILD / POPULATE
 // ══════════════════════════════════════════════════════════════════════════
 function syncReportInputs() {
-  document.querySelectorAll('.report-card').forEach((card, i) => {
+  document.querySelectorAll('#cuic-reports-list .report-card').forEach((card, i) => {
     const inputs = card.querySelectorAll('.inline-row input');
     if (inputs[0]) cuicReports[i].label  = inputs[0].value;
     if (inputs[1]) cuicReports[i].folder = inputs[1].value;
     if (inputs[2]) cuicReports[i].name   = inputs[2].value;
+  });
+  document.querySelectorAll('#smax-reports-list .report-card').forEach((card, i) => {
+    const inputs = card.querySelectorAll('.inline-row input');
+    if (inputs[0]) smaxReports[i].label = inputs[0].value;
+    if (inputs[1]) smaxReports[i].url   = inputs[1].value;
   });
 }
 
@@ -1044,7 +1254,10 @@ function buildSettings() {
       smax: {
         enabled:              document.getElementById('smax-enabled').checked,
         base_url:             document.getElementById('smax-url').value,
-        report_urls:          document.getElementById('smax-urls').value.split('\n').map(s=>s.trim()).filter(Boolean),
+        reports:              smaxReports.map(r => ({
+          label: r.label, url: r.url, enabled: r.enabled !== false,
+          properties: r.properties || {}
+        })),
         page_load_timeout_ms: parseInt(document.getElementById('smax-t-load').value) || 120000,
         element_wait_timeout_ms: parseInt(document.getElementById('smax-t-elem').value) || 30000,
         tab_stagger_delay_ms: parseInt(document.getElementById('smax-t-stagger').value) || 2000,
@@ -1091,7 +1304,15 @@ function populateSettings(s) {
   const smax = (s.workers || {}).smax || {};
   setBool('smax-enabled', smax.enabled, false);
   setVal('smax-url', smax.base_url || 'https://smax.corp.pdo.om');
-  setVal('smax-urls', (smax.report_urls || []).join('\n'));
+  // Support both new 'reports' format and legacy 'report_urls' list
+  if (smax.reports && smax.reports.length) {
+    smaxReports = smax.reports.map(r => ({ label: r.label||'', url: r.url||'', enabled: r.enabled !== false, properties: r.properties||{} }));
+  } else if (smax.report_urls && smax.report_urls.length) {
+    smaxReports = smax.report_urls.map((u, i) => ({ label: 'report_' + (i+1), url: u, enabled: true, properties: {} }));
+  } else {
+    smaxReports = [];
+  }
+  renderSmaxReports();
   setVal('smax-t-load', smax.page_load_timeout_ms || 120000);
   setVal('smax-t-elem', smax.element_wait_timeout_ms || 30000);
   setVal('smax-t-stagger', smax.tab_stagger_delay_ms || 2000);
@@ -1138,6 +1359,7 @@ async function loadFromServer() {
       scrapeStatus = {};
       (data||[]).forEach(s => scrapeStatus[s.source+':'+s.report_label] = s);
       renderCuicReports();
+      renderSmaxReports();
       updateDashboard(data);
     }
     if (logRes?.ok) renderScrapeLog(await logRes.json());
@@ -1155,7 +1377,7 @@ async function loadFromServer() {
 //  DASHBOARD
 // ══════════════════════════════════════════════════════════════════════════
 function updateDashboard(statusData) {
-  document.getElementById('stat-total-reports').textContent = cuicReports.length;
+  document.getElementById('stat-total-reports').textContent = cuicReports.length + smaxReports.length;
   if (!statusData?.length) {
     document.getElementById('stat-last-run').textContent = 'Never';
     document.getElementById('stat-success-rate').textContent = '-';
@@ -1211,7 +1433,7 @@ function resetDefaults() {
               reports:[{label:'call_type_hist',folder:'Test',name:'Z Call Type Historical All Fields',enabled:true,filters:{}},
                       {label:'agent_hist',folder:'Stock/CCE/CCE_AF_Historical',name:'Agent Historical All Fields',enabled:true,filters:{}}],
               timeout_nav_ms:30000, timeout_short_ms:1500, timeout_medium_ms:2500, timeout_long_ms:8000 },
-      smax: { enabled:false, base_url:'https://smax.corp.pdo.om', report_urls:[],
+      smax: { enabled:false, base_url:'https://smax.corp.pdo.om', reports:[],
               page_load_timeout_ms:120000, element_wait_timeout_ms:30000, tab_stagger_delay_ms:2000, max_retries:2 }
     }
   });

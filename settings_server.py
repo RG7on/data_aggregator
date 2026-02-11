@@ -63,6 +63,8 @@ class SettingsHandler(BaseHTTPRequestHandler):
             self._save_json_file(CREDENTIALS_PATH)
         elif path == '/api/discover-filters':
             self._discover_filters()
+        elif path == '/api/discover-smax-properties':
+            self._discover_smax_properties()
         else:
             self.send_error(404)
 
@@ -86,6 +88,37 @@ class SettingsHandler(BaseHTTPRequestHandler):
             try:
                 from workers.cuic_worker import Worker as CuicWorker
                 result = CuicWorker.discover_wizard(report_config)
+                self._send_json(result)
+            finally:
+                with _discovery_lock:
+                    _discovery_running = False
+
+        except json.JSONDecodeError as e:
+            self._send_json({'error': f'Invalid JSON: {e}'}, status=400)
+        except Exception as e:
+            with _discovery_lock:
+                _discovery_running = False
+            self._send_json({'error': str(e)}, status=500)
+
+    # ── SMAX Report Properties discovery ──────────────────────────────────
+
+    def _discover_smax_properties(self):
+        """Launch a browser to read Report Properties from an SMAX report."""
+        global _discovery_running
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            report_config = json.loads(body)
+
+            with _discovery_lock:
+                if _discovery_running:
+                    self._send_json({'error': 'A discovery is already running. Please wait.'}, status=409)
+                    return
+                _discovery_running = True
+
+            try:
+                from workers.smax_worker import Worker as SmaxWorker
+                result = SmaxWorker.discover_properties(report_config)
                 self._send_json(result)
             finally:
                 with _discovery_lock:

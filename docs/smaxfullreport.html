@@ -1,0 +1,1316 @@
+<html class="no-js" lang="en" dir="ltr"><!--<![endif]--><head><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\:form{display:block;}</style>
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta charset="utf-8">
+    <!-- clickjacking defense -->
+    
+    <script type="text/javascript">
+        if (self === top) {
+            var antiClickjack = document.getElementById("antiClickjack");
+            antiClickjack.parentNode.removeChild(antiClickjack);
+        } else {
+            top.location = self.location;
+        }
+        _actualTenantId = 281542187;
+        _maasIsEssOnly = false;
+        _maasIsSingleTenantUser = true;
+        _navigationTrustedDomains = 'hpeswlab.net,swinfra.net,softwaregrp.net,microfocus.com,smax.corp.pdo.om';
+        _maasIsCustomDomain = true;
+        _farmUrl = 'https://mus-n-v00533.pdo.shell.om:443';
+    </script>
+    <!-- end clickjacking defense -->
+    <title ng-bind="title.value">Reports</title>
+    <meta name="description" content="">
+    <base href="/v27/">
+    <meta name="viewport" content="width=device-width ,initial-scale=1">
+    
+
+    
+    
+    <link rel="stylesheet" href="resources/css/third-party.631640ae26d703cc.css">
+<link rel="stylesheet" href="resources/css/saw-theme_part_1.6f53777c02449337.css">
+<link rel="stylesheet" href="resources/css/saw-theme_part_2.56f65baa1a38a6f9.css">
+<link rel="stylesheet" href="resources/css/saw-theme_part_3.c3f76a68d796385e.css">
+<link rel="stylesheet" href="resources/css/saw-theme_part_4.e59647c20b6d1887.css">
+<link rel="stylesheet" href="resources/css/saw-theme_part_5.067012256b628cf6.css">
+
+
+<style>.cke{visibility:hidden;}</style><style type="text/css" rel="stylesheet">.slickgrid_173108 .slick-header-column { left: 1000px; } .slickgrid_173108 .slick-top-panel { height:25px; } .slickgrid_173108 .slick-headerrow-columns { height:32px; } .slickgrid_173108 .slick-cell { height:59px; } .slickgrid_173108 .slick-row { height:60px; } .slickgrid_173108 .l0 { } .slickgrid_173108 .r0 { }</style><script src="lib/yfiles/prod/yfiles.min.js?2024-Mar-21-12:59:50"></script><link type="image/x-icon" rel="icon" href="/favicon-inverse.ico"></head>
+
+<body ng-controller="ApplicationCtrl">
+<!--[if lt IE 10]>
+<h2>Unsupported Browser</h2>
+<p>You are using an <strong>unsupported</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a>.</p>
+<p>HP MaaS supports IE 10 and above, Chrome and Firefox.</p>
+<p>If you’re using IE 10 please make sure you are not running in compatibility mode by following these steps:</p>
+<ol>
+    <li>Press "F12" to open developer tools</li>
+    <li>Press "ALT+9" to set the browser in standards mode. Your settings should look like the picture below.</li>
+    <li>Press "F12" again to close developer tools</li>
+    <li>Refresh your browser</li>
+</ol>
+<![endif]-->
+<!-- ngIf: applicationInitialized --><pl-palette ng-if="applicationInitialized" ng-hide="loading" class=""><div class="palette-body" ng-class="{palettevisible: visible}">
+    <!-- ngIf: visible -->
+</div>
+</pl-palette><!-- end ngIf: applicationInitialized -->
+<!-- ngIf: applicationInitialized --><header ng-if="applicationInitialized" ng-hide="loading" id="headerView" class="">
+    <!-- ngInclude: undefined --><ng-include src="appHeader" class=""><!-- ngIf: isStandardTheme && !isHighContrastMode -->
+<div class="navbar navbar-fixed-top navbar-inline" ng-class="{'masthead-dev-env-indicator': isDevTenant, 'masthead-trial-tenant-indicator': isTrialTenant, 'oob-theme': isStandardTheme}" ng-style="{'--headerBackgroundColor': headerBackgroundColor, '--logoBackgroundColor': logoBackgroundColor}" style="--headerBackgroundColor: #0073e7; --logoBackgroundColor: #00abf3;">
+    <div class="*nav main_navigation">
+        <div class="main-menu-navbar" role="navigation" aria-label="Main menu">
+    <div id="application-menu-main-button" class="application-menu-main-button inline-block" data-toggle="dropdown" ng-click="toggleMenu()" role="button" aria-label="Main menu dropdown" tabindex="0" click-enter="">
+        <img class="main-menu-button-icon" src="resources/images/icons/hamburger-new.svg" alt="">
+    </div>
+    <!-- ngIf: menuVisible -->
+</div>
+    </div>
+
+    <a aria-role="banner" data-aid="homepage-button" class="brand" ui-sref="platform_dashboard" href="/dashboard">
+        <span class="responsive-hide-3 brand-wrapper">
+            <!-- ngIf: isOOTBLogoPath -->
+            <!-- ngIf: !isOOTBLogoPath --><span ng-if="!isOOTBLogoPath" class="customBrandLogoContainer">
+                <img class="brandLogo" ng-src="../rest/281542187/frs/image-list/f371b386-8927-42a1-9918-af2ddf267eb0" alt="Back to dashboard" src="../rest/281542187/frs/image-list/f371b386-8927-42a1-9918-af2ddf267eb0">
+            </span><!-- end ngIf: !isOOTBLogoPath -->
+            <span class="divider-vertical-short"></span>
+            <span class="brandText">SMAX</span>
+            <!-- ngIf: showCeVersion -->
+        </span>
+    </a>
+
+    <div>
+        <div class="sub-menu-navbar">
+  <div class="sub-section">
+    Reports
+  </div>
+  <div class="inline-block" id="subitems" style="left: 23px;">
+    <div class="sub-menu-items-tabs show-items-tabs">
+      <!-- ngRepeat: subitem in selecteditem.sub_items --><div data-aid="sub-menu-item-reports" ng-repeat="subitem in selecteditem.sub_items" id="menu-subitem-0" class="subitem-link selected-subitem" ng-class="{'selected-subitem':subitem == selectedSubitem}" style="max-width: 512.633px;">
+        <!-- ngIf: !subitem.externalUrl || subitem == selectedSubitem --><a ng-if="!subitem.externalUrl || subitem == selectedSubitem" ui-sref="platform_reports" class="item-text" title="Reports" href="/reports" style="max-width: 484.633px;">Reports</a><!-- end ngIf: !subitem.externalUrl || subitem == selectedSubitem -->
+        <!-- ngIf: subitem.externalUrl && subitem != selectedSubitem -->
+        <button bs-dropdown="starDropdown" data-placement="bottom-left" class="star-button" aria-haspopup="true" aria-expanded="false" data-aid="star-reports" ng-click="starClicked(subitem)">
+          <span class="icon-12 icon-star-hollow" ng-class="{'icon-star star-background-yellow':subitem.isLandingPage, 'icon-star-hollow':!subitem.isLandingPage}" title="Set preferences for this page"></span>
+        </button>
+      </div><!-- end ngRepeat: subitem in selecteditem.sub_items --><div data-aid="sub-menu-item-schedules" ng-repeat="subitem in selecteditem.sub_items" id="menu-subitem-1" class="subitem-link" ng-class="{'selected-subitem':subitem == selectedSubitem}" style="max-width: 951.562px;">
+        <!-- ngIf: !subitem.externalUrl || subitem == selectedSubitem --><a ng-if="!subitem.externalUrl || subitem == selectedSubitem" ui-sref="platform_schedules" class="item-text" title="Schedules" href="/schedules" style="max-width: 923.562px;">Schedules</a><!-- end ngIf: !subitem.externalUrl || subitem == selectedSubitem -->
+        <!-- ngIf: subitem.externalUrl && subitem != selectedSubitem -->
+        <button bs-dropdown="starDropdown" data-placement="bottom-left" class="star-button" aria-haspopup="true" aria-expanded="false" data-aid="star-schedules" ng-click="starClicked(subitem)">
+          <span class="icon-12 icon-star-hollow" ng-class="{'icon-star star-background-yellow':subitem.isLandingPage, 'icon-star-hollow':!subitem.isLandingPage}" title="Set preferences for this page"></span>
+        </button>
+      </div><!-- end ngRepeat: subitem in selecteditem.sub_items -->
+    </div>
+    <div class="sub-menu-items-dropdown">
+      <div class="dropdown">
+        <a class="dropdown-toggle ng-scope" data-toggle="dropdown" role="button" aria-label="Submenu dropdown" click-enter="" tabindex="0">Reports<span class="main-menu-button__caret"></span></a>
+        <ul class="dropdown-menu" pl-bs-dropdown-body="" ng-class="{'dropdown-menu-right': reverseDirection}">
+          <!-- ngRepeat: subitem in selecteditem.sub_items --><li class="dropdown-menu-subitem" ng-repeat="subitem in selecteditem.sub_items">
+            <!-- ngIf: !subitem.externalUrl || subitem == selectedSubitem --><a ng-if="!subitem.externalUrl || subitem == selectedSubitem" data-aid="dd-sub-menu-item-reports" ui-sref="platform_reports" title="Reports" href="/reports" class="">Reports</a><!-- end ngIf: !subitem.externalUrl || subitem == selectedSubitem -->
+            <!-- ngIf: subitem.externalUrl && subitem != selectedSubitem -->
+          </li><!-- end ngRepeat: subitem in selecteditem.sub_items --><li class="dropdown-menu-subitem" ng-repeat="subitem in selecteditem.sub_items">
+            <!-- ngIf: !subitem.externalUrl || subitem == selectedSubitem --><a ng-if="!subitem.externalUrl || subitem == selectedSubitem" data-aid="dd-sub-menu-item-schedules" ui-sref="platform_schedules" title="Schedules" href="/schedules" class="">Schedules</a><!-- end ngIf: !subitem.externalUrl || subitem == selectedSubitem -->
+            <!-- ngIf: subitem.externalUrl && subitem != selectedSubitem -->
+          </li><!-- end ngRepeat: subitem in selecteditem.sub_items -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+    </div>
+
+    <div class="notification-area">
+        <ul class="notifications-container animation-fade ng-hide" ng-show="notifications.length &gt; 0" style="z-index: -1;">
+    <!-- ngRepeat: notification in notifications -->
+</ul>
+    </div>
+
+    <ul id="application-toolbar" pl-toolbar-keyboard-navigation="" role="toolbar">
+    <li class="item-performance">
+        <pl-performance><!-- ngIf: isEnabled -->
+</pl-performance>
+    </li>
+    <li class="item-click-trigger-enabled">
+        <div class="main-toolbar-icon-wrapper" role="button" ng-click="openSearch()" aria-label="Search" aria-expanded="false" pl-shortcut="mod+/" data-aid="main-toolbar-search-icon" tabindex="0">
+            <i class="icon-find"></i>
+        </div>
+    </li>
+    <li class="item-click-trigger-enabled">
+        <div class="main-toolbar-icon-wrapper" role="button" ng-click="showRecentConversations()" aria-label="Recent discussions" data-aid="conversation-item-open-con-btn" tabindex="-1">
+            <i class="icon-chat"></i>
+        </div>
+    </li>
+    <li class="item-click-trigger-enabled">
+        <div class="main-toolbar-icon-wrapper" role="button" ng-click="openHelpCenter()" aria-label="Help" pl-shortcut="mod+shift+/" id="help-container" tabindex="-1">
+            <i class="icon-help"></i>
+        </div>
+    </li>
+    <li ng-show="opticSwitcherJsIsReady" class="item-click-trigger-enabled ng-hide">
+        <div class="main-toolbar-icon-wrapper" role="button" data-aid="optic-switcher-icon" tabindex="-1">
+            <optic-switcher host-url=""></optic-switcher>
+        </div>
+    </li>
+    <!-- ngIf: isTrialTenant -->
+    <!-- ngIf: isDevTenant -->
+    <li class="logged-in-user-wrapper is-business" ng-class="{'is-business': !isDevTenant &amp;&amp; !isTrialTenant}" aria-label="Profile page">
+        <span class="dropdown" data-aid="main-toolbar">
+            <a id="main-toolbar-main-menu" data-toggle="dropdown" data-aid="main-toolbar-main-menu" role="button" aria-label="More actions" tabindex="-1">
+                <span class="logged-in-user-container" title="Al-Sarmi, Al-Muntaser IDSC14X" data-aid="main-toolbar-user-profile">
+    <a id="logged-in-user" class="logged-in-user-container" tabindex="-1">
+        <span id="logged-in-user-name">
+            <pl-avatar person="user" image-class="imageClass" size="imageSize" alt="alt"><span class="avatar-wrapper logged-in-user-image online-presence" ng-class="{'userOnline':onlineStatus, 'online-presence':isPresent}">
+    <pl-image class="ts-avatar" image-id="getImage()" image-class="imageClass" alt="alt" size="size"><img role="presentation" class="image-small-size logged-in-user-image ts-image" ng-src="resources/images/user_image.png" alt="" pl-fallback-image="resources/images/user_image.png" src="resources/images/user_image.png">
+</pl-image>
+</span>
+</pl-avatar>
+            <div class="responsive-hide-3 logged-in-user-fullName" title="Al-Sarmi, Al-Muntaser IDSC14X" dir="auto">Al-Sarmi, Al-Muntaser IDSC14X</div>
+        </span>
+    </a>
+</span>
+                <span class="icon-arrow-med-down"></span>
+            </a>
+            <ul class="dropdown-menu" pl-bs-dropdown-body="" data-aid="dropdown-action-menu">
+                <!-- ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-user-profile" class="">
+                    <!-- ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref --><a ng-if="!button.href &amp;&amp; button.sref" title="User profile" ui-sref="platform_profile_and_preferences_main" href="/home/profile/main" class="">User profile</a><!-- end ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-start-workflow-debug" class="ng-hide">
+                    <!-- ngIf: button.href --><a ng-if="button.href" title="Start debug" href="#" class="">Start debug</a><!-- end ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-community" class="">
+                    <!-- ngIf: button.href --><a ng-if="button.href" title="Community" href="https://community.microfocus.com/t5/SMAX-Suite/ct-p/ITSMA_Suite" target="_blank" class="">Community</a><!-- end ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-support-ticket" class="ng-hide">
+                    <!-- ngIf: button.href --><a ng-if="button.href" title="Proactive customer support" href="https://www.microfocus.com/pcs" target="_blank" class="">Proactive customer support</a><!-- end ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-logout" class="">
+                    <!-- ngIf: button.href --><a ng-if="button.href" title="Logout" href="#" class="">Logout</a><!-- end ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-mobile-app-instructions" class="">
+                    <!-- ngIf: button.href --><a ng-if="button.href" title="Mobile app activation" href="#" class="">Mobile app activation</a><!-- end ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid --><li ng-repeat="button in ::buttons track by button.dataAid" ng-show="button.visible === undefined || button.visible()" ng-click="(button.enabled &amp;&amp; !button.enabled()) || button.callback()" ng-class="{disabled: button.enabled &amp;&amp; !button.enabled()}" data-aid="main-toolbar-about" class="">
+                    <!-- ngIf: button.href --><a ng-if="button.href" title="About" href="#" class="">About</a><!-- end ngIf: button.href -->
+                    <!-- ngIf: !button.href && button.sref -->
+                </li><!-- end ngRepeat: button in ::buttons track by button.dataAid -->
+                <li>
+                    <span ng-show="showSwitchTenants" class="switch-tenants-div" show-switch-tenants="showSwitchTenants">
+    <div class="switch-tenant-loading ng-hide" ng-show="isLoading" data-ng-animate="{show: 'slide-down'}">Loading tenants...</div>
+    <div class="switch-tenant-content" ng-hide="isLoading" data-ng-animate="{show: 'slide-down'}">
+        <div class="switch-tenant-title">Switch Tenant</div>
+        <!-- ngRepeat: tenant in switchTenants -->
+        <div ng-show="showNoTenantsStatement" class="switch-tenant-content-no-result">
+        No tenant found.
+    </div>
+    </div>
+</span>
+                </li>
+            </ul>
+        </span>
+    </li>
+    <!-- ngInclude: 'js/modules/platform/ui/main-toolbar/recent-conversations-dlg-tmpl.html' --><div ng-include="'js/modules/platform/ui/main-toolbar/recent-conversations-dlg-tmpl.html'" class=""><div class="recent-conversations-div ng-hide" ng-show="showRecentConversationsFlag.flag" data-aid="recent-conversations-tab">
+    <pl-recent-conversations show-recent-conversations="showRecentConversationsFlag"><div class="recent-loading ng-hide" ng-show="isLoading" data-ng-animate="{show: 'slide-down'}">Loading discussions...</div>
+<div class="recent-conversations-list" ng-hide="isLoading" data-ng-animate="{show: 'slide-down'}">
+    <!-- ngRepeat: convItem in conversations -->
+    <div class="recent-show-more-div" ng-hide="hideMoreBtnVisible">
+        <a href="" ng-click="showMoreConvs()" data-aid="recent-show-more-link">Show more</a>
+    </div>
+    <!-- ngIf: !conversations || conversations.length === 0 --><div ng-if="!conversations || conversations.length === 0" class="">
+        <!-- ngInclude: 'js/modules/platform/ui/no-conversations-to-display-tmpl.html' --><div ng-include="'js/modules/platform/ui/no-conversations-to-display-tmpl.html'" class=""><div class="no-conversations-to-display ng-hide" ng-show="showNoConversationStatement">
+    <div class="no-conversations-demonstration-icon" data-aid="no-conversation-icon">
+        <i class="icon-chat"></i> <span class="conversations-bar-statement" aria-label="No discussion found">No discussion found</span>
+    </div>
+    <!-- ngIf: isEntityPermitted !== false --><div ng-if="isEntityPermitted !== false" class="no-conversations-tips">
+        <div class="no-conversation-statement" aria-label="Write your comments below">Write your comments below</div>
+        <span class="icon-arrowdown"></span>
+    </div><!-- end ngIf: isEntityPermitted !== false -->
+</div>
+</div>
+    </div><!-- end ngIf: !conversations || conversations.length === 0 -->
+</div></pl-recent-conversations>
+</div>
+</div>
+</ul>
+
+</div>
+<div class="application-header-wrap">
+    <div class="search-component" ng-controller="GlobalSearchController" role="search" aria-labeledby="Search">
+        <!-- ngIf: state.isVisible -->
+    </div>
+
+    <pl-header-banner ng-controller="timeoutActionCtrl" banner-message="message" banner-button-text="buttonText" banner-action-callback="refreshPage()" should-banner-appear="shouldBannerAppear()" header-banner-class="timeout-warning-message" header-banner-icon-class="icon-warning-inverted-triangle" automation-id="timeout-warning" class="header-banner-container" add-close-button="true"><div ng-class="headerBannerClass" class="timeout-warning-message" style="top: 56px;">
+    <!-- ngIf: shouldBannerAppear() && !headerBannerCtrl.bannerClosed -->
+</div>
+</pl-header-banner>
+
+    <pl-header-banner ng-controller="WorkflowDebugBannerCtrl" banner-message="debugStartedMessage" banner-button-text="stopDebugButtonText" banner-action-callback="stopDebugSession()" should-banner-appear="isDebugSessionActive()" header-banner-class="workflow-debug-header-banner" header-banner-icon-class="debug-recording-icon" automation-id="workflow-debug" class="header-banner-container"><div ng-class="headerBannerClass" class="workflow-debug-header-banner" style="top: 56px;">
+    <!-- ngIf: shouldBannerAppear() && !headerBannerCtrl.bannerClosed -->
+</div>
+</pl-header-banner>
+    <pl-header-banner ng-controller="DataOutdatedBannerCtrl" banner-message="dataOutdatedMessage" banner-button-text="reloadButtonText" banner-action-callback="refreshPage()" should-banner-appear="shouldBannerAppear()" header-banner-class="data-outdated-warning-message" header-banner-icon-class="icon-warning-inverted-triangle" automation-id="outdated-banner" class="header-banner-container"><div ng-class="headerBannerClass" class="data-outdated-warning-message">
+    <!-- ngIf: shouldBannerAppear() && !headerBannerCtrl.bannerClosed -->
+</div>
+</pl-header-banner>
+
+    <div>
+        <div ng-show="breadcrumbs.length &gt; 1" id="breadcrumbs" class="breadcrumbs ng-hide">
+    <ul class="breadcrumb">
+        <!-- ngRepeat: breadcrumb in breadcrumbs -->
+    </ul>
+</div>
+    </div>
+    <div>
+        <div id="application-header" class="application-header ng-hide" ng-show="header.headerText">
+    
+</div>
+    </div>
+
+</div>
+</ng-include>
+</header><!-- end ngIf: applicationInitialized -->
+
+<!-- ngIf: applicationInitialized --><!-- uiView:  --><div ng-if="applicationInitialized" ng-hide="loading" ui-view="" id="mainView" class=""><div class="absolute-position report-page-layout" data-aid="reports-page" style="top: 56px;">
+    <h1 class="h1-relative-position">Report Page</h1>
+    <div class="report-list pl-sidebar-anchor docked left" ng-class="[state, direction]" options="reportListSidebarOptions" data-aid="report-list">
+    <div class="pl-sidebar-wrapper">
+        <div class="pl-sidebar-header tool-bar toolbar">
+            <div ng-switch="" on="state">
+                <!-- ngSwitchWhen: collapsed -->
+                <!-- ngSwitchWhen: docked --><div ng-switch-when="docked" class="">
+                    <button type="button" class="btn btn-icon" ng-click="collapse()" data-aid="sidebar-btn-collapse" title="Collapse">
+                        <span class="collapsed icon-arrow-big-left" ng-class="{'icon-arrow-big-left' : direction === 'left', 'icon-arrow-big-right' : direction === 'right'}"></span>
+                    </button>
+                    <!-- ngIf: options.mode === 'default' -->
+                    <span ng-show="headerTitle" class="header-title" title="Reports list" role="heading" aria-level="3">Reports list</span>
+                </div><!-- end ngSwitchWhen: -->
+                <!-- ngSwitchDefault:  -->
+            </div>
+        </div>
+        <div class="pl-sidebar-content" ng-show="state !== 'collapsed'" data-aid="sidebar-content" ng-transclude="">
+        <!-- plSidebarContent: undefined -->
+    <pl-sidebar-content>
+            <!-- ngInclude: 'js/modules/platform/ui/reports/list/report-list-container-tmpl.html' --><div ng-include="'js/modules/platform/ui/reports/list/report-list-container-tmpl.html'" class=""><div ng-controller="ReportListContainerCtrl" class="report-list-container-layout">
+    <div class="report-display-toolbar tool-bar" data-aid="tool-bar-main-container" pl-toolbar-keyboard-navigation="" pl-toolbar="" items="toolbarItems" role="toolbar">
+    <!-- ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown --><span ng-switch-when="DropDown" data-aid="tool-bar-dd-container-new-report-actions" class="btn-group" ng-show="item.visible" ng-disabled="false">
+                <button role="listbox" aria-haspopup="true" aria-label="New" data-aid="tool-bar-main-dd-btn-new-report-actions" class="btn pl-toolbar-dropdown report-side-button" title="New" ng-class="{plToolbarItemDisabled:!dropDownEnabled, disabled:!dropDownEnabled}" data-toggle="dropdown" type="button" tabindex="0">
+                    <span data-ng-switch="item.type">
+                         <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+                             <span>
+                                 <!-- ngSwitchDefault: false -->
+                                 <!-- ngSwitchWhen: true --><div ng-switch-when="true" class="icon-new pl-toolbar-item-icon"></div><!-- end ngSwitchWhen: -->
+                             </span>New
+                         </span><!-- end ngSwitchWhen: -->
+                         <!-- ngSwitchWhen: text-only -->
+                     </span>
+                    <span class="caret"></span>
+                </button>
+                <span class="divider-vertical-short"></span>
+                <ul class="dropdown-menu pull-left" ng-class="reverseDirection ? 'pull-right' : 'pull-left'" pl-bs-dropdown-body="">
+                    <!-- ngRepeat: btn in item.buttons track by btn.dataAid --><li ng-repeat="btn in item.buttons track by btn.dataAid" class="">
+                        <a role="option" href="javascript:" ng-show="item.visible" aria-label="Analytic report" tabindex="-1" data-aid="tool-bar-inner-dd-btn-new-report-basicanalytical" type="submit" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" class="new-report-dropdown-item" ng-click="item.callback(item, $event)" ng-mouseenter="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = true)" ng-mouseleave="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = false)" pl-toolbar-button-in-dropdown="" item="btn">
+    <span data-ng-switch="::item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="::item.isGlyph" class="">
+            <span title="Analytic reports are calculated according to a defined schedule and can be generated for an unlimited amount of data.">
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><div ng-switch-when="true" class="icon-information pl-toolbar-item-icon"></div><!-- end ngSwitchWhen: -->
+            </span>
+            <!-- ngIf: ::item.premark !== undefined --><span ng-if="::item.premark !== undefined" class="toolbar-dropdown-before-item-mark">
+                <span class="analytic-badge">An</span>
+            </span><!-- end ngIf: ::item.premark !== undefined -->
+            <span class="toolbar-dropdown-item-text">Analytic report</span>
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: text-only -->
+        <!-- ngSwitchWhen: sub-dropdown -->
+    </span>
+</a>
+                    </li><!-- end ngRepeat: btn in item.buttons track by btn.dataAid --><li ng-repeat="btn in item.buttons track by btn.dataAid" class="">
+                        <a role="option" href="javascript:" ng-show="item.visible" aria-label="Operational report" tabindex="-1" data-aid="tool-bar-inner-dd-btn-new-report-basicoperational" type="submit" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" class="new-report-dropdown-item" ng-click="item.callback(item, $event)" ng-mouseenter="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = true)" ng-mouseleave="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = false)" pl-toolbar-button-in-dropdown="" item="btn">
+    <span data-ng-switch="::item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="::item.isGlyph" class="">
+            <span title="Operational reports reflect real-time aggregated data and are generated ad-hoc.">
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><div ng-switch-when="true" class="icon-information pl-toolbar-item-icon"></div><!-- end ngSwitchWhen: -->
+            </span>
+            <!-- ngIf: ::item.premark !== undefined --><span ng-if="::item.premark !== undefined" class="toolbar-dropdown-before-item-mark">
+                <span class="operational-badge">Op</span>
+            </span><!-- end ngIf: ::item.premark !== undefined -->
+            <span class="toolbar-dropdown-item-text">Operational report</span>
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: text-only -->
+        <!-- ngSwitchWhen: sub-dropdown -->
+    </span>
+</a>
+                    </li><!-- end ngRepeat: btn in item.buttons track by btn.dataAid --><li ng-repeat="btn in item.buttons track by btn.dataAid" class="">
+                        <a role="option" href="javascript:" ng-show="item.visible" aria-label="Operational raw data report" tabindex="-1" data-aid="tool-bar-inner-dd-btn-new-report-rawdataoperational" type="submit" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" class="new-report-dropdown-item" ng-click="item.callback(item, $event)" ng-mouseenter="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = true)" ng-mouseleave="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = false)" pl-toolbar-button-in-dropdown="" item="btn">
+    <span data-ng-switch="::item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="::item.isGlyph" class="">
+            <span title="Operational raw data reports reflect real-time data and are generated ad-hoc. They are useful for a limited amount of data.">
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><div ng-switch-when="true" class="icon-information pl-toolbar-item-icon"></div><!-- end ngSwitchWhen: -->
+            </span>
+            <!-- ngIf: ::item.premark !== undefined --><span ng-if="::item.premark !== undefined" class="toolbar-dropdown-before-item-mark">
+                <span class="operational-badge">Op</span>
+            </span><!-- end ngIf: ::item.premark !== undefined -->
+            <span class="toolbar-dropdown-item-text">Operational raw data report</span>
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: text-only -->
+        <!-- ngSwitchWhen: sub-dropdown -->
+    </span>
+</a>
+                    </li><!-- end ngRepeat: btn in item.buttons track by btn.dataAid --><li ng-repeat="btn in item.buttons track by btn.dataAid" class="">
+                        <a role="option" href="javascript:" ng-show="item.visible" aria-label="Survey analytic report" tabindex="-1" data-aid="tool-bar-inner-dd-btn-new-report-surveyanalytical" type="submit" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" class="new-report-dropdown-item" ng-click="item.callback(item, $event)" ng-mouseenter="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = true)" ng-mouseleave="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = false)" pl-toolbar-button-in-dropdown="" item="btn">
+    <span data-ng-switch="::item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="::item.isGlyph" class="">
+            <span title="Survey reports are analytic reports based on the results of a survey">
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><div ng-switch-when="true" class="icon-information pl-toolbar-item-icon"></div><!-- end ngSwitchWhen: -->
+            </span>
+            <!-- ngIf: ::item.premark !== undefined --><span ng-if="::item.premark !== undefined" class="toolbar-dropdown-before-item-mark">
+                <span class="analytic-badge">An</span>
+            </span><!-- end ngIf: ::item.premark !== undefined -->
+            <span class="toolbar-dropdown-item-text">Survey analytic report</span>
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: text-only -->
+        <!-- ngSwitchWhen: sub-dropdown -->
+    </span>
+</a>
+                    </li><!-- end ngRepeat: btn in item.buttons track by btn.dataAid -->
+                </ul>
+            </span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-remove-report" tabindex="0" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Delete" class="btn btn-icon plToolbarItem report-side-button tool-bar-btn-remove-report plToolbarItemDisabled disabled" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Delete " disabled="disabled">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-delete pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Delete
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) -->
+    <!-- ngIf: secondaryItems && secondaryItems.length -->
+</div>
+    <span data-aid="search-component">
+        <input type="text" placeholder="Search report ..." ng-model="searchInput" ng-change="onSearchInputChanged()" class="search-icon ng-pristine ng-untouched ng-valid" data-aid="search-report" name="">
+    </span>
+
+    <pl-report-list selected-report="selectedReport" api="reportListApi" show-mine-only="showMineOnly" show-in-active="true" check-revert-needed="checkRevertReportSelectionChange"><div class="report-list-layout">
+    <div class="report-grid">
+        <pl-grid name="reportsGrid" options="gridOptions" grid-id="grid-reportList" role="grid" class="slickgrid_173108 ui-widget platform-grid" data-aid="pl-grid" style="overflow: hidden; outline: 0px; position: relative;"><div ng-show="status.isLoading" class="progress progress-striped grid-loading active ng-hide"><div class="bar"></div></div><!-- ngIf: status.error --><div ng-transclude=""></div><div tabindex="0" hidefocus="" style="position:fixed;width:0;height:0;top:0;left:0;outline:0;"></div><div class="slick-header ui-state-default" style="overflow:hidden;position:relative;"><div class="slick-header-columns ui-sortable" style="left: -1000px; width: 1272px;" role="row" unselectable="on"><div class="ui-state-default slick-header-column slick-header-sortable grid_header_itemId ui-sortable-handle" role="columnHeader" id="slickgrid_173108itemId" title="" data-aid="grid_header_itemId" tabindex="0" click-enter="true" style="width: 246px;"><span class="slick-column-name">itemId</span><span class="slick-sort-indicator"></span></div></div></div><div class="slick-headerrow ui-state-default" style="overflow: hidden; position: relative; display: none;"><div class="slick-headerrow-columns" style="width: 262px;"></div><div style="display: block; height: 1px; position: absolute; top: 0px; left: 0px; width: 272px;"></div></div><div class="slick-top-panel-scroller ui-state-default" style="overflow: hidden; position: relative; display: none;"><div class="slick-top-panel" style="width:10000px"></div></div><div class="slick-viewport" style="width: 100%; overflow: auto; outline: 0px; position: relative; height: 698px;"><div class="grid-canvas" style="width: 262px; height: 46980px;"><div class="ui-widget-content slick-row even no-background-hover recent-row" style="top:0px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="report-header-item">Recently Viewed</div></div></div></div><div class="ui-widget-content slick-row odd" style="top:60px" role="row"><div class="slick-cell l0 r0 selected" tabindex="-1" role="gridcell" title=""><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="SLA&nbsp;-FCR&nbsp;This&nbsp;Month&nbsp;-&nbsp;80%&nbsp;-&nbsp;Incident&nbsp;Excluded">SLA&nbsp;-FCR&nbsp;This&nbsp;Month&nbsp;-&nbsp;80%&nbsp;-&nbsp;Incident&nbsp;Excluded</span></div></div></div><div class="ui-widget-content slick-row even" style="top:120px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="ISC:&nbsp;First&nbsp;Touch&nbsp;Response&nbsp;&lt;1&nbsp;hour&nbsp;-&nbsp;monta">ISC:&nbsp;First&nbsp;Touch&nbsp;Response&nbsp;&lt;1&nbsp;hour&nbsp;-&nbsp;monta</span></div></div></div><div class="ui-widget-content slick-row odd" style="top:180px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="Aging&nbsp;Requests">Aging&nbsp;Requests</span></div></div></div><div class="ui-widget-content slick-row even" style="top:240px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="ISC:&nbsp;First&nbsp;Touch&nbsp;Response&nbsp;&lt;1&nbsp;hour">ISC:&nbsp;First&nbsp;Touch&nbsp;Response&nbsp;&lt;1&nbsp;hour</span></div></div></div><div class="ui-widget-content slick-row odd" style="top:300px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="BIA&nbsp;Requests">BIA&nbsp;Requests</span></div></div></div><div class="ui-widget-content slick-row even no-background-hover all-report-row" style="top:360px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="report-header-item">All Reports</div></div></div></div><div class="ui-widget-content slick-row odd no-background-hover sort-row" style="top:420px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="report-sort-item"><span class="report-sort-item-label" title="Sort by:">Sort by:</span><div class="select2-container report-sort-selection" id="s2id_autogen5"><a href="javascript:void(0)" class="select2-choice" tabindex="-1">   <span class="select2-chosen" id="select2-chosen-6">Report Name A-Z</span><abbr class="select2-search-choice-close"></abbr>   <span class="select2-arrow" role="presentation"><b role="presentation"></b></span></a><label for="s2id_autogen6" class="select2-offscreen"></label><input class="select2-focusser select2-offscreen" type="text" aria-haspopup="true" role="button" aria-labelledby="select2-chosen-6" id="s2id_autogen6"><div class="select2-drop select2-display-none">   <div class="select2-search select2-search-hidden select2-offscreen">       <label for="s2id_autogen6_search" class="select2-offscreen"></label>       <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input" role="combobox" aria-expanded="true" aria-autocomplete="list" aria-owns="select2-results-6" id="s2id_autogen6_search" placeholder="">   </div>   <ul class="select2-results" role="listbox" id="select2-results-6">   </ul></div></div><select class="report-sort-selection select2-offscreen" tabindex="-1" title=""><option value="Name">Report Name A-Z</option><option value="Access">Access (Private/Group/Public) </option><option value="IsActive">State (Active/Inactive) </option><option value="TemplateId">Report type (Analytic/Operational) </option></select></div></div></div></div><div class="ui-widget-content slick-row even" style="top:480px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-subscription"><div class="pl-color-badge-type" title="Subscription">Subscription</div></div><span class="report-item-text" title="Active&nbsp;cloud&nbsp;subscriptions">Active&nbsp;cloud&nbsp;subscriptions</span></div></div></div><div class="ui-widget-content slick-row odd" style="top:540px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-release"><div class="pl-color-badge-type" title="Release">Release</div></div><span class="report-item-text" title="Active&nbsp;releases&nbsp;by&nbsp;phase&nbsp;and&nbsp;type">Active&nbsp;releases&nbsp;by&nbsp;phase&nbsp;and&nbsp;type</span></div></div></div><div class="ui-widget-content slick-row even" style="top:600px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-incident"><div class="pl-color-badge-type" title="Incident">Incident</div></div><span class="report-item-text" title="Aging&nbsp;Incidents">Aging&nbsp;Incidents</span></div></div></div><div class="ui-widget-content slick-row odd" style="top:660px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-incident"><div class="pl-color-badge-type" title="Incident">Incident</div></div><span class="report-item-text" title="Aging&nbsp;Incidents&nbsp;status">Aging&nbsp;Incidents&nbsp;status</span></div></div></div><div class="ui-widget-content slick-row even" style="top:720px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="Aging&nbsp;Requests">Aging&nbsp;Requests</span></div></div></div><div class="ui-widget-content slick-row odd" style="top:780px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="(&nbsp;AI)&nbsp;fulfilled&nbsp;request&nbsp;past&nbsp;one&nbsp;year">(&nbsp;AI)&nbsp;fulfilled&nbsp;request&nbsp;past&nbsp;one&nbsp;year</span></div></div></div><div class="ui-widget-content slick-row even" style="top:840px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="all_reort1">all_reort1</span></div></div></div><div class="ui-widget-content slick-row odd" style="top:900px" role="row"><div class="slick-cell l0 r0" tabindex="-1" role="gridcell"><div><div class="color-badge-general pl-color-badge-request"><div class="pl-color-badge-type" title="Request">Request</div></div><span class="report-item-text" title="All_report">All_report</span></div></div></div></div></div><div tabindex="0" hidefocus="" style="position:fixed;width:0;height:0;top:0;left:0;outline:0;"></div></pl-grid>
+        <!-- ngIf: showNoDataMessage -->
+    </div>
+    <!-- ngIf: showInActive --><div ng-if="showInActive" class="report-footer">
+        <label class="checkboxes">
+            <input role="checkbox" type="checkbox" ng-model="displayInactive" ng-change="onDisplayInactiveChanged()" pl-highlight-on-focus="" name="" class="ng-pristine ng-untouched ng-valid">
+            <span></span>
+        </label>
+        <span class="checkbox-label" title="Display inactive reports">Display inactive reports</span>
+    </div><!-- end ngIf: showInActive -->
+</div>
+
+</pl-report-list>
+    <!-- ngIf: influenceQuota --><div class="report-list-container-progress-bar" data-aid="quota-bar" ng-if="influenceQuota" bs-tooltip="quotaTooltip" html="true">
+        <div class="progress">
+            <div class="progress-bar" data-aid="progress-bar" role="progressbar" aria-valuenow="26" aria-valuemin="0" aria-valuemax="100" ng-style="quotaStyle" style="width: 26%; background-color: rgb(0, 150, 214);">
+            </div>
+        </div>
+        <div id="quotaText" class="quota-text" data-aid="quota-text" ng-style="quotaTextStyle" style="color: rgb(63, 63, 63);">&nbsp;&nbsp;26% used</div>
+    </div><!-- end ngIf: influenceQuota -->
+</div></div>
+        </pl-sidebar-content></div>
+    </div>
+</div>
+    <!-- uiView:  --><div ui-view="" class="report-page-sub-area"><div class="report-properties pl-sidebar-anchor docked right" ng-class="[state, direction]" options="propertiesSidebarOptions" data-aid="report-properties">
+    <div class="pl-sidebar-wrapper">
+        <div class="pl-sidebar-header tool-bar toolbar">
+            <div ng-switch="" on="state">
+                <!-- ngSwitchWhen: collapsed -->
+                <!-- ngSwitchWhen: docked --><div ng-switch-when="docked" class="">
+                    <button type="button" class="btn btn-icon" ng-click="collapse()" data-aid="sidebar-btn-collapse" title="Collapse">
+                        <span class="collapsed icon-arrow-big-right" ng-class="{'icon-arrow-big-left' : direction === 'left', 'icon-arrow-big-right' : direction === 'right'}"></span>
+                    </button>
+                    <!-- ngIf: options.mode === 'default' -->
+                    <span ng-show="headerTitle" class="header-title" title="Report properties" role="heading" aria-level="3">Report properties</span>
+                </div><!-- end ngSwitchWhen: -->
+                <!-- ngSwitchDefault:  -->
+            </div>
+        </div>
+        <div class="pl-sidebar-content" ng-show="state !== 'collapsed'" data-aid="sidebar-content" ng-transclude="">
+    <!-- plSidebarContent: undefined -->
+<pl-sidebar-content>
+        <!-- ngInclude: 'js/modules/platform/ui/reports/properties/report-properties-container-tmpl.html' --><div class="report-properties-container" ng-include="'js/modules/platform/ui/reports/properties/report-properties-container-tmpl.html'"><div class="report-properties-container-layout" ng-controller="ReportPropertiesContainerCtrl">
+    <div class="navbar">
+        <ul class="nav">
+            <!-- ngRepeat: tab in model.propertiesTabs --><li class="tab-link active" ng-repeat="tab in model.propertiesTabs" ng-class="{active: tab.active, disabled: tab.disabled}" data-aid="general">
+                <a data-toggle="tab" ng-click="setCurrentTab(tab,$event)" title="">General </a>
+            </li><!-- end ngRepeat: tab in model.propertiesTabs --><li class="tab-link" ng-repeat="tab in model.propertiesTabs" ng-class="{active: tab.active, disabled: tab.disabled}" data-aid="chart">
+                <a data-toggle="tab" ng-click="setCurrentTab(tab,$event)" title="">Chart </a>
+            </li><!-- end ngRepeat: tab in model.propertiesTabs --><li class="tab-link" ng-repeat="tab in model.propertiesTabs" ng-class="{active: tab.active, disabled: tab.disabled}" data-aid="details">
+                <a data-toggle="tab" ng-click="setCurrentTab(tab,$event)" title="">Details </a>
+            </li><!-- end ngRepeat: tab in model.propertiesTabs -->
+        </ul>
+        <!-- ngIf: (isSystem | bool) -->
+    </div>
+
+    <div class="report-tabs-content">
+        <!-- ngRepeat: tab in model.propertiesTabs --><div class="tabContent" ng-repeat="tab in model.propertiesTabs">
+            <!-- ngInclude: tab.templateUrl --><div ng-include="tab.templateUrl" ng-class="{active: tab.active}" ng-show="tab.active == true" data-aid="general-content" class="active"><div class="property-grid-container report-properties-general-tab" ng-controller="ReportTabGeneralCtrl">
+    <div class="report-properties-general-tab-content">
+        <ng-form name="generalTabForm" novalidate="" class="ng-valid ng-valid-required ng-dirty ng-valid-parse">            
+            <pl-presenter-container presenter-mode="view" container-type="report-properties-general-tab-content">
+                <!-- ngRepeat: fieldMetadata in METADATA --><div ng-repeat="fieldMetadata in METADATA" class="">
+                    <!-- ngIf: fieldMetadata.hidden !== true --><div data-aid="field-att-container-" ng-if="fieldMetadata.hidden !== true" class="row-fluid row-margin">
+                        <div class="col-md-3 label-container">
+                            <span class="report-properties-label" title="Report name">Report name</span>
+                            <span class="requiredAsterisk ng-hide" ng-show="fieldMetadata.required &amp;&amp; fieldsMode !== 'view' | bool ">*</span>
+                        </div>
+                        <div class="col-md-9 field-container">
+                            <div item="reportConfigModel.MetaData" field-metadata="fieldMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/textbox/textbox-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/textbox/textbox-viewer-tmpl.html'" class=""><div data-aid="report-properties-general-tab-content_Name" data-control-type="TextBox">SLA -FCR This Month - 80% - Incident Excluded</div></div></span><!-- end of pl-presenter --></div>
+                            <!-- ngIf: generalTabForm[fieldMetadata.name].$invalid -->
+                        </div>
+                    </div><!-- end ngIf: fieldMetadata.hidden !== true -->
+                </div><!-- end ngRepeat: fieldMetadata in METADATA --><div ng-repeat="fieldMetadata in METADATA" class="">
+                    <!-- ngIf: fieldMetadata.hidden !== true --><div data-aid="field-att-container-" ng-if="fieldMetadata.hidden !== true" class="row-fluid row-margin">
+                        <div class="col-md-3 label-container">
+                            <span class="report-properties-label" title="Display label">Display label</span>
+                            <span class="requiredAsterisk ng-hide" ng-show="fieldMetadata.required &amp;&amp; fieldsMode !== 'view' | bool ">*</span>
+                        </div>
+                        <div class="col-md-9 field-container">
+                            <div item="reportConfigModel.MetaData" field-metadata="fieldMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/multi-lang-editor/multi-lang-editor-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/multi-lang-editor/multi-lang-editor-viewer-tmpl.html'" class=""><span ng-controller="multiLangEditorViewerCtrl" ng-bind="displayMsg(field.value)">SLA -FCR This Month - 80% - Incident Excluded</span></div></span><!-- end of pl-presenter --></div>
+                            <!-- ngIf: generalTabForm[fieldMetadata.name].$invalid -->
+                        </div>
+                    </div><!-- end ngIf: fieldMetadata.hidden !== true -->
+                </div><!-- end ngRepeat: fieldMetadata in METADATA -->
+                <!-- ngInclude:  --><div ng-include="" src="recordTypeCustomItem.templateUrl" class=""><div ng-controller="ReportRecordTypeCtrl" class="row-fluid row-margin">
+    <div class="col-md-3 label-container">
+        <span class="report-properties-label" title="Record type">Record type</span>
+        <span class="requiredAsterisk ng-hide" ng-show="EntityTypeMetadata.required &amp;&amp; fieldsMode !== 'view' | bool ">*</span>
+    </div>
+    <div class="col-md-9" data-aid="record-type">
+        <div item="reportConfigModel.getTemplateConfig()" field-metadata="EntityTypeMetadata" initial-mode="edit" on-apply-field-value="onEntityTypeChange(newValue, oldValue, fieldMetadata)"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="report-properties-general-tab-content_EntityType" data-control-type="EntityTypePicker" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">Request</div>
+</div></span><!-- end of pl-presenter --></div>
+        <!-- ngIf: generalTabForm[EntityTypeMetadata.name].$invalid -->
+    </div>
+</div>
+</div>
+            </pl-presenter-container>
+
+            <!-- ngInclude:  --><div ng-include="" src="filterCustomItem.templateUrl" class=""><div ng-controller="ReportFilterCtrl">
+    <pl-presenter-container presenter-mode="view" container-type="report-properties-general-tab-filter">
+        <div class="row-fluid row-margin">
+            <div class="col-md-3 label-container">
+                <span>Filter by</span>
+            </div>
+            <div class="col-md-9">
+                <div class="report-filter-property" item="FilterContainer" field-metadata="FilterMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><pl-filter-panel fields="field.metadata.filterAvailableFields" filter-syntax="field.metadata.filterSyntax" filter-map="field.value" filter-panel-key="panelFilter" flavor="field.metadata.flavor" related-options="field.metadata.relatedOptions" filter-panel-mode="view" class="platform-filter-panel"><!-- ngRepeat: config in fieldFilterConfigs --><pl-filter-field ng-repeat="config in fieldFilterConfigs" available-fields-metadata="config.availableFields" field-metadata="config.field" field-predicate="config.fieldPredicate" remove="removeField(filterKey,config.fullFieldName)" add="addNewField(fieldName)" apply="applyFieldFilter(config.fullFieldName, filterFieldName, filterFieldPredicate, config.filterKey)" use-non-searchable-query-method="canUseNonSearchable(filterKey)" get-selected-filters="getCurrentlySelectedFilters()" related-field-information="config.relatedFieldInformation" filter-mode="config.filterMode" filter-key="config.filterKey" flavor="flavor" disable-related-fields="disableRelatedFields" disable-related-per-entity="disableRelatedPerEntity" should-disable-advance-options="disableAdvanceOptions" get-non-negation-fields-amount="getNonNegationFieldsLength(config.filterKey)" container-options="containerOptions" class="platform-filter-field normal"><!-- ngIf: fieldSelectorShown -->
+<span data-aid="filter_field_CloseTime" ng-click="showFieldSelector()" ng-hide="fieldSelectorShown" class="platform-filter-field-viewer" role="button" tabindex="0" click-enter="">
+    Closed time
+</span>
+<span class="platform-filter-field-viewer-separator">:</span>
+<div ng-click="showPredicateEditor()" ng-hide="predicateEditorShown" class="platform-filter-field-predicate-viewer" role="button" tabindex="0" click-enter="" data-aid="datetime_filter_viewer" title="from 12/01/2024 to 12/23/2024">from 12/01/2024 to 12/23/2024</div>
+<div ng-show="predicateEditorShown" class="platform-filter-field-predicate-editor ng-hide"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/date-filter/date-filter-editor-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/date-filter/date-filter-editor-tmpl.html'" class=""><div data-aid="date_filter_editor" ng-controller="DateFilterEditorController" class="menu open dateFilterPanel">
+    <span class="displayValue">from 12/01/2024 to 12/23/2024</span>
+    <span class="icon-blue-down" ng-click="openDropDown()"></span>
+    <ul class="dropdown-menu dropdown-menu-date pull-left" ng-class="reverseDirection? 'pull-right' : 'pull-left'">
+        <!-- ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-noValue" ng-click="applyDateFilter(range)">&lt;No Value&gt;</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-today" ng-click="applyDateFilter(range)">Today</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-yesterday" ng-click="applyDateFilter(range)">Yesterday</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-previousMonth" ng-click="applyDateFilter(range)">Previous month</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-last7days" ng-click="applyDateFilter(range)">Past week</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-lastMonth" ng-click="applyDateFilter(range)">Past month</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-lastYear" ng-click="applyDateFilter(range)">Past year</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-tomorrow" ng-click="applyDateFilter(range)">Tomorrow</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-currentMonth" ng-click="applyDateFilter(range)">This month</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-nextWeek" ng-click="applyDateFilter(range)">Next week</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-nextMonth" ng-click="applyDateFilter(range)">Next month</a></li><!-- end ngRepeat: range in ranges --><li ng-repeat="range in ranges" ng-hide="isDateRangeShown" class=""><a data-aid="date-range-picker-nextYear" ng-click="applyDateFilter(range)">Next year</a></li><!-- end ngRepeat: range in ranges -->
+        <div ng-show="isShowDateRanges">
+            <li class="divider" ng-hide="isDateRangeShown"></li>
+            <!-- ngIf: isDateRangeShown -->
+            <!--<li ng-hide="isDateRangeShown"><a ng-click="showRange()">{{'default:filter.dateFilter.between' |-->
+            <!--i18nf}}</a></li>-->
+            <li ng-hide="isDateRangeShown"><a class="date-filter-editor-dates" data-aid="date-filter-editor-dates" ng-click="isDateRangeShown = true">Choose dates...</a></li>
+            <!-- ngIf: isDateRangeShown -->
+        </div>
+    </ul>
+</div></div></div>
+<!-- ngIf: filterMode === 'normal' -->
+</pl-filter-field><!-- end ngRepeat: config in fieldFilterConfigs --><pl-filter-field ng-repeat="config in fieldFilterConfigs" available-fields-metadata="config.availableFields" field-metadata="config.field" field-predicate="config.fieldPredicate" remove="removeField(filterKey,config.fullFieldName)" add="addNewField(fieldName)" apply="applyFieldFilter(config.fullFieldName, filterFieldName, filterFieldPredicate, config.filterKey)" use-non-searchable-query-method="canUseNonSearchable(filterKey)" get-selected-filters="getCurrentlySelectedFilters()" related-field-information="config.relatedFieldInformation" filter-mode="config.filterMode" filter-key="config.filterKey" flavor="flavor" disable-related-fields="disableRelatedFields" disable-related-per-entity="disableRelatedPerEntity" should-disable-advance-options="disableAdvanceOptions" get-non-negation-fields-amount="getNonNegationFieldsLength(config.filterKey)" container-options="containerOptions" class="platform-filter-field normal"><!-- ngIf: fieldSelectorShown -->
+<span data-aid="filter_field_PhaseId" ng-click="showFieldSelector()" ng-hide="fieldSelectorShown" class="platform-filter-field-viewer" role="button" tabindex="0" click-enter="">
+    Phase Id
+</span>
+<span class="platform-filter-field-viewer-separator">:</span>
+<div ng-click="showPredicateEditor()" ng-hide="predicateEditorShown" class="platform-filter-field-predicate-viewer" role="button" tabindex="0" click-enter="" title=" "><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/data-provider-based-list-filter/data-provider-based-list-filter-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/data-provider-based-list-filter/data-provider-based-list-filter-viewer-tmpl.html'" class=""><!-- ngIf: field.value && field.value.filterNegationOperator === true -->
+<span data-control-type="DropDownPredicate" pl-data-provider-item-label="" field-value="field.valueId" data-provider="field.metadata.dataProvider">Close, Accept</span>
+</div></div>
+<div ng-show="predicateEditorShown" class="platform-filter-field-predicate-editor ng-hide"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/data-provider-based-list-filter/data-provider-based-list-filter-editor-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/data-provider-based-list-filter/data-provider-based-list-filter-editor-tmpl.html'" class=""><!--<div data-aid="{{field.metadata.formName || containerType}}_{{field.metadata.modelAttribute || field.metadata.name}}" data-control-type="{{field.metadata.presentationId}}">-->
+<div ng-controller="DataProviderBasedListFilterEditorController" data-control-type="DropDownPredicate">
+    <pl-filter-advance-button value="filterNegationOperator" selector-fields="advanceButtonSelectorOptions" show-dropdown="false" disable-advance-options="disableAdvanceOptions"><span ng-show="disableAdvanceOptions !== true" data-aid="filter-advance-options" tabindex="0">
+    <i ng-show="!shouldShowDropdown" class="filter-advance-button-icon icon-add" ng-click="openSelectDropDown()" data-aid="open-advance-filter-options" title="Advanced options" role="button" tabindex="0" click-enter=""></i>
+    <select class="filter-advance-dropdown ng-pristine ng-untouched ng-valid ng-hide" ng-show="shouldShowDropdown === true" ng-model="selectedOption" ng-options="option.localizedLabel for option in selectorFields" data-aid="filter-advance-options-selector" tabindex="0" click-enter="" name=""><option value="0" selected="selected" label="Is">Is</option><option value="1" label="Is not">Is not</option></select>
+</span></pl-filter-advance-button>
+    <div pl-drop-down="" field-value="field.valueId" field-metadata="field.metadata" options="options" get-data="getData()" pl-set-editor-focus="" pl-leave-on-blur="">
+    <div class="select2-container select2-container-multi drop-down-list ng-pristine ng-untouched ng-valid ng-valid-required" id="s2id_autogen3"><ul class="select2-choices">  <li class="select2-search-choice">    <div>Close</div>    <a href="#" class="select2-search-choice-close" tabindex="-1"></a></li><li class="select2-search-choice">    <div>Accept</div>    <a href="#" class="select2-search-choice-close" tabindex="-1"></a></li><li class="select2-search-field">    <label for="s2id_autogen4" class="select2-offscreen"></label>    <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input" id="s2id_autogen4" placeholder="" style="width: 10px;">  </li></ul><div class="select2-drop select2-drop-multi select2-display-none entity-picker-of-undefined intelligent-suggestions-entity-picker">   <ul class="select2-results">   <li class="select2-no-results">No matches found</li><li class="select2-no-results">No matches found</li><li class="select2-no-results">No matches found</li></ul></div></div><input type="hidden" ui-select2="select2Options" ng-model="fieldValue" ng-model-options="{ allowInvalid: true }" ng-change="selectionChanged()" ng-required="fieldMetadata.required | bool" name="PhaseId" ng-class="{'ng-error': fieldMetadata.error}" ng-disabled="select2Options.disabled()" class="drop-down-list ng-pristine ng-untouched ng-valid ng-valid-required select2-offscreen" pl-select2-adapter="" value="Close,Accept" tabindex="-1">
+</div>
+</div>
+</div></div>
+<!-- ngIf: filterMode === 'normal' -->
+</pl-filter-field><!-- end ngRepeat: config in fieldFilterConfigs --><pl-filter-field ng-repeat="config in fieldFilterConfigs" available-fields-metadata="config.availableFields" field-metadata="config.field" field-predicate="config.fieldPredicate" remove="removeField(filterKey,config.fullFieldName)" add="addNewField(fieldName)" apply="applyFieldFilter(config.fullFieldName, filterFieldName, filterFieldPredicate, config.filterKey)" use-non-searchable-query-method="canUseNonSearchable(filterKey)" get-selected-filters="getCurrentlySelectedFilters()" related-field-information="config.relatedFieldInformation" filter-mode="config.filterMode" filter-key="config.filterKey" flavor="flavor" disable-related-fields="disableRelatedFields" disable-related-per-entity="disableRelatedPerEntity" should-disable-advance-options="disableAdvanceOptions" get-non-negation-fields-amount="getNonNegationFieldsLength(config.filterKey)" container-options="containerOptions" class="platform-filter-field normal"><!-- ngIf: fieldSelectorShown -->
+<span data-aid="filter_field_ServiceDeskGroup" ng-click="showFieldSelector()" ng-hide="fieldSelectorShown" class="platform-filter-field-viewer" role="button" tabindex="0" click-enter="">
+    Service desk group
+</span>
+<span class="platform-filter-field-viewer-separator">:</span>
+<div ng-click="showPredicateEditor()" ng-hide="predicateEditorShown" class="platform-filter-field-predicate-viewer" role="button" tabindex="0" click-enter="" title=""><span>SMX-IT-ISC-HELPDESK</span>, <span>SMX-IT-ISC-SUBSURFACE</span></div>
+<div ng-show="predicateEditorShown" class="platform-filter-field-predicate-editor ng-hide"><pl-filter-advance-button value="filterNegationOperator" selector-fields="advanceButtonSelectorOptions" show-dropdown="false" disable-advance-options="disableAdvanceOptions" ng-show="!showRelatedProperties()"><span ng-show="disableAdvanceOptions !== true" data-aid="filter-advance-options" tabindex="0">
+    <i ng-show="!shouldShowDropdown" class="filter-advance-button-icon icon-add" ng-click="openSelectDropDown()" data-aid="open-advance-filter-options" title="Advanced options" role="button" tabindex="0" click-enter=""></i>
+    <select class="filter-advance-dropdown ng-pristine ng-untouched ng-valid ng-hide" ng-show="shouldShowDropdown === true" ng-model="selectedOption" ng-options="option.localizedLabel for option in selectorFields" data-aid="filter-advance-options-selector" tabindex="0" click-enter="" name=""><option value="0" selected="selected" label="Is">Is</option><option value="1" label="Is not">Is not</option></select>
+</span></pl-filter-advance-button><!-- ngIf: byEntityInstance --><span data-aid="ep-container" pl-entity-picker="" field-value="field.valueId" custom-options="field.customOptions" field-metadata="field.metadata" options="options" show-advance-button="false" fixed-item="fixedItemOptions" ng-if="byEntityInstance">
+    <div class="entity-picker-wrapper" ng-class="{'input-with-btn-container': shouldShowAdvanceButton()}" pl-popover="popoverPreviewOptions" auto-position="true" show="false" data-unique="true">
+        <div class="entity-picker-input-wrapper" ng-mouseenter="showPreview($event)" ng-mouseleave="hidePreview()">
+            <div class="select2-container select2-container-multi entity-picker-drop-down-list ng-pristine ng-untouched ng-valid ng-valid-required ng-valid-parse" id="s2id_autogen1"><ul class="select2-choices">  <li class="select2-search-choice">    <div><span>SMX-IT-ISC-HELPDESK</span></div>    <a href="#" class="select2-search-choice-close" tabindex="-1"></a></li><li class="select2-search-choice">    <div><span>SMX-IT-ISC-SUBSURFACE</span></div>    <a href="#" class="select2-search-choice-close" tabindex="-1"></a></li><li class="select2-search-field">    <label for="s2id_autogen2" class="select2-offscreen"></label>    <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input" id="s2id_autogen2" placeholder="" style="width: 10px;" role="combobox" aria-label="Service desk group with value     SMX-IT-ISC-HELPDESK        SMX-IT-ISC-SUBSURFACE    ">  </li></ul><div class="select2-drop select2-drop-multi select2-display-none entity-picker-of-ServiceDeskGroup intelligent-suggestions-entity-picker">   <ul class="select2-results">   <li class="select2-no-results">No matches found</li><li class="select2-no-results">No matches found</li><li class="select2-no-results">No matches found</li><li class="select2-no-results">No matches found</li></ul></div></div><input type="hidden" ui-select2="init" ng-model="$parent.innerFieldValue" ng-model-options="{ allowInvalid: true }" data-placeholder="" class="entity-picker-drop-down-list ng-pristine ng-untouched ng-valid ng-valid-required select2-offscreen ng-valid-parse" ng-required="fieldMetadata.required | bool" name="ServiceDeskGroup" ng-class="{'ng-error': fieldMetadata.error}" ng-disabled="fieldMetadata.disabled | bool" pl-select2-adapter="" value="52010,55397" tabindex="-1">
+        </div>
+        <!-- ngIf: shouldShowAdvanceButton() -->
+    </div>
+</span><!-- end ngIf: byEntityInstance --><!-- ngIf: showRelatedProperties() --></div>
+<!-- ngIf: filterMode === 'normal' -->
+</pl-filter-field><!-- end ngRepeat: config in fieldFilterConfigs --><pl-filter-field ng-repeat="config in fieldFilterConfigs" available-fields-metadata="config.availableFields" field-metadata="config.field" field-predicate="config.fieldPredicate" remove="removeField(filterKey,config.fullFieldName)" add="addNewField(fieldName)" apply="applyFieldFilter(config.fullFieldName, filterFieldName, filterFieldPredicate, config.filterKey)" use-non-searchable-query-method="canUseNonSearchable(filterKey)" get-selected-filters="getCurrentlySelectedFilters()" related-field-information="config.relatedFieldInformation" filter-mode="config.filterMode" filter-key="config.filterKey" flavor="flavor" disable-related-fields="disableRelatedFields" disable-related-per-entity="disableRelatedPerEntity" should-disable-advance-options="disableAdvanceOptions" get-non-negation-fields-amount="getNonNegationFieldsLength(config.filterKey)" container-options="containerOptions" class="platform-filter-field normal"><!-- ngIf: fieldSelectorShown -->
+<span data-aid="filter_field_CurrentAssignment" ng-click="showFieldSelector()" ng-hide="fieldSelectorShown" class="platform-filter-field-viewer" role="button" tabindex="0" click-enter="">
+    Current assignment
+</span>
+<span class="platform-filter-field-viewer-separator">:</span>
+<div ng-click="showPredicateEditor()" ng-hide="predicateEditorShown" class="platform-filter-field-predicate-viewer" role="button" tabindex="0" click-enter="" title="Not Incident"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/enum-filter/enum-filter-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/enum-filter/enum-filter-viewer-tmpl.html'" class=""><!-- ngIf: field.value && field.value.filterNegationOperator === true --><span ng-if="field.value &amp;&amp; field.value.filterNegationOperator === true" class="advance-filter-options-value">Not </span><!-- end ngIf: field.value && field.value.filterNegationOperator === true -->
+<span data-aid="enum_filter_viewer" ng-controller="EnumFilterViewerController">Incident</span></div></div>
+<div ng-show="predicateEditorShown" class="platform-filter-field-predicate-editor ng-hide"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/enum-filter/enum-filter-editor-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/enum-filter/enum-filter-editor-tmpl.html'" class=""><div ng-controller="EnumFilterEditorController">
+    <pl-filter-advance-button value="filterNegationOperator" selector-fields="advanceButtonSelectorOptions" show-dropdown="true" disable-advance-options="disableAdvanceOptions" class="dropdownShown"><span ng-show="disableAdvanceOptions !== true" data-aid="filter-advance-options" tabindex="0">
+    <i ng-show="!shouldShowDropdown" class="filter-advance-button-icon icon-add ng-hide" ng-click="openSelectDropDown()" data-aid="open-advance-filter-options" title="Advanced options" role="button" tabindex="0" click-enter=""></i>
+    <select class="filter-advance-dropdown ng-pristine ng-untouched ng-valid" ng-show="shouldShowDropdown === true" ng-model="selectedOption" ng-options="option.localizedLabel for option in selectorFields" data-aid="filter-advance-options-selector" tabindex="0" click-enter="" name=""><option value="0" label="Is">Is</option><option value="1" selected="selected" label="Is not">Is not</option></select>
+</span></pl-filter-advance-button>
+    <pl-multi-select-drop-down categories="fieldsMetaData" id="name" display="localized_label" selected="selection" is-dropdown="true" tabindex="0" click-enter="" role="listbox"><div class="menu open multiDropDown" tabindex="0">
+    <span class="displayValue" title=""></span>
+    <div class="checkbox-margin dropdown-menu pull-left" ng-class="{'dropdown-menu': isDropdown, 'pull-left': isDropdown &amp;&amp; !isRTL, 'pull-right': isDropdown &amp;&amp; isRTL}" tabindex="0">
+        <ul class="checkboxes">
+            <!-- ngRepeat: category in categories --><li ng-repeat="category in categories" class="">
+                <label>
+                <input data-aid="flt-cb-id-Unassigned" type="checkbox" class="row-selection-checkbox ng-pristine ng-untouched ng-valid" id="" ng-model="selected[category.name]" ng-model-options="{ allowInvalid: true }" name="">
+                    <span style="" tabindex="0" click-enter="">Unassigned</span>
+                </label>
+            </li><!-- end ngRepeat: category in categories --><li ng-repeat="category in categories" class="">
+                <label>
+                <input data-aid="flt-cb-id-ServiceDesk" type="checkbox" class="row-selection-checkbox ng-pristine ng-untouched ng-valid" id="" ng-model="selected[category.name]" ng-model-options="{ allowInvalid: true }" name="">
+                    <span style="" tabindex="0" click-enter="">Service Desk</span>
+                </label>
+            </li><!-- end ngRepeat: category in categories --><li ng-repeat="category in categories" class="">
+                <label>
+                <input data-aid="flt-cb-id-ExpertGroup" type="checkbox" class="row-selection-checkbox ng-pristine ng-untouched ng-valid" id="" ng-model="selected[category.name]" ng-model-options="{ allowInvalid: true }" name="">
+                    <span style="" tabindex="0" click-enter="">Expert Group</span>
+                </label>
+            </li><!-- end ngRepeat: category in categories --><li ng-repeat="category in categories" class="">
+                <label>
+                <input data-aid="flt-cb-id-Incident" type="checkbox" class="row-selection-checkbox ng-pristine ng-untouched ng-valid" id="" ng-model="selected[category.name]" ng-model-options="{ allowInvalid: true }" name="">
+                    <span style="" tabindex="0" click-enter="">Incident</span>
+                </label>
+            </li><!-- end ngRepeat: category in categories --><li ng-repeat="category in categories" class="">
+                <label>
+                <input data-aid="flt-cb-id-&lt;No Value&gt;" type="checkbox" class="row-selection-checkbox ng-pristine ng-untouched ng-valid" id="" ng-model="selected[category.name]" ng-model-options="{ allowInvalid: true }" name="">
+                    <span style="" tabindex="0" click-enter="">&lt;No Value&gt;</span>
+                </label>
+            </li><!-- end ngRepeat: category in categories -->
+        </ul>
+        <div class="button-group-margin">
+            <!-- ngIf: showSelectAllButton -->
+            <!-- ngIf: !hideOkAndCancelButtons --><button ng-click="submit()" ng-if="!hideOkAndCancelButtons" data-aid="btn-checkboxes-ok" class="btn btn-primary" id="ok" title="OK">OK</button><!-- end ngIf: !hideOkAndCancelButtons -->
+            <!-- ngIf: !hideOkAndCancelButtons --><button ng-click="cancel()" ng-if="!hideOkAndCancelButtons" data-aid="btn-checkboxes-cancel" class="btn" id="cancel" title="Cancel">Cancel</button><!-- end ngIf: !hideOkAndCancelButtons -->
+            <button data-aid="btn-checkboxes-clear" class="btn" id="clear" ng-click="clear()" title="Clear">Clear</button>
+        </div>
+    </div>
+</div></pl-multi-select-drop-down>
+</div></div></div>
+<!-- ngIf: filterMode === 'normal' -->
+</pl-filter-field><!-- end ngRepeat: config in fieldFilterConfigs -->
+<!-- ngIf: blankFieldShown -->
+<!-- ngIf: !blankFieldShown && !filterPanelViewMode -->
+<!-- ngIf: !filterPanelViewMode && isClearAllEnabled() -->
+<!-- ngIf: !isClearAllEnabled() && !loading --><span data-aid="no_filter_marker" ng-if="!isClearAllEnabled() &amp;&amp; !loading" class="">&nbsp;</span><!-- end ngIf: !isClearAllEnabled() && !loading --></pl-filter-panel></span><!-- end of pl-presenter --></div>
+            </div>
+        </div>
+    </pl-presenter-container>
+</div>
+</div>
+
+            <!-- ngInclude:  --><div ng-include="" src="groupByCustomItem.templateUrl" class=""><div ng-controller="ReportGroupByCtrl" data-aid="field-att-container-group-by" class="row-fluid row-margin">
+    <div class="col-md-3 label-container">
+        <span>Group by</span>
+        <span class="requiredAsterisk ng-hide" ng-show="groupByOptions.required &amp;&amp; !groupByOptions.isDisabled | bool">*</span>
+    </div>
+    <div class="col-md-9" data-aid="group-by">
+        <pl-group-by-custom-fields selected-items="groupByItems" flavor="flavor" entity-type="Request" static-options="groupByStaticOptions" options="groupByOptions" ng-model="groupByInvalidModel" name="reportGroupBy" user-options="userOptionFields" ng-required="groupByOptions.required &amp;&amp; !groupByOptions.isDisabled | bool" class="ng-pristine ng-untouched ng-valid ng-valid-required"><pl-custom-field-container options="staticOptions" template-information="customTemplateData" dynamic-options="dynamicOptions" selected-items="selectedItems" ng-class="{'custom-field-container-disabled':dynamicOptions.isDisabled &amp;&amp; selectedItems.length === 0}" data-aid="group-by-custom-field"><div class="custom-fields-container-root-block">
+
+    <!-- ngIf: !useInlineAddition && !isReachedTotalItemsLimit() && !isDisabled -->
+
+    <!--show all selected fields, if there are any-->
+    <div class="custom-items-table-container">
+        <div class="custom-items-table">
+            <!-- ngRepeat: customField in selectedItems --><div ng-repeat="customField in selectedItems" ng-mouseenter="addHoverClass($index)" ng-mouseleave="removeHoverClass($index)" class="row no-gutter custom-single-item" ng-class="{'custom-item-is-hovered': itemIsHovered || selectedItemIndex === $index}" data-aid="custom-items-table-row-0">
+
+                <!--show the template in view mode-->
+                <div class="col-xs-9 single-item-template indent-0" ng-class="options.useIndentation &amp;&amp; 'indent-' + ($index)">
+                    <!-- ngInclude: templateInformation.url --><div ng-include="templateInformation.url" ng-init="mode='view'" class=""><div ng-controller="SingleRelatedFieldCtrl">
+
+    <!--shows the first presenter for the main field selection-->
+    <div data-aid="related-properties-main-field-dd" pl-presenter="" name="firstPresenterAPI" item="customField" class="group-by-single-custom-field group-by-main-field field-in-mode-view full-width" field-metadata="template.Parameters[0]" initial-mode="view" ng-class="!customField.secondaryItemName &amp;&amp; !shouldShowRelated($index) &amp;&amp; 'full-width'"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="_mainItemName" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">Current assignment</div>
+</div></span><!-- end of pl-presenter --></div>
+
+    <!--shows the '+ Related' if needed. once will be selected, it will enable the next block that shows the second presenter-->
+    <span data-aid="related-properties-secondary-field-dd-opener" ng-show="shouldShowRelated($index)" class="group-by-related-label group-by-related-field-0 ng-hide" ng-click="showRelatedFieldPicker()">+ Related
+    </span>
+
+    <!--show the separator label in case a related property is selected-->
+    <span class="related-property-separator group-by-related-field-separator-label-0 ng-hide" ng-show="selectedEntityProperty !== undefined" title=""> . </span>
+
+    <!--another pl-presenter for the second item as well to show its value in view mode-->
+    <div data-aid="related-properties-secondary-field-dd" ng-show="selectedEntityProperty !== undefined &amp;&amp; !showSecondarySelector || secondaryFieldPresentorMode === 'edit'" pl-presenter="" name="secondaryPresenterAPI" item="customField" class="group-by-single-custom-field group-by-secondary-field field-in-mode-view ng-hide" field-metadata="template.Parameters[1]" ng-click="enablePopoverForEditing()" initial-mode="view" keep-initial-mode="true"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="_secondaryItemName" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider"></div>
+</div></span><!-- end of pl-presenter --></div>
+
+    <!--a popover will be shown with pl-presenter will be added here dynamically and will appear once the user clicked the + related-->
+    <div class="related-field-popup-element" pl-popover="dummyPopoverOptions" auto-position="true" show="false" back-drop="false">
+    </div>
+
+</div></div>
+                </div>
+
+                <!--show the custom actions section-->
+                <div class="col-xs-3 single-item-actions">
+                    <div ng-class="isRTL ? 'pull-left' : 'pull-right'" class="pull-right">
+                        <div class="custom-fields-actions-per-field ng-hide" ng-show="showUpArrow(itemIsHovered, $index)">
+                            <i class="custom-field-action up-down-action icon-move-up" data-aid="single-item-action-move-up" ng-click="setItemUp($index)"></i>
+                        </div>
+                        <div class="custom-fields-actions-per-field ng-hide" ng-show="showDownArrow(itemIsHovered, $index)">
+                            <i class="custom-field-action up-down-action icon-move-down" data-aid="single-item-action-move-down" ng-click="setItemDown($index)"></i>
+                        </div>
+                        <div class="custom-fields-actions-per-field ng-hide" ng-show="showRemove($index)">
+                            <i class="custom-field-action remove-action icon-delete" data-aid="single-item-action-remove" ng-click="itemRemoved($index)"></i>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end ngRepeat: customField in selectedItems -->
+        </div>
+    </div>
+    <!--show inline add new field option-->
+    <!-- ngIf: useInlineAddition && !isReachedTotalItemsLimit() && !isDisabled -->
+</div></pl-custom-field-container></pl-group-by-custom-fields>
+        <!-- ngIf: tabForm.reportGroupBy.$invalid -->
+    </div>
+</div></div>
+
+            <!-- ngInclude:  --><div ng-include="" src="functionCustomItem.templateUrl" class=""><div ng-controller="ReportFunctionCtrl" data-aid="field-att-container-function" class="row-fluid row-margin">
+    <div class="col-md-3 label-container">
+        <span>Function</span>
+        <span class="requiredAsterisk ng-hide" ng-show="functionOptions.required &amp;&amp; !functionOptions.isDisabled | bool">*</span>
+    </div>
+    <div class="col-md-9" data-aid="function">
+        <pl-function-custom-fields selected-items="functionItems" single-item-business-rule="functionBusinessRule" single-param-item-business-rule="functionParamBusinessRule" entity-type="Request" group-by-field="" options="functionOptions" ng-model="functionInvalidModel" name="reportFunction" ng-required="functionOptions.required &amp;&amp; !functionOptions.isDisabled | bool" class="ng-pristine ng-untouched ng-valid ng-valid-required"><pl-custom-field-container dynamic-options="dynamicOptions" options="staticOptions" template-information="customTemplateData" selected-items="selectedItems" ng-class="{'custom-field-container-disabled':dynamicOptions.isDisabled &amp;&amp; selectedItems.length === 0}" data-aid="function-custom-field"><div class="custom-fields-container-root-block">
+
+    <!-- ngIf: !useInlineAddition && !isReachedTotalItemsLimit() && !isDisabled -->
+
+    <!--show all selected fields, if there are any-->
+    <div class="custom-items-table-container">
+        <div class="custom-items-table">
+            <!-- ngRepeat: customField in selectedItems --><div ng-repeat="customField in selectedItems" ng-mouseenter="addHoverClass($index)" ng-mouseleave="removeHoverClass($index)" class="row no-gutter custom-single-item" ng-class="{'custom-item-is-hovered': itemIsHovered || selectedItemIndex === $index}" data-aid="custom-items-table-row-0">
+
+                <!--show the template in view mode-->
+                <div class="col-xs-9 single-item-template" ng-class="options.useIndentation &amp;&amp; 'indent-' + ($index)">
+                    <!-- ngInclude: templateInformation.url --><div ng-include="templateInformation.url" ng-init="mode='view'" class=""><div class="function-single-custom-field-container" ng-controller="FunctionSingleFieldCtrl">
+    <!--shows the first presenter for the main field selection-->
+    <div pl-presenter="" name="firstPresenterAPI" item="customField" ng-class="{disabled: isDisabled}" class="function-single-custom-field field-in-mode-view disabled" field-metadata="template.Parameters[0]" ng-click="toggleFirstMode()" initial-mode="view"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="_mainItemName" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">Percent</div>
+</div></span><!-- end of pl-presenter --></div>
+
+    <!--shows the '+ Related' if needed. once will be selected, it will enable the next block that shows the second presenter-->
+    <span ng-show="shouldShowFieldPicker()" class="function-field-label ng-hide" ng-click="showFieldPicker()">+ Field
+    </span>
+
+    <!--this block will be presented once a secondary property is selected-->
+    <span class="conjunction-field-label" ng-show="selectedSecondaryProperty !== undefined">by</span>
+    <div ng-show="showSecondarySelector || selectedSecondaryProperty !== undefined" pl-presenter="" name="secondPresenterAPI" item="customField" ng-class="{disabled: isDisabled}" class="function-single-custom-field field-in-mode-view disabled" field-metadata="template.Parameters[1]" ng-click="toggleSecondMode()" initial-mode="view"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="_secondaryItemName" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">Count</div>
+</div></span><!-- end of pl-presenter --></div>
+
+    <span ng-show="shouldShowParamFieldPicker($index)" class="function-field-label ng-hide" ng-click="showParamFieldPicker()">+ Field
+    </span>
+
+    <span ng-show="selectedSecondaryParamProperty !== undefined" class="conjunction-field-label ng-hide"></span>
+    <span ng-show="selectedSecondaryParamProperty" ng-click="toggleAdditionalParams()" class="function-secondary-param disabled ng-hide" ng-class="{disabled: isDisabled}"></span>
+
+    <div pl-popover="popoverOptions" show="false" class="popover-function"></div>
+
+
+</div>
+</div>
+                </div>
+
+                <!--show the custom actions section-->
+                <div class="col-xs-3 single-item-actions">
+                    <div ng-class="isRTL ? 'pull-left' : 'pull-right'" class="pull-right">
+                        <div class="custom-fields-actions-per-field ng-hide" ng-show="showUpArrow(itemIsHovered, $index)">
+                            <i class="custom-field-action up-down-action icon-move-up" data-aid="single-item-action-move-up" ng-click="setItemUp($index)"></i>
+                        </div>
+                        <div class="custom-fields-actions-per-field ng-hide" ng-show="showDownArrow(itemIsHovered, $index)">
+                            <i class="custom-field-action up-down-action icon-move-down" data-aid="single-item-action-move-down" ng-click="setItemDown($index)"></i>
+                        </div>
+                        <div class="custom-fields-actions-per-field ng-hide" ng-show="showRemove($index)">
+                            <i class="custom-field-action remove-action icon-delete" data-aid="single-item-action-remove" ng-click="itemRemoved($index)"></i>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- end ngRepeat: customField in selectedItems -->
+        </div>
+    </div>
+    <!--show inline add new field option-->
+    <!-- ngIf: useInlineAddition && !isReachedTotalItemsLimit() && !isDisabled -->
+</div></pl-custom-field-container>
+</pl-function-custom-fields>
+        <!-- ngIf: tabForm.reportFunction.$invalid -->
+    </div>
+</div>
+</div>
+        </ng-form>
+
+        <!-- ngInclude:  --><div ng-include="" src="columnsCustomItem.templateUrl" class=""><div ng-controller="ReportColumnsCtrl" data-aid="field-att-container-columns-container">
+    <div class="pl-entity-page-component-header report-column-picker-header report-additional-tabs-header no-content" data-aid="field-att-container-header" tabindex="0" ui-keypress="{'enter': 'columnsSectionOpen=!columnsSectionOpen'}" role="group" ng-class="{'no-content':columnsModel.length === 0}">
+        <div id="collapse-icon" class="pl-entity-page-component-header-inner-wrapper" ng-click="toggleColumnsSection()">
+            <span class="pl-entity-page-component-header-icon icon-arrow-med-right" pl-bidi-collapse-arrow="!columnsSectionOpen"></span>
+            <span class="pl-entity-page-component-header-text">Additional table columns</span>
+            <span class="pl-entity-page-component-header-description" title="No columns to select">No columns to select</span>
+        </div>
+    </div>
+
+    <pl-presenter-container presenter-mode="view" container-type="report-properties-general-tab-column-model">
+        <!-- ngIf: columnsSectionOpen -->
+    </pl-presenter-container>
+</div></div>
+        <!-- ngInclude:  --><div ng-include="" src="displayResultsItem.templateUrl" class=""><div ng-controller="DisplayResultsCtrl" data-aid="field-att-container-display-results-container" class="display-results">
+    <div class="pl-entity-page-component-header report-display-results-header report-additional-tabs-header" data-aid="field-att-container-header" tabindex="1" ui-keypress="{'enter': 'displayResultsSectionOpen=!displayResultsSectionOpen'}" role="group" ng-class="{'no-content': !sortShouldBeDisplayed()}">
+        <div id="collapse-icon" class="pl-entity-page-component-header-inner-wrapper" ng-click="toggleDisplayResultsSection()">
+            <span class="pl-entity-page-component-header-icon icon-arrow-med-right" pl-bidi-collapse-arrow="!displayResultsSectionOpen"></span>
+            <span class="pl-entity-page-component-header-text">Display results</span>
+        </div>
+    </div>
+
+    <pl-presenter-container presenter-mode="view" container-type="reports">
+        <!-- ngIf: displayResultsSectionOpen && sortShouldBeDisplayed() -->
+    </pl-presenter-container>
+</div>
+</div>
+    </div>
+
+    <div class="general-tab-footer">
+        <pl-presenter-container presenter-mode="view" container-type="report-properties-general-tab-footer" ng-hide="tabOptions.hideEnableChartView">
+            <div data-aid="enable-chart-check-box" class="row-fluid">
+                <div class="col-md-1">
+                    <div item="checkboxItems" field-metadata="enableChartMetadata" initial-mode="view" on-apply-field-value="onEnableChartChanged(newValue)"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/checkbox/checkbox-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/checkbox/checkbox-viewer-tmpl.html'" class=""><div ng-controller="checkboxViewerCtrl" data-aid="" data-control-type="CheckBox" class="checkbox-container">
+    <label class="checkboxes">
+        <span class="check-box-label" title="" ng-bind-html="field.metadata.localized_label" ui-jq="tooltip" ui-options="{placement: reverseDirection ? 'left' : 'right'}" data-original-title=""></span>
+        <span ng-bind-html="fieldMetadata.priceDisplay"></span>
+        <!-- ngIf: field.metadata.tooltip_label !== undefined -->
+        <!-- ngIf: field.metadata.tooltip_label === undefined --><span ng-if="field.metadata.tooltip_label === undefined" title="checked" class="tick tick-checked" ng-class="{'tick-checked' : (field.value|bool)}"></span><!-- end ngIf: field.metadata.tooltip_label === undefined -->
+        <span class="requiredAsterisk ng-hide" ng-show="(field.metadata.required | bool) &amp;&amp; !fieldMetadata.hideAsterisk">*</span>
+    </label>
+    <!-- ngIf: field.metadata.locallizedHelpText -->
+</div></div></span><!-- end of pl-presenter --></div>
+                </div>
+                <div class="col-md-9 label-container">
+                    Enable chart view
+                </div>
+            </div>
+        </pl-presenter-container>
+
+<!--        <pl-presenter-container presenter-mode="{{addToDashboardPresenterMode}}" container-type="report-properties-add-to-dashboard">-->
+<!--            <div data-aid="add-dashboard-check-box" class="row-fluid">-->
+<!--                <div class="col-md-1">-->
+<!--                    <pl-presenter item="checkboxItems" field-metadata="addToDashboardMetadata" initial-mode="edit"-->
+<!--                                  on-apply-field-value="onAddToDashboardChanged(oldValue, newValue)"></pl-presenter>-->
+<!--                </div>-->
+<!--                <div class="col-md-9 label-container">-->
+<!--                    {{addToDashboard.localized_label}}-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </pl-presenter-container>-->
+    </div>
+</div>
+</div>
+        </div><!-- end ngRepeat: tab in model.propertiesTabs --><div class="tabContent" ng-repeat="tab in model.propertiesTabs">
+            <!-- ngInclude: tab.templateUrl --><div ng-include="tab.templateUrl" ng-class="{active: tab.active}" ng-show="tab.active == true" data-aid="chart-content" class="ng-hide"><div class="report-properties-tab-chart-layout property-grid-container" ng-controller="ReportTabChartCtrl" ng-class="{masked: reportConfigModel.MetaData.IsSystem}">
+    <pl-presenter-container presenter-mode="view" container-type="report-properties-chart-tab-content">
+        <!-- ngInclude:  --><div ng-include="" src="chartFunctionItem.templateUrl" class=""><div ng-controller="ChartFunctionCtrl" class="row-fluid row-margin">
+    <div class="col-md-3 label-container chart-function-label" title="Chart function">
+        Chart function
+    </div>
+    <div class="col-md-9">
+        <div item="reportConfigModel.getDefaultVisualizationConfig()" field-metadata="chartFunctionMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="report-properties-chart-tab-content_AggregationField" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">Percent by Count</div>
+</div></span><!-- end of pl-presenter --></div>
+    </div>
+</div>
+</div>
+
+        <div data-aid="report-chart-type-container" class="row-fluid row-margin report-chart-type-container">
+            <div class="col-md-3 label-container">
+                Chart type
+            </div>
+        <span class="btn-group col-md-9" data-toggle="buttons">
+            <!-- ngRepeat: chartTypeId in availableChartTypes --><table class="report-chart-type" ng-repeat="chartTypeId in availableChartTypes">
+                <tbody ng-show="showChartType(chartTypeId)">
+                <tr>
+                    <td>
+                        <button class="report-chart-type-btn active" ng-click="onChangeChartType(chartTypeId)" ng-disabled="fieldsMode === 'view'" data-aid="report-toggle-Pie" ng-class="{active: chartTypeId.name === chartType.name}" disabled="disabled">
+                            <input type="radio" class="report-chart-type-radio-btn">
+                            <img style="width: 90%" ng-src="resources/images/reports_pie.svg" src="resources/images/reports_pie.svg">
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="report-chart-type-text-td">
+                        <span class="report-chart-type-text">Pie</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table><!-- end ngRepeat: chartTypeId in availableChartTypes --><table class="report-chart-type" ng-repeat="chartTypeId in availableChartTypes">
+                <tbody ng-show="showChartType(chartTypeId)">
+                <tr>
+                    <td>
+                        <button class="report-chart-type-btn" ng-click="onChangeChartType(chartTypeId)" ng-disabled="fieldsMode === 'view'" data-aid="report-toggle-Bar" ng-class="{active: chartTypeId.name === chartType.name}" disabled="disabled">
+                            <input type="radio" class="report-chart-type-radio-btn">
+                            <img style="width: 90%" ng-src="resources/images/reports_bars.svg" src="resources/images/reports_bars.svg">
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="report-chart-type-text-td">
+                        <span class="report-chart-type-text">Bar</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table><!-- end ngRepeat: chartTypeId in availableChartTypes --><table class="report-chart-type" ng-repeat="chartTypeId in availableChartTypes">
+                <tbody ng-show="showChartType(chartTypeId)">
+                <tr>
+                    <td>
+                        <button class="report-chart-type-btn" ng-click="onChangeChartType(chartTypeId)" ng-disabled="fieldsMode === 'view'" data-aid="report-toggle-Column" ng-class="{active: chartTypeId.name === chartType.name}" disabled="disabled">
+                            <input type="radio" class="report-chart-type-radio-btn">
+                            <img style="width: 90%" ng-src="resources/images/reports_column.svg" src="resources/images/reports_column.svg">
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="report-chart-type-text-td">
+                        <span class="report-chart-type-text">Column</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table><!-- end ngRepeat: chartTypeId in availableChartTypes --><table class="report-chart-type" ng-repeat="chartTypeId in availableChartTypes">
+                <tbody ng-show="showChartType(chartTypeId)" class="ng-hide">
+                <tr>
+                    <td>
+                        <button class="report-chart-type-btn" ng-click="onChangeChartType(chartTypeId)" ng-disabled="fieldsMode === 'view'" data-aid="report-toggle-Line" ng-class="{active: chartTypeId.name === chartType.name}" disabled="disabled">
+                            <input type="radio" class="report-chart-type-radio-btn">
+                            <img style="width: 90%" ng-src="resources/images/reports_line.svg" src="resources/images/reports_line.svg">
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="report-chart-type-text-td">
+                        <span class="report-chart-type-text">Line</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table><!-- end ngRepeat: chartTypeId in availableChartTypes -->
+        </span>
+        </div>
+        <!-- ngIf: displayAxisLabelsInput() -->
+    </pl-presenter-container>
+</div>
+</div>
+        </div><!-- end ngRepeat: tab in model.propertiesTabs --><div class="tabContent" ng-repeat="tab in model.propertiesTabs">
+            <!-- ngInclude: tab.templateUrl --><div ng-include="tab.templateUrl" ng-class="{active: tab.active}" ng-show="tab.active == true" data-aid="details-content" class="ng-hide"><div class="property-grid-container" ng-controller="ReportTabDetailsCtrl" xmlns="http://www.w3.org/1999/html" ng-class="{masked: reportConfigModel.MetaData.IsSystem}">
+    <ng-form name="detailedTabForm" novalidate="" class="ng-pristine ng-valid">
+        <pl-presenter-container presenter-mode="view" container-type="report-properties-details-tab-content">
+            <!-- ngRepeat: fieldMetadata in METADATA --><div ng-repeat="fieldMetadata in METADATA" class="">
+                <div data-aid="field-att-container" class="row-fluid row-margin">
+                    <div class="col-md-3 label-container">
+                        <span class="properties-label" title="Created on">Created on</span>
+                        <span class="requiredAsterisk ng-hide" ng-show="fieldMetadata.required | bool">*</span>
+                    </div>
+                    <div class="col-md-9 field-container">
+                        <div item="reportConfigModel.MetaData" field-metadata="fieldMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/date-time-picker/date-time-picker-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/date-time-picker/date-time-picker-viewer-tmpl.html'" class=""><div data-aid="" data-control-type="DateTimePicker" pl-date-time-viewer="" field-value="field.value" field-logical-type="field.metadata.logical_type" tabindex="0" aria-readonly="true" role="textbox" aria-label="" class="date-time-picker-viewer">October 30 2024 5:17:31 AM</div>
+</div></span><!-- end of pl-presenter --></div>
+                    </div>
+                </div>
+            </div><!-- end ngRepeat: fieldMetadata in METADATA --><div ng-repeat="fieldMetadata in METADATA" class="">
+                <div data-aid="field-att-container" class="row-fluid row-margin">
+                    <div class="col-md-3 label-container">
+                        <span class="properties-label" title="Created by">Created by</span>
+                        <span class="requiredAsterisk ng-hide" ng-show="fieldMetadata.required | bool">*</span>
+                    </div>
+                    <div class="col-md-9 field-container">
+                        <div item="reportConfigModel.MetaData" field-metadata="fieldMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><span ng-controller="entityPickerViewerCtrl"><span class="entity-picker-viewer-content"><span pl-shared="Person" mode="item" skiptimeout="true" entity-ids="18823708"><span><span class="pl-person-item"><pl-avatar person="item" alt="" image-class="itemImageClass" size="itemImageSize"><span class="avatar-wrapper pl-shared-item-img" ng-class="{'userOnline':onlineStatus, 'online-presence':isPresent}">
+    <pl-image class="ts-avatar" image-id="getImage()" image-class="imageClass" alt="alt" size="size"><img role="presentation" class="image-small-size pl-shared-item-img ts-image" ng-src="resources/images/user_image.png" alt="" pl-fallback-image="resources/images/user_image.png" src="resources/images/user_image.png">
+</pl-image>
+</span>
+</pl-avatar>Ahmed, Afhaz IDSP4X</span></span></span></span></span></span><!-- end of pl-presenter --></div>
+                    </div>
+                </div>
+            </div><!-- end ngRepeat: fieldMetadata in METADATA --><div ng-repeat="fieldMetadata in METADATA" class="">
+                <div data-aid="field-att-container" class="row-fluid row-margin">
+                    <div class="col-md-3 label-container">
+                        <span class="properties-label" title="Last edited on">Last edited on</span>
+                        <span class="requiredAsterisk ng-hide" ng-show="fieldMetadata.required | bool">*</span>
+                    </div>
+                    <div class="col-md-9 field-container">
+                        <div item="reportConfigModel.MetaData" field-metadata="fieldMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/date-time-picker/date-time-picker-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/date-time-picker/date-time-picker-viewer-tmpl.html'" class=""><div data-aid="" data-control-type="DateTimePicker" pl-date-time-viewer="" field-value="field.value" field-logical-type="field.metadata.logical_type" tabindex="0" aria-readonly="true" role="textbox" aria-label="" class="date-time-picker-viewer">December 29 2024 10:34:36 AM</div>
+</div></span><!-- end of pl-presenter --></div>
+                    </div>
+                </div>
+            </div><!-- end ngRepeat: fieldMetadata in METADATA --><div ng-repeat="fieldMetadata in METADATA" class="">
+                <div data-aid="field-att-container" class="row-fluid row-margin">
+                    <div class="col-md-3 label-container">
+                        <span class="properties-label" title="Last edited by">Last edited by</span>
+                        <span class="requiredAsterisk ng-hide" ng-show="fieldMetadata.required | bool">*</span>
+                    </div>
+                    <div class="col-md-9 field-container">
+                        <div item="reportConfigModel.MetaData" field-metadata="fieldMetadata" initial-mode="edit"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><span ng-controller="entityPickerViewerCtrl"><span class="entity-picker-viewer-content"><span pl-shared="Person" mode="item" skiptimeout="true" entity-ids="18823708"><span><span class="pl-person-item"><pl-avatar person="item" alt="" image-class="itemImageClass" size="itemImageSize"><span class="avatar-wrapper pl-shared-item-img" ng-class="{'userOnline':onlineStatus, 'online-presence':isPresent}">
+    <pl-image class="ts-avatar" image-id="getImage()" image-class="imageClass" alt="alt" size="size"><img role="presentation" class="image-small-size pl-shared-item-img ts-image" ng-src="resources/images/user_image.png" alt="" pl-fallback-image="resources/images/user_image.png" src="resources/images/user_image.png">
+</pl-image>
+</span>
+</pl-avatar>Ahmed, Afhaz IDSP4X</span></span></span></span></span></span><!-- end of pl-presenter --></div>
+                    </div>
+                </div>
+            </div><!-- end ngRepeat: fieldMetadata in METADATA -->
+            <div>
+                <div data-aid="field-att-container" class="row-fluid row-margin">
+                    <div class="col-md-3 label-container">
+                        Access<span class="requiredAsterisk ng-hide" ng-show="accessMetadata.required | bool">*</span>
+                    </div>
+                    <div class="col-md-9 field-container">
+                        <div item="reportConfigModel.MetaData" field-metadata="accessMetadata" initial-mode="edit" on-apply-field-value="handleAccessChange(oldValue, newValue, fieldMetadata)"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="report-properties-details-tab-content_Access" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">Group</div>
+</div></span><!-- end of pl-presenter --></div>
+                    </div>
+                </div>
+            </div>
+            <div ng-show="showGroups" class="ng-hide">
+                <div data-aid="field-att-container" class="row-fluid row-margin">
+                    <div class="col-md-3 label-container">
+                        Audience<span class="requiredAsterisk ng-hide" ng-show="groupsMetadata.required | bool">*</span>
+                    </div>
+                    <div class="col-md-9 field-container">
+                        <div item="reportConfigModel.MetaData" field-metadata="groupsMetadata" initial-mode="view" on-apply-field-value="handleGroupsChange(oldValue, newValue)"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/drop-down/drop-down-viewer-tmpl.html'" class=""><div data-aid="report-properties-details-tab-content_GroupIds" data-control-type="DropDown" pl-data-provider-item-label="" field-value="field.value" data-provider="field.metadata.dataProvider">SMX-IT-ISC-HELPDESK, PDO CIDO Members</div>
+</div></span><!-- end of pl-presenter --></div>
+                    </div>
+                </div>
+            </div>
+			<div>
+				<div data-aid="field-att-container" class="row-fluid row-margin">
+					<div class="col-md-3 label-container">
+						Description<span class="requiredAsterisk ng-hide" ng-show="descriptionMetadata.required | bool">*</span>
+					</div>
+					<div class="col-md-9 field-container">
+						<div item="reportConfigModel.MetaData" field-metadata="descriptionMetadata" initial-mode="edit" on-apply-field-value="handleDescriptionChange(oldValue, newValue, fieldMetadata)"><!-- pl-presenter --><span class="control-template-placeholder viewer-template-placeholder"><!-- ngInclude: 'js/modules/platform/ui/presentation-controls/textarea/textarea-viewer-tmpl.html' --><div ng-include="'js/modules/platform/ui/presentation-controls/textarea/textarea-viewer-tmpl.html'" class=""><div data-aid="report-properties-details-tab-content_Description" data-control-type="TextArea" pl-bind-html="field.value" class="ng-binding">Shows the number of active Requests which are waiting to be assigned, grouped by priority.</div></div></span><!-- end of pl-presenter --></div>
+					</div>
+				</div>
+			</div>
+            <!-- ngInclude:  -->
+        </pl-presenter-container>
+    </ng-form>
+</div></div>
+        </div><!-- end ngRepeat: tab in model.propertiesTabs -->
+    </div>
+
+    <div class="properties-footer">
+        <div class="separator"></div>
+        <div class="buttonBar" data-aid="properties-buttonBar">
+            <div class="align-float-left">
+                <button class="btn min-width btn-primary" ng-disabled="!model.selectedReportIsDirty" data-aid="report-properties-btn-Save" ng-click="saveReport()" blur="" disabled="disabled">Save</button>
+                <button class="btn min-width" ng-disabled="!model.selectedReportIsDirty" data-aid="report-properties-btn-Cancel" ng-click="cancelChanges()" disabled="disabled">Cancel</button>
+            </div>
+            <button class="btn min-width align-float-right" ng-disabled="!model.selectedReportIsDirty" data-aid="report-properties-btn-Preview" ng-click="previewReport()" disabled="disabled">Preview</button>
+        </div>
+    </div>
+</div></div>
+    </pl-sidebar-content></div>
+    </div>
+</div>
+<div class="report-area" data-aid="report-area">
+    <div id="reportContainer" style="height:100%">
+        <!-- ngInclude: 'js/modules/platform/ui/reports/chart-container/report-container-tmpl.html' --><div ng-include="'js/modules/platform/ui/reports/chart-container/report-container-tmpl.html'" style="height:100%" class=""><div ng-controller="ReportContainerCtrl">
+
+    <div class="report-area-header clearfix" data-aid="report-area-header">
+        <div class="report-area-title">
+            <div class="report-title-name name-ellipsis">
+                <pl-top-x-indicator report-id="reportId" report-metadata="reportMetadata" is-top-x-report="isTopxReport"><!-- ngIf: isTopXReport --></pl-top-x-indicator>
+
+                <!-- ngIf: !isTopxReport --><span data-aid="report-total-count" ng-if="!isTopxReport" title="3716 Records" class="">3716</span><!-- end ngIf: !isTopxReport -->
+                <!-- ngIf: !isTopxReport && (reportTotalCount !== '') --><span ng-if="!isTopxReport &amp;&amp; (reportTotalCount !== '')" class="report-count-separator divider-vertical-short"></span><!-- end ngIf: !isTopxReport && (reportTotalCount !== '') -->
+
+                <span ng-class="{'top-x-report-name' : isTopxReport}" data-aid="report-name" role="heading" aria-level="3">SLA -FCR This Month - 80% - Incident Excluded</span>
+            <span class="report-dirty"></span>
+            </div>
+            <pl-report-type-display report-type="BasicOperational" data-aid="BasicOperational"><div class="report-type-title" title="-Operational report-"><span class="report-type-badge operational-badge">Op</span>-Operational report-</div></pl-report-type-display>
+        </div>
+        <div class="report-display-toolbar tool-bar" data-aid="tool-bar-main-container" pl-toolbar-keyboard-navigation="" pl-toolbar="" items="toolbarItems" role="toolbar">
+    <!-- ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-duplicate" tabindex="0" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Duplicate" class="btn btn-icon plToolbarItem  tool-bar-btn-duplicate" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Duplicate ">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-copy pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Duplicate
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-export" tabindex="-1" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Export CSV" class="btn btn-icon plToolbarItem  tool-bar-btn-export" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Export CSV ">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-document-csv pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Export CSV
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-export-xls" tabindex="-1" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Export XLS" class="btn btn-icon plToolbarItem  tool-bar-btn-export-xls" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Export XLS ">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-document-excel pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Export XLS
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-export-pdf" tabindex="-1" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Export PDF" class="btn btn-icon plToolbarItem  tool-bar-btn-export-pdf" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Export PDF ">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-document-pdf pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Export PDF
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-activate" tabindex="0" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Activate" class="btn btn-icon plToolbarItem  tool-bar-btn-activate ng-hide plToolbarItemDisabled disabled" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Activate " disabled="disabled">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-activate pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Activate
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular --><span ng-switch-when="regular" pl-toolbar-button="" item="item" class=""><button ng-show="item.visible" data-aid="tool-bar-btn-deactivate" tabindex="0" aria-haspopup="false" type="button" role="button" aria-live="off" aria-label="Deactivate" class="btn btn-icon plToolbarItem  tool-bar-btn-deactivate ng-hide plToolbarItemDisabled disabled" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" ng-click="executeCallback(item, $event)" pl-shortcut="" context="" title="Deactivate " disabled="disabled">
+    <span data-ng-switch="item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+            <span>
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><span ng-switch-when="true" class="icon-rrect-na pl-toolbar-item-icon"></span><!-- end ngSwitchWhen: -->
+            </span>Deactivate
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: icon-only -->
+        <!-- ngSwitchWhen: text-only -->
+    </span>
+</button></span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) --><span ng-repeat="item in items track by (item.dataAid + $index)" class="tool-bar-item">
+	    <span ng-switch="" on="getButtonType(item)">
+            <!-- ngSwitchWhen: DropDown --><span ng-switch-when="DropDown" data-aid="tool-bar-dd-container-change-type" class="btn-group ng-hide" ng-show="item.visible" ng-disabled="true" disabled="disabled">
+                <button role="listbox" aria-haspopup="true" aria-label="Change type" data-aid="tool-bar-main-dd-btn-change-type" class="btn pl-toolbar-dropdown  plToolbarItemDisabled disabled" title="Change type" ng-class="{plToolbarItemDisabled:!dropDownEnabled, disabled:!dropDownEnabled}" data-toggle="dropdown" type="button" tabindex="-1">
+                    <span data-ng-switch="item.type">
+                         <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="item.isGlyph" class="">
+                             <span>
+                                 <!-- ngSwitchDefault: false --><!-- ngIf: item.icon --><!-- end ngSwitchWhen: -->
+                                 <!-- ngSwitchWhen: true -->
+                             </span>Change type
+                         </span><!-- end ngSwitchWhen: -->
+                         <!-- ngSwitchWhen: text-only -->
+                     </span>
+                    <span class="caret"></span>
+                </button>
+                <span class="divider-vertical-short"></span>
+                <ul class="dropdown-menu pull-left" ng-class="reverseDirection ? 'pull-right' : 'pull-left'" pl-bs-dropdown-body="">
+                    <!-- ngRepeat: btn in item.buttons track by btn.dataAid --><li ng-repeat="btn in item.buttons track by btn.dataAid" class="">
+                        <a role="option" href="javascript:" ng-show="item.visible" aria-label="Analytic report" tabindex="-1" data-aid="tool-bar-inner-dd-btn-change-report-basicanalytical" type="submit" ng-disabled="!item.enabled" ng-class="{plToolbarItemDisabled:!item.enabled, disabled:!item.enabled}" class="plToolbarItemDisabled disabled" ng-click="item.callback(item, $event)" ng-mouseenter="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = true)" ng-mouseleave="item.type === 'sub-dropdown' &amp;&amp; (item.isSubDropdownOpen = false)" pl-toolbar-button-in-dropdown="" item="btn" disabled="disabled">
+    <span data-ng-switch="::item.type">
+        <!-- ngSwitchDefault: text-icon --><span data-ng-switch-default="text-icon" ng-switch="" on="::item.isGlyph" class="">
+            <span title="Analytic reports are calculated according to a defined schedule and can be generated for an unlimited amount of data.">
+                <!-- ngSwitchWhen: false -->
+                <!-- ngSwitchWhen: true --><div ng-switch-when="true" class="icon-information pl-toolbar-item-icon"></div><!-- end ngSwitchWhen: -->
+            </span>
+            <!-- ngIf: ::item.premark !== undefined --><span ng-if="::item.premark !== undefined" class="toolbar-dropdown-before-item-mark">
+                <span class="analytic-badge">An</span>
+            </span><!-- end ngIf: ::item.premark !== undefined -->
+            <span class="toolbar-dropdown-item-text">Analytic report</span>
+        </span><!-- end ngSwitchWhen: -->
+        <!-- ngSwitchWhen: text-only -->
+        <!-- ngSwitchWhen: sub-dropdown -->
+    </span>
+</a>
+                    </li><!-- end ngRepeat: btn in item.buttons track by btn.dataAid -->
+                </ul>
+            </span><!-- end ngSwitchWhen: -->
+            <!-- ngSwitchWhen: ClickableDropDown -->
+            <!-- ngSwitchWhen: template -->
+            <!-- ngSwitchWhen: regular -->
+            <!-- ngSwitchWhen: delayInit -->
+        </span>
+    </span><!-- end ngRepeat: item in items track by (item.dataAid + $index) -->
+    <!-- ngIf: secondaryItems && secondaryItems.length -->
+</div>
+        <div class="report-area-buttons" ng-show="isReportActive">
+            <div class="report-area-display-toggle" data-aid="report-area-buttons">
+                <span class="btn-group" data-toggle="buttons">
+                    <!-- ngRepeat: vis in visualizations --><button ng-repeat="vis in visualizations" ng-click="changeSelectedVis(vis)" class="btn active" data-aid="report-toggle-Pie" ng-class="{active: vis.Id === selectedVisId}" title="Show Chart">
+                        <input type="radio"><i class="icon-pie"></i>
+                    </button><!-- end ngRepeat: vis in visualizations --><button ng-repeat="vis in visualizations" ng-click="changeSelectedVis(vis)" class="btn" data-aid="report-toggle-Grid" ng-class="{active: vis.Id === selectedVisId}" title="Show Table">
+                        <input type="radio"><i class="icon-table"></i>
+                    </button><!-- end ngRepeat: vis in visualizations -->
+                </span>
+            </div>
+            <div class="reports-display">Display:</div>
+        </div>
+    </div>
+    <!-- ngIf: isReportActive --><pl-report class="reportViewTemplateBk" report-id="reportId" report-metadata="reportMetadata" preview="isPreview" ng-if="isReportActive" api="reportApi"><div class="report-drtv BasicOperational Pie" data-aid="report-container" ng-class="getTemplateId() + ' ' + selectedVisualizationType" style="top: 96px;">
+    <div id="drilldown-menu" class="report-context-menu ng-hide" ng-show="showDrilldownMenu" ng-mouseenter="endMenuTimer()" ng-mouseleave="startMenuTimer()">
+        <div class="report-context-menu-item ng-hide" ng-show="showEmsDrilldownOption">
+            Go to  
+             grid
+        </div>
+        <div class="report-context-menu-item ng-hide" ng-show="showOfflineDrilldownOption">
+            Export specific raw data
+        </div>
+    </div>
+    <div ng-switch="status">
+        <!-- ngSwitchWhen: InProcess -->
+    </div>
+    <!-- ngIf: preview && status=='Success' -->
+    <div class="report-visualization-container" ng-show="status=='Success'"><pl-report-pie data="data" data-aid="pie-chart" options="options" style="height: 100%;" class="fixed-legend"><div class="chart-container" data-aid="report-pie" report-id="reportId">
+    <svg aria-hidden="true" style=""><g class="nvd3 nv-wrap nv-pieChart" transform="translate(20,30)"><g><g class="nv-pieWrap"><g class="nvd3 nv-wrap nv-pie nv-chart-2001" transform="translate(0,0)"><g><g class="nv-pie" transform="translate(461.5,299)"><g class="nv-slice" fill="#2281af" stroke="#2281af"><path d="M1.4646775717802343e-14,-239.2A239.2,239.2 0 1,1 -162.58433916106608,-175.45076990301138L0,0Z"></path><g class="nv-label" transform="translate(56.39886580985145,143.8381657814169)"><rect rx="3" ry="3" style="stroke: rgb(255, 255, 255); fill: rgb(255, 255, 255);" width="69.71875" height="30" transform="translate(-34.859375,-21)"></rect><text style="text-anchor: middle; fill: rgb(255, 255, 255); font-size: 18px;">88.11%</text></g></g><g class="nv-slice" fill="#753f83" stroke="#753f83"><path d="M-162.58433916106608,-175.45076990301138A239.2,239.2 0 0,1 -4.3940327153407027e-14,-239.2L0,0Z"></path><g class="nv-label" transform="translate(-56.398865809851465,-143.8381657814169)"><rect rx="3" ry="3" style="stroke: rgb(255, 255, 255); fill: rgb(255, 255, 255);" width="69.71875" height="30" transform="translate(-34.859375,-21)"></rect><text style="text-anchor: middle; fill: rgb(255, 255, 255); font-size: 18px;">11.89%</text></g></g></g></g></g></g><g class="nv-legendWrap" transform="translate(0,-30)"><g class="nvd3 nv-legend" transform="translate(0,1)"><g transform="translate(719.9375,1)"><g class="nv-series" transform="translate(5,5)"><circle r="5" style="stroke-width: 2; fill: rgb(34, 129, 175); stroke: rgb(34, 129, 175);"></circle><text text-anchor="start" dy=".32em" dx="8">Service Desk</text></g><g class="nv-series" transform="translate(103.6875,5)"><circle r="5" style="stroke-width: 2; fill: rgb(117, 63, 131); stroke: rgb(117, 63, 131);"></circle><text text-anchor="start" dy=".32em" dx="8">Expert Group</text></g></g></g></g></g></g></svg>
+</div><div class="nv-legendtab"><div data-aid="legend-item"><i style="background-color:rgb(34, 129, 175);border-color:rgb(34, 129, 175)"></i><span title="Service Desk">Service Desk</span><em> (88.11)</em></div><div data-aid="legend-item"><i style="background-color:rgb(117, 63, 131);border-color:rgb(117, 63, 131)"></i><span title="Expert Group">Expert Group</span><em> (11.89)</em></div></div></pl-report-pie></div>
+    <!-- ngIf: status=='Error' -->
+    <div class="report-bottom" ng-show="status=='Success'" ng-class="{'water-mark-displayed':preview &amp;&amp; status=='Success'}">
+        <!-- ngIf: preview && showPreviewDisclaimer -->
+        <span class="report-bottom-left">
+            Updated
+            <pl-time-ago from-time="1770805009108" style="display: inline" title="" aria-label="a few seconds ago" data-original-title="February 11 2026">a few seconds ago</pl-time-ago>
+        </span>
+        <span class="report-bottom-right">
+            <!-- ngIf: showGroupUTCDisclaimer -->
+            <a class="icon-refresh icon-blue report-refresh" data-aid="refresh-button" ng-click="refreshButtonHandler()" title="Refresh" tabindex="0" click-enter=""></a>
+            <a class="icon-info-sign ng-hide" style="margin-left: 5px;" pl-popover="tooltipPopoverOptions" ng-show="shouldShowInfoTooltip()"></a>
+        </span>
+    </div>
+</div>
+</pl-report><!-- end ngIf: isReportActive -->
+    <!-- ngIf: !isReportActive -->
+</div></div>
+    </div>
+</div></div>
+</div>
+</div><!-- end ngIf: applicationInitialized -->
+
+<!-- ngIf: !applicationInitialized || loading -->
+
+<!-- ngIf: applicationInitialized --><div ng-if="applicationInitialized" ng-hide="loading" id="aiAviator" class="ai-aviator-ctn">
+    <ai-aviator><!-- ngIf: aviatorAvailable --></ai-aviator>
+</div><!-- end ngIf: applicationInitialized -->
+
+<footer>
+    <div id="url-download-anchor" style="display: none">
+</div></footer>
+
+<!-- define mx-graph base path -->
+<script type="text/javascript">
+    mxBasePath = 'resources/mx-graph';
+    mxLoadStylesheets = false;
+</script>
+
+<script type="text/javascript" src="lib/third-party-libs-saw.07834018d79dc2b0.js"></script>
+<script type="text/javascript" src="lib/templates/prod/saw-templates.684b6abf99c80695.js"></script>
+<script type="text/javascript" src="js/platform-init.min.108b708a6d3e65e0.js"></script>
+<script type="text/javascript" src="app.c777be063b52832c.js"></script>
+<script type="text/javascript" src="js/infra.a3e889f322e22f6b.js"></script>
+<script type="text/javascript" src="js/shared.823299aaec959625.js"></script>
+<script type="text/javascript" src="js/platform.ff2ed8309b5d5456.js"></script>
+<script type="text/javascript" src="js/saw-routes.132458d979f06c56.js"></script>
+<script type="text/javascript">mxKeyHandler.prototype.enabled = false;</script>
+<script type="text/javascript" src="js/ess.03501b6dec675cae.js"></script>
+<script type="text/javascript" src="js/admin.94fd8df02340e996.js"></script>
+<script type="text/javascript" src="js/sap.fea61de51ae54c12.js"></script>
+<script type="text/javascript" src="js/saw.323f0814c0dc2033.js"></script>
+<script type="text/javascript" src="maas-module.248523243a2f90a9.js"></script>
+
+<script type="text/javascript">
+    //Fallback for CDN - reload page with [no-cdn] parameter
+    if(!window.jQuery){
+        var currentLocation = window.location.href;
+        if(currentLocation.indexOf('no-cdn') < 0){
+            window.location.search += '&no-cdn=true';
+        } else {
+            //To avoid refresh page endless loop
+            alert("Static content unavailable");
+        }
+    }
+</script>
+
+
+
+
+
+<span role="status" aria-live="polite" class="select2-hidden-accessible"></span><span role="status" aria-live="polite" class="select2-hidden-accessible"></span><span role="status" aria-live="polite" class="select2-hidden-accessible"></span></body></html>
