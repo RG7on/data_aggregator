@@ -129,8 +129,22 @@ def _default_settings() -> dict:
             "cuic": {
                 "enabled": True,
                 "url": "https://148.151.32.77:8444/cuicui/Main.jsp",
-                "report_folder": "Test",
-                "report_name": "Z Call Type Historical All Fields",
+                "reports": [
+                    {
+                        "label": "call_type_hist",
+                        "folder": "Test",
+                        "name": "Z Call Type Historical All Fields",
+                        "enabled": True,
+                        "filters": {}
+                    },
+                    {
+                        "label": "agent_hist",
+                        "folder": "Stock/CCE/CCE_AF_Historical",
+                        "name": "Agent Historical All Fields",
+                        "enabled": True,
+                        "filters": {}
+                    }
+                ],
                 "timeout_nav_ms": 30000,
                 "timeout_short_ms": 1500,
                 "timeout_medium_ms": 2500,

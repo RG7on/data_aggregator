@@ -2,21 +2,25 @@
 CUIC Report Worker
 ==================
 Scrapes Cisco Unified Intelligence Center (CUIC) ag-grid report data.
+Supports multiple reports configured in settings.json.
 
-Flow (optimised for speed):
+Flow:
   1. Login (2-stage: username → password + LDAP)
-  2. Click Reports tab → enter reports iframe
-  3. Click folder → click report (single-click, ng-grid)
-  4. Filter wizard: Next → Next → Run
-  5. Scrape ag-grid data → long-format dicts
+  2. For each enabled report:
+     a. Navigate to Reports tab → enter reports iframe
+     b. Click folder → click report (single-click, ng-grid)
+     c. Filter wizard: Next → Next → Run
+     d. Scrape ag-grid data → long-format dicts
+     e. Close report tab → return to reports list
 """
 
-import os, sys, re
+import os, sys, re, time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.base_worker import BaseWorker
 from core.config import get_worker_settings, get_worker_credentials
+from core.database import log_scrape
 from typing import Dict, Any, List
 
 
@@ -50,11 +54,16 @@ class Worker(BaseWorker):
         cfg  = get_worker_settings('cuic')
         cred = get_worker_credentials('cuic')
 
-        self.url            = cfg.get('url', 'https://148.151.32.77:8444/cuicui/Main.jsp')
-        self.folder_name    = cfg.get('report_folder', 'Test')
-        self.report_name    = cfg.get('report_name', 'Z Call Type Historical All Fields')
-        self.username       = cred.get('username', '')
-        self.password       = cred.get('password', '')
+        self.url         = cfg.get('url', 'https://148.151.32.77:8444/cuicui/Main.jsp')
+        self.reports     = cfg.get('reports', [{
+            'label': 'call_type_hist',
+            'folder': 'Test',
+            'name': 'Z Call Type Historical All Fields',
+            'enabled': True,
+            'filters': {}
+        }])
+        self.username    = cred.get('username', '')
+        self.password    = cred.get('password', '')
         self.timeout_nav    = cfg.get('timeout_nav_ms',    30000)
         self.timeout_short  = cfg.get('timeout_short_ms',  1500)
         self.timeout_medium = cfg.get('timeout_medium_ms', 2500)
@@ -68,7 +77,13 @@ class Worker(BaseWorker):
         if not self.username or not self.password:
             self.logger.error("CUIC credentials not set in config/credentials.json")
             return []
-        self.logger.info(f"Starting CUIC scraper → {self.url}")
+
+        enabled = [r for r in self.reports if r.get('enabled', True)]
+        if not enabled:
+            self.logger.info("No enabled CUIC reports configured")
+            return []
+
+        self.logger.info(f"Starting CUIC scraper → {self.url} ({len(enabled)} report(s))")
         try:
             self.setup_browser(ignore_https_errors=True)
             return self.scrape()
@@ -82,14 +97,79 @@ class Worker(BaseWorker):
     def scrape(self) -> List[Dict[str, Any]]:
         if not self._login():
             return []
-        frame = self._get_reports_frame()
-        if not frame:
-            return []
-        if not self._open_report(frame):
-            return []
-        if not self._run_filter_wizard():
-            return []
-        return self._scrape_data()
+
+        all_data = []
+        enabled = [r for r in self.reports if r.get('enabled', True)]
+
+        for i, report in enumerate(enabled):
+            label  = report.get('label', f'report_{i}')
+            folder = report.get('folder', '')
+            name   = report.get('name', '')
+
+            self.logger.info(f"━━━ Report {i+1}/{len(enabled)}: {label} ({folder}/{name}) ━━━")
+            t0 = time.time()
+
+            try:
+                # Between reports: close extra tabs, navigate back to reports root
+                if i > 0:
+                    self._close_report_page()
+                    self._navigate_to_reports_root()
+
+                frame = self._get_reports_frame()
+                if not frame:
+                    log_scrape('cuic', label, 'error', 0, time.time() - t0,
+                               'Reports iframe not found')
+                    continue
+
+                if not self._open_report(frame, folder, name):
+                    log_scrape('cuic', label, 'error', 0, time.time() - t0,
+                               f'Could not open {folder}/{name}')
+                    continue
+
+                if not self._run_filter_wizard():
+                    log_scrape('cuic', label, 'error', 0, time.time() - t0,
+                               'Filter wizard failed')
+                    continue
+
+                data = self._scrape_data(label)
+                elapsed = time.time() - t0
+
+                if data:
+                    all_data.extend(data)
+                    log_scrape('cuic', label, 'success', len(data), elapsed, '')
+                    self.logger.info(
+                        f"Report '{label}': {len(data)} records in {elapsed:.1f}s")
+                else:
+                    log_scrape('cuic', label, 'no_data', 0, elapsed, 'No data found')
+
+            except Exception as e:
+                log_scrape('cuic', label, 'error', 0, time.time() - t0, str(e))
+                self.logger.error(f"Report '{label}' failed: {e}")
+
+        # Final cleanup
+        self._close_report_page()
+        return all_data
+
+    # ──────────────────────────────────────────────────────────────────────
+    #  Navigation helpers for multi-report
+    # ──────────────────────────────────────────────────────────────────────
+    def _close_report_page(self):
+        """Close any extra browser tabs opened by a report."""
+        try:
+            pages = self.context.pages
+            while len(pages) > 1:
+                pages[-1].close()
+                pages = self.context.pages
+        except Exception:
+            pass
+
+    def _navigate_to_reports_root(self):
+        """Click the Reports tab to reset back to the reports list root."""
+        try:
+            self.page.click(self.REPORTS_TAB_CSS)
+            self.page.wait_for_timeout(self.timeout_medium)
+        except Exception as e:
+            self.logger.warning(f"Navigate to reports root: {e}")
 
     # ══════════════════════════════════════════════════════════════════════
     #  STEP 1 – LOGIN
@@ -155,47 +235,79 @@ class Worker(BaseWorker):
     # ══════════════════════════════════════════════════════════════════════
     #  STEP 3 – NAVIGATE FOLDER → CLICK REPORT
     # ══════════════════════════════════════════════════════════════════════
-    def _open_report(self, frame) -> bool:
+    def _open_report(self, frame, folder_path: str, report_name: str) -> bool:
+        """Navigate through a folder path (e.g. 'Stock/CCE/CCE_AF_Historical')
+        then click the report. Supports any nesting depth."""
         try:
-            # Click folder
-            if not self._click_grid_item(frame, self.folder_name, is_folder=True):
-                self.logger.error(f"Folder '{self.folder_name}' not found")
-                self.screenshot("folder_not_found", is_step=False)
-                return False
-            self.logger.info(f"Opened folder '{self.folder_name}'")
+            # Split folder path into segments — supports / or \ delimiters
+            folders = [f.strip() for f in folder_path.replace('\\', '/').split('/') if f.strip()]
 
-            self.page.wait_for_timeout(self.timeout_medium)
+            for depth, folder in enumerate(folders):
+                if not self._click_grid_item(frame, folder, is_folder=True):
+                    # Try scrolling to find it
+                    if not self._scroll_and_click_folder(frame, folder):
+                        self.logger.error(f"Folder '{folder}' not found (depth {depth})")
+                        self._dump_grid(frame)
+                        self.screenshot("folder_not_found", is_step=False)
+                        return False
+                self.logger.info(f"Opened folder '{folder}' (depth {depth})")
 
-            # Re-acquire frame if it detached
-            try:
-                frame.query_selector('body')
-            except Exception:
-                frame = self.page.frame(name=self.REPORTS_IFRAME_NAME)
+                self.page.wait_for_timeout(self.timeout_medium)
+
+                # Re-acquire frame if it detached
+                frame = self._reacquire_frame(frame)
                 if not frame:
-                    self.logger.error("Frame detached after folder click")
                     return False
 
-            # Wait for grid to refresh
-            try:
-                frame.wait_for_selector(self.GRID_CONTAINER, timeout=self.timeout_nav)
-            except Exception:
-                self.page.wait_for_timeout(self.timeout_short)
+                # Wait for grid to refresh with new folder contents
+                try:
+                    frame.wait_for_selector(self.GRID_CONTAINER, timeout=self.timeout_nav)
+                except Exception:
+                    self.page.wait_for_timeout(self.timeout_short)
 
-            # Click report
-            if not self._click_grid_item(frame, self.report_name, is_folder=False):
-                # Try scrolling
-                if not self._scroll_and_click(frame, self.report_name):
-                    self.logger.error(f"Report '{self.report_name}' not found")
+            # Click the report itself
+            if not self._click_grid_item(frame, report_name, is_folder=False):
+                if not self._scroll_and_click(frame, report_name):
+                    self.logger.error(f"Report '{report_name}' not found")
                     self._dump_grid(frame)
                     self.screenshot("report_not_found", is_step=False)
                     return False
-            self.logger.info(f"Clicked report '{self.report_name}'")
+            self.logger.info(f"Clicked report '{report_name}'")
             self.page.wait_for_timeout(self.timeout_medium)
             self.screenshot("02_report_clicked")
             return True
         except Exception as e:
             self.logger.error(f"Open report failed: {e}")
             self.screenshot("open_report_error", is_step=False)
+            return False
+
+    def _reacquire_frame(self, frame):
+        """Re-acquire the reports iframe if it detached after a click."""
+        try:
+            frame.query_selector('body')
+            return frame
+        except Exception:
+            frame = self.page.frame(name=self.REPORTS_IFRAME_NAME)
+            if not frame:
+                self.logger.error("Frame detached and could not be re-acquired")
+            return frame
+
+    def _scroll_and_click_folder(self, frame, name: str, max_scrolls: int = 20) -> bool:
+        """Scroll through the ng-grid viewport to find and click a folder."""
+        try:
+            vp = frame.query_selector(self.GRID_VIEWPORT)
+            if not vp:
+                return False
+            for _ in range(max_scrolls):
+                frame.evaluate('''s => {
+                    const vp = document.querySelector(s);
+                    if (vp) vp.scrollTop += vp.clientHeight;
+                }''', self.GRID_VIEWPORT)
+                self.page.wait_for_timeout(400)
+                if self._click_grid_item(frame, name, is_folder=True):
+                    return True
+            return False
+        except Exception:
             return False
 
     # ──────────────────────────────────────────────────────────────────────
@@ -327,7 +439,133 @@ class Worker(BaseWorker):
     # ══════════════════════════════════════════════════════════════════════
     #  STEP 5 – SCRAPE ag-grid DATA
     # ══════════════════════════════════════════════════════════════════════
-    def _scrape_data(self) -> List[Dict[str, Any]]:
+
+    # JavaScript injected into the frame to extract ALL data via ag-grid's
+    # internal API.  This bypasses virtual scrolling (DOM only renders
+    # visible rows) and is far more reliable than CSS-selector scraping.
+    #
+    # Access patterns tried (in order):
+    #   1. gridOptions.api  – most ag-grid versions expose this
+    #   2. __agComponent    – ag-grid enterprise internal
+    #   3. Angular scope    – AngularJS wrapper ($scope.gridApi)
+    #   4. ag-Grid global   – older builds register on window
+    AG_GRID_JS = r'''() => {
+        /* ── locate the grid API ────────────────────────────────── */
+        function findApi() {
+            // Pattern 1: walk DOM nodes for gridOptions (works on most versions)
+            const roots = document.querySelectorAll(
+                '.ag-root-wrapper, .ag-root, [class*="ag-theme"]'
+            );
+            for (const el of roots) {
+                // ag-grid >= 25: element stores a reference
+                if (el.__agComponent && el.__agComponent.gridApi)
+                    return el.__agComponent.gridApi;
+                // some builds put it on gridOptions attached to the element
+                if (el.gridOptions && el.gridOptions.api)
+                    return el.gridOptions.api;
+            }
+            // Pattern 2: walk ALL elements (broader search)
+            const all = document.querySelectorAll('*');
+            for (const el of all) {
+                if (el.__agComponent && el.__agComponent.gridApi)
+                    return el.__agComponent.gridApi;
+            }
+            // Pattern 3: AngularJS scope
+            if (typeof angular !== 'undefined') {
+                const agEl = document.querySelector('.ag-root-wrapper, .ag-root');
+                if (agEl) {
+                    const scope = angular.element(agEl).scope();
+                    if (scope && scope.gridApi) return scope.gridApi;
+                    if (scope && scope.gridOptions && scope.gridOptions.api)
+                        return scope.gridOptions.api;
+                }
+            }
+            // Pattern 4: window-level references
+            if (window.gridApi) return window.gridApi;
+            if (window.gridOptions && window.gridOptions.api)
+                return window.gridOptions.api;
+            return null;
+        }
+
+        /* ── locate column definitions ──────────────────────────── */
+        function getColumns(api) {
+            // Modern API (>= v28): api.getColumns()
+            try {
+                const cols = api.getColumns ? api.getColumns() :
+                             api.columnModel ? api.columnModel.getColumns() :
+                             null;
+                if (cols && cols.length) {
+                    return cols.map(c => ({
+                        field:    c.colDef ? c.colDef.field    : c.field    || '',
+                        headerName: c.colDef ? c.colDef.headerName : c.headerName || ''
+                    }));
+                }
+            } catch(e) {}
+
+            // columnApi (ag-grid < v31)
+            try {
+                const colApi = api.columnApi || api.columnController;
+                if (colApi) {
+                    const cols = colApi.getAllDisplayedColumns
+                        ? colApi.getAllDisplayedColumns()
+                        : colApi.getAllColumns();
+                    if (cols && cols.length) {
+                        return cols.map(c => ({
+                            field: c.colDef.field || '',
+                            headerName: c.colDef.headerName || ''
+                        }));
+                    }
+                }
+            } catch(e) {}
+
+            // getAllDisplayedColumns directly on api (v31+)
+            try {
+                const cols = api.getAllDisplayedColumns();
+                if (cols && cols.length) {
+                    return cols.map(c => ({
+                        field: c.colDef.field || '',
+                        headerName: c.colDef.headerName || ''
+                    }));
+                }
+            } catch(e) {}
+
+            return null;
+        }
+
+        /* ── extract all row data ───────────────────────────────── */
+        function getRows(api) {
+            const rows = [];
+            try {
+                // Works on all ag-grid versions
+                api.forEachNode(node => {
+                    if (node.data) rows.push(node.data);
+                });
+            } catch(e) {
+                // Fallback: getModel().forEachNode()
+                try {
+                    const model = api.getModel();
+                    model.forEachNode(node => {
+                        if (node.data) rows.push(node.data);
+                    });
+                } catch(e2) {}
+            }
+            return rows;
+        }
+
+        /* ── main ───────────────────────────────────────────────── */
+        const api = findApi();
+        if (!api) return { error: 'API_NOT_FOUND' };
+
+        const cols = getColumns(api);
+        if (!cols || cols.length === 0) return { error: 'NO_COLUMNS' };
+
+        const rows = getRows(api);
+        if (rows.length === 0) return { error: 'NO_ROWS' };
+
+        return { columns: cols, rows: rows, rowCount: rows.length };
+    }'''
+
+    def _scrape_data(self, report_label: str = '') -> List[Dict[str, Any]]:
         try:
             self.page.wait_for_timeout(self.timeout_long)
 
@@ -335,13 +573,22 @@ class Worker(BaseWorker):
             target = all_pages[-1] if len(all_pages) > 1 else self.page
 
             for frame in target.frames:
-                data = self._scrape_ag_grid(frame)
+                # ── Primary: ag-grid JavaScript API (gets ALL rows) ──
+                data = self._scrape_ag_grid_api(frame, report_label)
                 if data:
-                    self.logger.info(f"Scraped {len(data)} records from ag-grid")
+                    self.logger.info(f"Scraped {len(data)} records via ag-grid JS API")
                     self.screenshot("04_done")
                     return data
 
-                data = self._scrape_html_tables(frame)
+                # ── Fallback 1: DOM scraping (visible rows only) ─────
+                data = self._scrape_ag_grid_dom(frame, report_label)
+                if data:
+                    self.logger.info(f"Scraped {len(data)} records via ag-grid DOM fallback")
+                    self.screenshot("04_done")
+                    return data
+
+                # ── Fallback 2: plain HTML tables ────────────────────
+                data = self._scrape_html_tables(frame, report_label)
                 if data:
                     self.logger.info(f"Scraped {len(data)} records from HTML tables")
                     self.screenshot("04_done")
@@ -355,7 +602,63 @@ class Worker(BaseWorker):
             self.screenshot("scrape_error", is_step=False)
             return []
 
-    def _scrape_ag_grid(self, frame) -> List[Dict[str, Any]]:
+    # ──────────────────────────────────────────────────────────────────────
+    #  PRIMARY: ag-grid JavaScript API
+    # ──────────────────────────────────────────────────────────────────────
+    def _scrape_ag_grid_api(self, frame, report_label: str = '') -> List[Dict[str, Any]]:
+        """Extract data via ag-grid's internal JS API.
+        Returns ALL rows regardless of virtual scroll viewport."""
+        try:
+            if not frame.query_selector('.ag-root, .ag-body-viewport, [class*="ag-theme"]'):
+                return []
+
+            result = frame.evaluate(self.AG_GRID_JS)
+
+            if not isinstance(result, dict):
+                self.logger.debug("ag-grid JS API: unexpected return type")
+                return []
+            if 'error' in result:
+                self.logger.debug(f"ag-grid JS API: {result['error']}")
+                return []
+
+            columns = result['columns']
+            rows    = result['rows']
+            self.logger.info(f"ag-grid JS API: {len(columns)} columns, {result['rowCount']} rows")
+
+            # Build header names (prefer headerName, fall back to field)
+            hdrs = [c.get('headerName') or c.get('field', f'col_{i}')
+                    for i, c in enumerate(columns)]
+            fields = [c.get('field', '') for c in columns]
+
+            self.logger.info(f"ag-grid columns: {hdrs}")
+
+            # Convert to long-format dicts
+            data = []
+            for row in rows:
+                # First column = category (Call Type, etc.)
+                cat = str(row.get(fields[0], '') if fields[0] else '') if fields else ''
+
+                for ci in range(1, len(columns)):
+                    field = fields[ci]
+                    val = row.get(field, '') if field else ''
+                    if val is None:
+                        val = ''
+                    data.append({
+                        'metric_title': f"CUIC_{hdrs[ci]}",
+                        'category':     cat,
+                        'sub_category': report_label,
+                        'value':        str(val)
+                    })
+            return data
+        except Exception as e:
+            self.logger.debug(f"ag-grid JS API failed: {e}")
+            return []
+
+    # ──────────────────────────────────────────────────────────────────────
+    #  FALLBACK 1: ag-grid DOM scraping (original method)
+    # ──────────────────────────────────────────────────────────────────────
+    def _scrape_ag_grid_dom(self, frame, report_label: str = '') -> List[Dict[str, Any]]:
+        """DOM-based scraping. Only gets rows rendered in viewport."""
         try:
             if not frame.query_selector('.ag-root, .ag-body-viewport'):
                 return []
@@ -365,7 +668,7 @@ class Worker(BaseWorker):
             ) if h.inner_text().strip()]
             if len(hdrs) < 2:
                 return []
-            self.logger.info(f"ag-grid columns: {hdrs}")
+            self.logger.info(f"ag-grid DOM columns: {hdrs}")
 
             data = []
             for row in frame.query_selector_all('.ag-row'):
@@ -376,13 +679,16 @@ class Worker(BaseWorker):
                 for ci in range(1, min(len(hdrs), len(vals))):
                     data.append({
                         'metric_title': f"CUIC_{hdrs[ci]}",
-                        'category': cat, 'sub_category': '', 'value': vals[ci]
+                        'category': cat, 'sub_category': report_label, 'value': vals[ci]
                     })
             return data
         except Exception:
             return []
 
-    def _scrape_html_tables(self, frame) -> List[Dict[str, Any]]:
+    # ──────────────────────────────────────────────────────────────────────
+    #  FALLBACK 2: plain HTML tables
+    # ──────────────────────────────────────────────────────────────────────
+    def _scrape_html_tables(self, frame, report_label: str = '') -> List[Dict[str, Any]]:
         try:
             data = []
             for table in frame.query_selector_all('table'):
@@ -400,7 +706,7 @@ class Worker(BaseWorker):
                     for ci in range(1, min(len(hdrs), len(vals))):
                         data.append({
                             'metric_title': f"CUIC_{hdrs[ci]}",
-                            'category': cat, 'sub_category': '', 'value': vals[ci]
+                            'category': cat, 'sub_category': report_label, 'value': vals[ci]
                         })
             return data
         except Exception:

@@ -3,27 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Data Aggregator — Settings</title>
+<title>Data Aggregator — Control Panel</title>
 <style>
-  :root { --bg: #0d1117; --surface: #161b22; --border: #30363d; --text: #c9d1d9; --muted: #8b949e;
-           --accent: #58a6ff; --green: #3fb950; --red: #f85149; --yellow: #d29922; --radius: 8px; }
+  :root { --bg: #0d1117; --surface: #161b22; --surface2: #1c2128; --border: #30363d;
+           --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950;
+           --red: #f85149; --yellow: #d29922; --orange: #db6d28; --radius: 8px; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-         background: var(--bg); color: var(--text); line-height: 1.6; padding: 24px; max-width: 960px; margin: auto; }
-
+         background: var(--bg); color: var(--text); line-height: 1.6; padding: 24px; max-width: 1040px; margin: auto; }
   h1 { font-size: 24px; margin-bottom: 4px; }
   .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
-  h2 { font-size: 18px; margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+  h2 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
   h2 .badge { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: var(--border); color: var(--muted); font-weight: 400; }
   h3 { font-size: 15px; color: var(--accent); margin: 16px 0 8px; }
-
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-  .card.collapsed .card-body { display: none; }
-  .card-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-  .card-header h2 { margin: 0; }
-  .card-header .toggle { font-size: 20px; color: var(--muted); transition: transform .2s; }
-  .card.collapsed .toggle { transform: rotate(-90deg); }
-
   .field { margin-bottom: 14px; }
   .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
   .field input[type="text"], .field input[type="number"], .field input[type="password"], .field select, .field textarea {
@@ -32,123 +25,202 @@
   .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
   .field textarea { min-height: 72px; resize: vertical; font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 13px; }
   .field .hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
   .row { display: flex; gap: 12px; }
   .row > .field { flex: 1; }
-
   .toggle-switch { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   .toggle-switch input[type="checkbox"] { width: 36px; height: 20px; appearance: none; background: var(--border);
-    border-radius: 10px; position: relative; cursor: pointer; transition: .2s; }
+    border-radius: 10px; position: relative; cursor: pointer; transition: .2s; flex-shrink: 0; }
   .toggle-switch input[type="checkbox"]::after { content: ''; position: absolute; width: 16px; height: 16px;
     background: var(--muted); border-radius: 50%; top: 2px; left: 2px; transition: .2s; }
   .toggle-switch input[type="checkbox"]:checked { background: var(--green); }
   .toggle-switch input[type="checkbox"]:checked::after { left: 18px; background: #fff; }
   .toggle-switch label { font-size: 14px; cursor: pointer; }
-
-  .btn-bar { display: flex; gap: 10px; margin-top: 24px; position: sticky; bottom: 0; background: var(--bg); padding: 16px 0; border-top: 1px solid var(--border); }
-  .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; }
+  .btn-bar { display: flex; gap: 10px; margin-top: 24px; position: sticky; bottom: 0;
+             background: var(--bg); padding: 16px 0; border-top: 1px solid var(--border); z-index: 50; }
+  .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: .15s; }
   .btn-primary { background: var(--green); color: #fff; }
   .btn-primary:hover { filter: brightness(1.1); }
   .btn-secondary { background: var(--border); color: var(--text); }
   .btn-secondary:hover { background: #3d444d; }
-
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn-icon { padding: 6px 10px; font-size: 16px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; }
+  .btn-icon:hover { color: var(--red); border-color: var(--red); }
   .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px;
            font-size: 14px; font-weight: 500; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 100; }
   .toast.show { opacity: 1; }
   .toast.success { background: var(--green); color: #fff; }
   .toast.error { background: var(--red); color: #fff; }
   .toast.info { background: var(--accent); color: #fff; }
-
-  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
-  .tab { padding: 10px 18px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: .2s; font-size: 14px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; gap: 2px; }
+  .tab { padding: 10px 18px; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent;
+         transition: .2s; font-size: 14px; white-space: nowrap; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
-
   code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-  .help { background: #1c2128; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; font-size: 13px; color: var(--muted); }
+  .help { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+          padding: 16px; margin-bottom: 16px; font-size: 13px; color: var(--muted); }
   .help strong { color: var(--text); }
+
+  /* Report cards */
+  .report-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+                 padding: 16px; margin-bottom: 12px; }
+  .report-card.disabled { opacity: 0.6; }
+  .report-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .report-card-header .label-tag { font-size: 14px; font-weight: 600; color: var(--accent);
+    background: rgba(88,166,255,0.1); padding: 3px 10px; border-radius: 4px; }
+  .report-card .inline-row { display: grid; grid-template-columns: 160px 1fr; gap: 10px; margin-bottom: 8px; align-items: center; }
+  .report-card .inline-row label { font-size: 13px; color: var(--muted); }
+  .report-card .inline-row input { padding: 6px 10px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text); font-size: 13px; }
+  .report-card .inline-row input:focus { outline: none; border-color: var(--accent); }
+
+  /* Status badge */
+  .status-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-top: 10px;
+    background: var(--bg); border-radius: 6px; font-size: 12px; color: var(--muted); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.success { background: var(--green); }
+  .status-dot.error { background: var(--red); }
+  .status-dot.no_data { background: var(--yellow); }
+  .status-dot.pending { background: var(--border); }
+
+  /* Dashboard */
+  .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+               padding: 16px; text-align: center; }
+  .stat-card .stat-value { font-size: 28px; font-weight: 700; color: var(--accent); }
+  .stat-card .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .log-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .log-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--muted); font-weight: 500; }
+  .log-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .log-table tr:hover { background: var(--surface2); }
+  .status-pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .status-pill.success { background: rgba(63,185,80,0.15); color: var(--green); }
+  .status-pill.error { background: rgba(248,81,73,0.15); color: var(--red); }
+  .status-pill.no_data { background: rgba(210,153,34,0.15); color: var(--yellow); }
+
+  .server-status { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 6px; }
+  .server-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .server-status.offline .dot { background: var(--red); }
+  .server-status.offline { color: var(--red); }
 </style>
 </head>
 <body>
 
-<h1>⚙️ Data Aggregator Settings</h1>
-<p class="subtitle">Edit settings below, then click <strong>Save</strong> to generate updated JSON files. Copy the JSON into your config files.</p>
+<div style="display:flex; justify-content:space-between; align-items:flex-start;">
+  <div>
+    <h1>⚙️ Data Aggregator Control Panel</h1>
+    <p class="subtitle">Configure workers, manage reports, and monitor scrape status.</p>
+  </div>
+  <div class="server-status" id="server-status">
+    <span class="dot"></span>
+    <span id="server-status-text">Connected</span>
+  </div>
+</div>
 
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('global')">Global</div>
-  <div class="tab" onclick="switchTab('cuic')">CUIC Worker</div>
-  <div class="tab" onclick="switchTab('smax')">SMAX Worker</div>
-  <div class="tab" onclick="switchTab('export')">Export / Import</div>
+  <div class="tab active" data-tab="dashboard">Dashboard</div>
+  <div class="tab" data-tab="global">Global</div>
+  <div class="tab" data-tab="cuic">CUIC Worker</div>
+  <div class="tab" data-tab="smax">SMAX Worker</div>
+  <div class="tab" data-tab="export">Export / Import</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  DASHBOARD TAB                                                         -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-dashboard">
+  <div class="dashboard-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total-reports">-</div>
+      <div class="stat-label">Configured Reports</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-last-run">-</div>
+      <div class="stat-label">Last Scrape</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-success-rate">-</div>
+      <div class="stat-label">Success Rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-total-rows">-</div>
+      <div class="stat-label">Total Rows (Last Run)</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Recent Scrape History</h2>
+    <div style="max-height:400px; overflow-y:auto;">
+      <table class="log-table">
+        <thead><tr><th>Time</th><th>Source</th><th>Report</th><th>Status</th><th>Rows</th><th>Duration</th><th>Message</th></tr></thead>
+        <tbody id="scrape-log-body"><tr><td colspan="7" style="text-align:center;color:var(--muted)">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <!--  GLOBAL TAB                                                            -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-content active" id="tab-global">
+<div class="tab-content" id="tab-global">
   <div class="card">
     <h2>Browser</h2>
-    <div class="card-body">
-      <div class="toggle-switch">
-        <input type="checkbox" id="g-headless" checked>
-        <label for="g-headless">Headless mode <span style="color:var(--muted)">(no visible browser window)</span></label>
-      </div>
-      <div class="toggle-switch">
-        <input type="checkbox" id="g-system-chrome" checked>
-        <label for="g-system-chrome">Use system Chrome</label>
-      </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="g-headless" checked>
+      <label for="g-headless">Headless mode <span style="color:var(--muted)">(no visible browser window)</span></label>
+    </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="g-system-chrome" checked>
+      <label for="g-system-chrome">Use system Chrome</label>
     </div>
   </div>
 
   <div class="card">
     <h2>Screenshots</h2>
-    <div class="card-body">
-      <div class="toggle-switch">
-        <input type="checkbox" id="g-screenshot-steps">
-        <label for="g-screenshot-steps">Screenshot every step <span style="color:var(--muted)">(slow but useful for debugging)</span></label>
-      </div>
-      <div class="toggle-switch">
-        <input type="checkbox" id="g-screenshot-errors" checked>
-        <label for="g-screenshot-errors">Screenshot on errors</label>
-      </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="g-screenshot-steps">
+      <label for="g-screenshot-steps">Screenshot every step <span style="color:var(--muted)">(slow but useful for debugging)</span></label>
+    </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="g-screenshot-errors" checked>
+      <label for="g-screenshot-errors">Screenshot on errors</label>
     </div>
   </div>
 
   <div class="card">
     <h2>Logging & Storage</h2>
-    <div class="card-body">
-      <div class="row">
-        <div class="field">
-          <label>Log Level</label>
-          <select id="g-log-level">
-            <option value="DEBUG">DEBUG</option>
-            <option value="INFO" selected>INFO</option>
-            <option value="WARNING">WARNING</option>
-            <option value="ERROR">ERROR</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Data Retention (days)</label>
-          <input type="number" id="g-retention" value="90" min="1">
-        </div>
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>Output Directory</label>
-          <input type="text" id="g-output-dir" value="output">
-          <div class="hint">Relative to project root</div>
-        </div>
-        <div class="field">
-          <label>Log Directory</label>
-          <input type="text" id="g-log-dir" value="logs">
-        </div>
+    <div class="row">
+      <div class="field">
+        <label>Log Level</label>
+        <select id="g-log-level">
+          <option value="DEBUG">DEBUG</option>
+          <option value="INFO" selected>INFO</option>
+          <option value="WARNING">WARNING</option>
+          <option value="ERROR">ERROR</option>
+        </select>
       </div>
       <div class="field">
-        <label>Shared Drive CSV Path</label>
-        <input type="text" id="g-shared-drive" value="" placeholder="\\\\server\\share\\kpi_snapshots.csv">
-        <div class="hint">UNC path to auto-export CSV for Power BI. Leave empty to disable.</div>
+        <label>Data Retention (days)</label>
+        <input type="number" id="g-retention" value="90" min="1">
       </div>
+    </div>
+    <div class="row">
+      <div class="field">
+        <label>Output Directory</label>
+        <input type="text" id="g-output-dir" value="output">
+        <div class="hint">Relative to project root</div>
+      </div>
+      <div class="field">
+        <label>Log Directory</label>
+        <input type="text" id="g-log-dir" value="logs">
+      </div>
+    </div>
+    <div class="field">
+      <label>Shared Drive CSV Path</label>
+      <input type="text" id="g-shared-drive" value="" placeholder="\\\\server\\share\\kpi_snapshots.csv">
+      <div class="hint">UNC path to auto-export CSV for Power BI. Leave empty to disable.</div>
     </div>
   </div>
 </div>
@@ -159,50 +231,51 @@
 <div class="tab-content" id="tab-cuic">
   <div class="card">
     <h2>CUIC Worker <span class="badge">cuic_worker.py</span></h2>
-    <div class="card-body">
-      <div class="toggle-switch">
-        <input type="checkbox" id="cuic-enabled" checked>
-        <label for="cuic-enabled">Enabled</label>
-      </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="cuic-enabled" checked>
+      <label for="cuic-enabled">Enabled</label>
+    </div>
 
-      <h3>Connection</h3>
+    <h3>Connection</h3>
+    <div class="field">
+      <label>CUIC URL</label>
+      <input type="text" id="cuic-url" value="https://148.151.32.77:8444/cuicui/Main.jsp">
+    </div>
+    <div class="row">
       <div class="field">
-        <label>CUIC URL</label>
-        <input type="text" id="cuic-url" value="https://148.151.32.77:8444/cuicui/Main.jsp">
+        <label>Username</label>
+        <input type="text" id="cuic-user" value="">
       </div>
-      <div class="row">
-        <div class="field">
-          <label>Username</label>
-          <input type="text" id="cuic-user" value="">
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input type="password" id="cuic-pass" value="">
-        </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="cuic-pass" value="">
       </div>
+    </div>
+  </div>
 
-      <h3>Report Path</h3>
-      <div class="row">
-        <div class="field">
-          <label>Folder Name</label>
-          <input type="text" id="cuic-folder" value="Test">
-        </div>
-        <div class="field">
-          <label>Report Name</label>
-          <input type="text" id="cuic-report" value="Z Call Type Historical All Fields">
-        </div>
-      </div>
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="margin:0">Reports</h2>
+      <button class="btn btn-secondary btn-sm" onclick="addCuicReport()">+ Add Report</button>
+    </div>
+    <div class="help">
+      Each report specifies a <strong>folder path</strong> and <strong>report name</strong> as they appear in the CUIC reports list.
+      Use <code>/</code> to separate nested folders (e.g. <code>Stock/CCE/CCE_AF_Historical</code>).
+      The <strong>label</strong> is a short unique identifier used for tracking (e.g. <code>agent_hist</code>).
+    </div>
+    <div id="cuic-reports-list"></div>
+  </div>
 
-      <h3>Timeouts (ms)</h3>
-      <div class="help">Lower values = faster, but may cause failures on slow networks. Raise if the worker times out.</div>
-      <div class="row">
-        <div class="field"><label>Navigation</label><input type="number" id="cuic-t-nav" value="30000"></div>
-        <div class="field"><label>Short wait</label><input type="number" id="cuic-t-short" value="1500"></div>
-      </div>
-      <div class="row">
-        <div class="field"><label>Medium wait</label><input type="number" id="cuic-t-medium" value="2500"></div>
-        <div class="field"><label>Long wait</label><input type="number" id="cuic-t-long" value="8000"></div>
-      </div>
+  <div class="card">
+    <h3>Timeouts (ms)</h3>
+    <div class="help">Lower values = faster, but may cause failures on slow networks. Raise if the worker times out.</div>
+    <div class="row">
+      <div class="field"><label>Navigation</label><input type="number" id="cuic-t-nav" value="30000"></div>
+      <div class="field"><label>Short wait</label><input type="number" id="cuic-t-short" value="1500"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Medium wait</label><input type="number" id="cuic-t-medium" value="2500"></div>
+      <div class="field"><label>Long wait</label><input type="number" id="cuic-t-long" value="8000"></div>
     </div>
   </div>
 </div>
@@ -213,43 +286,35 @@
 <div class="tab-content" id="tab-smax">
   <div class="card">
     <h2>SMAX Worker <span class="badge">smax_worker.py</span></h2>
-    <div class="card-body">
-      <div class="toggle-switch">
-        <input type="checkbox" id="smax-enabled" checked>
-        <label for="smax-enabled">Enabled</label>
-      </div>
+    <div class="toggle-switch">
+      <input type="checkbox" id="smax-enabled">
+      <label for="smax-enabled">Enabled</label>
+    </div>
 
-      <h3>Connection</h3>
-      <div class="field">
-        <label>Base URL</label>
-        <input type="text" id="smax-url" value="https://smax.corp.pdo.om">
-      </div>
-      <div class="row">
-        <div class="field">
-          <label>Username</label>
-          <input type="text" id="smax-user" value="">
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input type="password" id="smax-pass" value="">
-        </div>
-      </div>
+    <h3>Connection</h3>
+    <div class="field">
+      <label>Base URL</label>
+      <input type="text" id="smax-url" value="https://smax.corp.pdo.om">
+    </div>
+    <div class="row">
+      <div class="field"><label>Username</label><input type="text" id="smax-user" value=""></div>
+      <div class="field"><label>Password</label><input type="password" id="smax-pass" value=""></div>
+    </div>
 
-      <h3>Report URLs</h3>
-      <div class="field">
-        <label>One URL per line</label>
-        <textarea id="smax-urls" rows="6"></textarea>
-      </div>
+    <h3>Report URLs</h3>
+    <div class="field">
+      <label>One URL per line</label>
+      <textarea id="smax-urls" rows="6"></textarea>
+    </div>
 
-      <h3>Timeouts (ms)</h3>
-      <div class="row">
-        <div class="field"><label>Page Load</label><input type="number" id="smax-t-load" value="120000"></div>
-        <div class="field"><label>Element Wait</label><input type="number" id="smax-t-elem" value="30000"></div>
-      </div>
-      <div class="row">
-        <div class="field"><label>Tab Stagger Delay</label><input type="number" id="smax-t-stagger" value="2000"></div>
-        <div class="field"><label>Max Retries</label><input type="number" id="smax-retries" value="2" min="0"></div>
-      </div>
+    <h3>Timeouts (ms)</h3>
+    <div class="row">
+      <div class="field"><label>Page Load</label><input type="number" id="smax-t-load" value="120000"></div>
+      <div class="field"><label>Element Wait</label><input type="number" id="smax-t-elem" value="30000"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Tab Stagger Delay</label><input type="number" id="smax-t-stagger" value="2000"></div>
+      <div class="field"><label>Max Retries</label><input type="number" id="smax-retries" value="2" min="0"></div>
     </div>
   </div>
 </div>
@@ -259,29 +324,21 @@
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-export">
   <div class="help">
-    <strong>How to use:</strong> Click "Generate JSON" to build both config files from the form values above.
-    Then copy each JSON block into the corresponding file inside <code>config/</code>.
-    Or use "Load from JSON" to populate the form from existing files.
+    <strong>How to use:</strong> Click "Generate JSON" to see the current configuration.
+    You can also paste JSON below and click "Load into form" to update the form.
   </div>
-
   <div class="card">
     <h2>settings.json</h2>
-    <div class="card-body">
-      <div class="field"><textarea id="out-settings" rows="16" readonly></textarea></div>
-      <button class="btn btn-secondary" onclick="copyToClipboard('out-settings')">📋 Copy</button>
-    </div>
+    <div class="field"><textarea id="out-settings" rows="16" readonly></textarea></div>
+    <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('out-settings')">📋 Copy</button>
   </div>
-
   <div class="card">
     <h2>credentials.json</h2>
-    <div class="card-body">
-      <div class="field"><textarea id="out-credentials" rows="8" readonly></textarea></div>
-      <button class="btn btn-secondary" onclick="copyToClipboard('out-credentials')">📋 Copy</button>
-    </div>
+    <div class="field"><textarea id="out-credentials" rows="8" readonly></textarea></div>
+    <button class="btn btn-secondary btn-sm" onclick="copyToClipboard('out-credentials')">📋 Copy</button>
   </div>
-
   <div style="margin-top:16px">
-    <h3>Load from existing JSON</h3>
+    <h3>Load from JSON</h3>
     <div class="row">
       <div class="field">
         <label>Paste settings.json</label>
@@ -292,7 +349,7 @@
         <textarea id="in-credentials" rows="6" placeholder='Paste credentials.json content here...'></textarea>
       </div>
     </div>
-    <button class="btn btn-secondary" onclick="loadFromJSON()">⬆️ Load into form</button>
+    <button class="btn btn-secondary btn-sm" onclick="loadFromJSON()">⬆️ Load into form</button>
   </div>
 </div>
 
@@ -300,22 +357,35 @@
 <!--  SAVE BAR                                                              -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
 <div class="btn-bar">
-  <button class="btn btn-primary" onclick="generateJSON()">💾 Generate JSON</button>
-  <button class="btn btn-secondary" onclick="resetDefaults()">↩️ Reset to defaults</button>
+  <button class="btn btn-primary" onclick="saveAll()">💾 Save Settings</button>
+  <button class="btn btn-secondary" onclick="generateJSON()">📄 Generate JSON</button>
+  <button class="btn btn-secondary" onclick="resetDefaults()">↩️ Reset Defaults</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Tab switching ──────────────────────────────────────────────────────────
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
-}
+// ══════════════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════════════
+let cuicReports = [];
+let scrapeStatus = {};
 
-// ── Toast ──────────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ══════════════════════════════════════════════════════════════════════════
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════════════════════════════
 function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -323,8 +393,74 @@ function showToast(msg, type = 'success') {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ── Build JSON from form ──────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+//  CUIC REPORT CARDS
+// ══════════════════════════════════════════════════════════════════════════
+function renderCuicReports() {
+  const container = document.getElementById('cuic-reports-list');
+  if (cuicReports.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">No reports configured. Click "+ Add Report" to get started.</p>';
+    return;
+  }
+  container.innerHTML = cuicReports.map((r, i) => {
+    const st = scrapeStatus['cuic:' + r.label];
+    let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
+    if (st) {
+      const icon = st.status === 'success' ? '✅' : st.status === 'error' ? '❌' : '⚠️';
+      const dur = st.duration_s ? st.duration_s.toFixed(1) + 's' : '';
+      const msg = st.message ? ' — ' + esc(st.message) : '';
+      statusHtml = `<div class="status-bar"><span class="status-dot ${st.status}"></span>
+        <span>${icon} ${esc(st.timestamp)} · ${st.row_count || 0} rows · ${dur}${msg}</span></div>`;
+    }
+    return `<div class="report-card ${r.enabled ? '' : 'disabled'}">
+      <div class="report-card-header">
+        <span class="label-tag">${esc(r.label || 'unnamed')}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div class="toggle-switch" style="margin:0">
+            <input type="checkbox" id="rpt-en-${i}" ${r.enabled ? 'checked' : ''}
+              onchange="cuicReports[${i}].enabled=this.checked;renderCuicReports()">
+            <label for="rpt-en-${i}" style="font-size:12px">Enabled</label>
+          </div>
+          <button class="btn btn-icon btn-sm" onclick="removeCuicReport(${i})" title="Remove">🗑️</button>
+        </div>
+      </div>
+      <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value" placeholder="e.g. call_type_hist"></div>
+      <div class="inline-row"><label>Folder</label><input value="${attr(r.folder)}" onchange="cuicReports[${i}].folder=this.value" placeholder="e.g. Stock/CCE/CCE_AF_Historical"></div>
+      <div class="inline-row"><label>Report Name</label><input value="${attr(r.name)}" onchange="cuicReports[${i}].name=this.value" placeholder="Exact name in CUIC"></div>
+      ${statusHtml}
+    </div>`;
+  }).join('');
+}
+
+function addCuicReport() {
+  cuicReports.push({ label: '', folder: '', name: '', enabled: true, filters: {} });
+  renderCuicReports();
+  document.getElementById('cuic-reports-list').lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function removeCuicReport(i) {
+  if (cuicReports.length <= 1) { showToast('Keep at least one report', 'error'); return; }
+  cuicReports.splice(i, 1);
+  renderCuicReports();
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function attr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  BUILD / POPULATE
+// ══════════════════════════════════════════════════════════════════════════
+function syncReportInputs() {
+  document.querySelectorAll('.report-card').forEach((card, i) => {
+    const inputs = card.querySelectorAll('.inline-row input');
+    if (inputs[0]) cuicReports[i].label  = inputs[0].value;
+    if (inputs[1]) cuicReports[i].folder = inputs[1].value;
+    if (inputs[2]) cuicReports[i].name   = inputs[2].value;
+  });
+}
+
 function buildSettings() {
+  syncReportInputs();
   return {
     global: {
       headless:             document.getElementById('g-headless').checked,
@@ -341,8 +477,7 @@ function buildSettings() {
       cuic: {
         enabled:            document.getElementById('cuic-enabled').checked,
         url:                document.getElementById('cuic-url').value,
-        report_folder:      document.getElementById('cuic-folder').value,
-        report_name:        document.getElementById('cuic-report').value,
+        reports:            cuicReports.map(r => ({ label: r.label, folder: r.folder, name: r.name, enabled: r.enabled !== false, filters: r.filters || {} })),
         timeout_nav_ms:     parseInt(document.getElementById('cuic-t-nav').value) || 30000,
         timeout_short_ms:   parseInt(document.getElementById('cuic-t-short').value) || 1500,
         timeout_medium_ms:  parseInt(document.getElementById('cuic-t-medium').value) || 2500,
@@ -368,38 +503,6 @@ function buildCredentials() {
   };
 }
 
-function generateJSON() {
-  const settings = buildSettings();
-  const creds = buildCredentials();
-  document.getElementById('out-settings').value = JSON.stringify(settings, null, 2);
-  document.getElementById('out-credentials').value = JSON.stringify(creds, null, 2);
-  switchTab('export');
-  // activate the export tab button
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab')[3].classList.add('active');
-  showToast('JSON generated! Copy into config/ files.', 'success');
-}
-
-// ── Load JSON into form ───────────────────────────────────────────────────
-function loadFromJSON() {
-  try {
-    const settingsText = document.getElementById('in-settings').value.trim();
-    const credsText = document.getElementById('in-credentials').value.trim();
-
-    if (settingsText) {
-      const s = JSON.parse(settingsText);
-      populateSettings(s);
-    }
-    if (credsText) {
-      const c = JSON.parse(credsText);
-      populateCredentials(c);
-    }
-    showToast('Form populated from JSON', 'success');
-  } catch (e) {
-    showToast('Invalid JSON: ' + e.message, 'error');
-  }
-}
-
 function populateSettings(s) {
   const g = s.global || {};
   setBool('g-headless', g.headless, true);
@@ -414,17 +517,20 @@ function populateSettings(s) {
 
   const cuic = (s.workers || {}).cuic || {};
   setBool('cuic-enabled', cuic.enabled, true);
-  setVal('cuic-url', cuic.url || '');
-  setVal('cuic-folder', cuic.report_folder || '');
-  setVal('cuic-report', cuic.report_name || '');
+  setVal('cuic-url', cuic.url || 'https://148.151.32.77:8444/cuicui/Main.jsp');
+  cuicReports = (cuic.reports || []).map(r => ({
+    label: r.label||'', folder: r.folder||'', name: r.name||'', enabled: r.enabled !== false, filters: r.filters||{}
+  }));
+  if (!cuicReports.length) cuicReports.push({ label:'call_type_hist', folder:'Test', name:'Z Call Type Historical All Fields', enabled:true, filters:{} });
+  renderCuicReports();
   setVal('cuic-t-nav', cuic.timeout_nav_ms || 30000);
   setVal('cuic-t-short', cuic.timeout_short_ms || 1500);
   setVal('cuic-t-medium', cuic.timeout_medium_ms || 2500);
   setVal('cuic-t-long', cuic.timeout_long_ms || 8000);
 
   const smax = (s.workers || {}).smax || {};
-  setBool('smax-enabled', smax.enabled, true);
-  setVal('smax-url', smax.base_url || '');
+  setBool('smax-enabled', smax.enabled, false);
+  setVal('smax-url', smax.base_url || 'https://smax.corp.pdo.om');
   setVal('smax-urls', (smax.report_urls || []).join('\n'));
   setVal('smax-t-load', smax.page_load_timeout_ms || 120000);
   setVal('smax-t-elem', smax.element_wait_timeout_ms || 30000);
@@ -433,52 +539,133 @@ function populateSettings(s) {
 }
 
 function populateCredentials(c) {
-  const cuic = c.cuic || {};
-  const smax = c.smax || {};
-  setVal('cuic-user', cuic.username || '');
-  setVal('cuic-pass', cuic.password || '');
-  setVal('smax-user', smax.username || '');
-  setVal('smax-pass', smax.password || '');
+  setVal('cuic-user', (c.cuic||{}).username||'');
+  setVal('cuic-pass', (c.cuic||{}).password||'');
+  setVal('smax-user', (c.smax||{}).username||'');
+  setVal('smax-pass', (c.smax||{}).password||'');
 }
 
 function setBool(id, val, def) { document.getElementById(id).checked = val !== undefined ? val : def; }
-function setVal(id, val) { document.getElementById(id).value = val; }
+function setVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
 
-// ── Defaults ──────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+//  SAVE / LOAD VIA API
+// ══════════════════════════════════════════════════════════════════════════
+async function saveAll() {
+  try {
+    const [r1, r2] = await Promise.all([
+      fetch('/api/settings',    { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(buildSettings()) }),
+      fetch('/api/credentials', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(buildCredentials()) })
+    ]);
+    if (r1.ok && r2.ok) showToast('Settings saved!');
+    else showToast('Save failed: ' + (await r1.text()) + (await r2.text()), 'error');
+  } catch(e) {
+    showToast('Server offline — use Export tab to copy JSON manually', 'error');
+  }
+}
+
+async function loadFromServer() {
+  try {
+    const [sRes, cRes, statusRes, logRes] = await Promise.all([
+      fetch('/api/settings'), fetch('/api/credentials'),
+      fetch('/api/scrape-status').catch(()=>null),
+      fetch('/api/scrape-log?limit=50').catch(()=>null)
+    ]);
+    if (sRes.ok) populateSettings(await sRes.json());
+    if (cRes.ok) populateCredentials(await cRes.json());
+    if (statusRes?.ok) {
+      const data = await statusRes.json();
+      scrapeStatus = {};
+      (data||[]).forEach(s => scrapeStatus[s.source+':'+s.report_label] = s);
+      renderCuicReports();
+      updateDashboard(data);
+    }
+    if (logRes?.ok) renderScrapeLog(await logRes.json());
+    document.getElementById('server-status').classList.remove('offline');
+    document.getElementById('server-status-text').textContent = 'Connected';
+  } catch(e) {
+    console.warn('Server not available', e);
+    document.getElementById('server-status').classList.add('offline');
+    document.getElementById('server-status-text').textContent = 'Offline';
+    resetDefaults();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════════════════════════
+function updateDashboard(statusData) {
+  document.getElementById('stat-total-reports').textContent = cuicReports.length;
+  if (!statusData?.length) {
+    document.getElementById('stat-last-run').textContent = 'Never';
+    document.getElementById('stat-success-rate').textContent = '-';
+    document.getElementById('stat-total-rows').textContent = '0';
+    return;
+  }
+  document.getElementById('stat-last-run').textContent = statusData[0].timestamp || '-';
+  const ok = statusData.filter(s => s.status === 'success').length;
+  document.getElementById('stat-success-rate').textContent = Math.round(ok/statusData.length*100) + '%';
+  document.getElementById('stat-total-rows').textContent = statusData.reduce((s,r) => s + (r.row_count||0), 0).toLocaleString();
+}
+
+function renderScrapeLog(log) {
+  const tb = document.getElementById('scrape-log-body');
+  if (!log?.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted)">No scrape history yet.</td></tr>'; return; }
+  tb.innerHTML = log.map(r => `<tr>
+    <td>${esc(r.timestamp)}</td><td>${esc(r.source)}</td><td>${esc(r.report_label)}</td>
+    <td><span class="status-pill ${r.status}">${r.status}</span></td>
+    <td>${r.row_count||0}</td><td>${r.duration_s?r.duration_s.toFixed(1)+'s':'-'}</td>
+    <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${attr(r.message)}">${esc(r.message||'')}</td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  EXPORT / IMPORT / DEFAULTS
+// ══════════════════════════════════════════════════════════════════════════
+function generateJSON() {
+  document.getElementById('out-settings').value = JSON.stringify(buildSettings(), null, 2);
+  document.getElementById('out-credentials').value = JSON.stringify(buildCredentials(), null, 2);
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('[data-tab="export"]').classList.add('active');
+  document.getElementById('tab-export').classList.add('active');
+  showToast('JSON generated!');
+}
+
+function loadFromJSON() {
+  try {
+    const st = document.getElementById('in-settings').value.trim();
+    const ct = document.getElementById('in-credentials').value.trim();
+    if (st) populateSettings(JSON.parse(st));
+    if (ct) populateCredentials(JSON.parse(ct));
+    showToast('Form populated from JSON');
+  } catch(e) { showToast('Invalid JSON: ' + e.message, 'error'); }
+}
+
 function resetDefaults() {
   populateSettings({
-    global: { headless: true, use_system_chrome: true, screenshot_steps: false, screenshot_errors: true,
-              log_level: 'INFO', output_dir: 'output', log_dir: 'logs', data_retention_days: 90, shared_drive_csv: '' },
+    global: { headless:true, use_system_chrome:true, screenshot_steps:false, screenshot_errors:true,
+              log_level:'INFO', output_dir:'output', log_dir:'logs', data_retention_days:90, shared_drive_csv:'' },
     workers: {
-      cuic: { enabled: true, url: 'https://148.151.32.77:8444/cuicui/Main.jsp', report_folder: 'Test',
-              report_name: 'Z Call Type Historical All Fields', timeout_nav_ms: 30000, timeout_short_ms: 1500,
-              timeout_medium_ms: 2500, timeout_long_ms: 8000 },
-      smax: { enabled: true, base_url: 'https://smax.corp.pdo.om', report_urls: [],
-              page_load_timeout_ms: 120000, element_wait_timeout_ms: 30000, tab_stagger_delay_ms: 2000, max_retries: 2 }
+      cuic: { enabled:true, url:'https://148.151.32.77:8444/cuicui/Main.jsp',
+              reports:[{label:'call_type_hist',folder:'Test',name:'Z Call Type Historical All Fields',enabled:true,filters:{}},
+                      {label:'agent_hist',folder:'Stock/CCE/CCE_AF_Historical',name:'Agent Historical All Fields',enabled:true,filters:{}}],
+              timeout_nav_ms:30000, timeout_short_ms:1500, timeout_medium_ms:2500, timeout_long_ms:8000 },
+      smax: { enabled:false, base_url:'https://smax.corp.pdo.om', report_urls:[],
+              page_load_timeout_ms:120000, element_wait_timeout_ms:30000, tab_stagger_delay_ms:2000, max_retries:2 }
     }
   });
-  populateCredentials({ cuic: { username: '', password: '' }, smax: { username: '', password: '' } });
+  populateCredentials({cuic:{username:'',password:''},smax:{username:'',password:''}});
   showToast('Reset to defaults', 'info');
 }
 
 function copyToClipboard(id) {
-  const el = document.getElementById(id);
-  el.select();
-  document.execCommand('copy');
-  showToast('Copied to clipboard', 'success');
+  const el = document.getElementById(id); el.select(); document.execCommand('copy');
+  showToast('Copied!');
 }
 
-// ── On load: try to read config files via File API (won't work without server, that's fine) ──
-// Fill defaults
-resetDefaults();
-// Put SMAX report URLs
-setVal('smax-urls', [
-  'https://smax.corp.pdo.om/reports/report/69808de7e4b05f4efa3fa48f',
-  'https://smax.corp.pdo.om/reports/report/6721c16be4b07e954f2bcb7e',
-  'https://smax.corp.pdo.om/reports/report/60238f97e4b04b36af700a76',
-  'https://smax.corp.pdo.om/reports/report/684a818ae4b07b034c72581b',
-  'https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640'
-].join('\n'));
+// ── Init ──────────────────────────────────────────────────────────────────
+loadFromServer();
 </script>
 </body>
 </html>

@@ -63,6 +63,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_kpi_dedup
     ON kpi_snapshots (date, source, metric_title, category, sub_category);
 """
 
+_CREATE_SCRAPE_LOG = """
+CREATE TABLE IF NOT EXISTS scrape_log (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp     TEXT    NOT NULL,
+    source        TEXT    NOT NULL,
+    report_label  TEXT    NOT NULL DEFAULT '',
+    status        TEXT    NOT NULL,
+    row_count     INTEGER DEFAULT 0,
+    duration_s    REAL    DEFAULT 0,
+    message       TEXT    DEFAULT ''
+);
+"""
+
 
 def init_db():
     """Create table + dedup index if they don't exist."""
@@ -70,6 +83,7 @@ def init_db():
     try:
         conn.execute(_CREATE_TABLE)
         conn.execute(_CREATE_INDEX)
+        conn.execute(_CREATE_SCRAPE_LOG)
         conn.commit()
         logger.debug("Database initialized")
     finally:
@@ -291,6 +305,67 @@ def migrate_csv_to_db(csv_path: str = None):
                 pass  # skip bad rows silently
         conn.commit()
         logger.info(f"Migrated {imported} rows from CSV into SQLite")
+    finally:
+        conn.close()
+
+    return imported
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  SCRAPE LOG — per-report scrape tracking for the control panel
+# ══════════════════════════════════════════════════════════════════════════
+
+def log_scrape(source: str, report_label: str, status: str,
+               row_count: int = 0, duration_s: float = 0, message: str = ''):
+    """Record a scrape attempt (success/error/no_data)."""
+    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    conn = _get_conn()
+    try:
+        conn.execute(
+            "INSERT INTO scrape_log (timestamp, source, report_label, status, row_count, duration_s, message) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (ts, source, report_label, status, row_count, round(duration_s, 2), message)
+        )
+        conn.commit()
+    except Exception as e:
+        logger.debug(f"Failed to log scrape: {e}")
+    finally:
+        conn.close()
+
+
+def get_scrape_log(limit: int = 100) -> List[Dict[str, Any]]:
+    """Return recent scrape log entries (newest first)."""
+    conn = _get_conn()
+    try:
+        cur = conn.execute(
+            "SELECT id, timestamp, source, report_label, status, row_count, duration_s, message "
+            "FROM scrape_log ORDER BY id DESC LIMIT ?",
+            (limit,)
+        )
+        cols = [d[0] for d in cur.description]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
+    except Exception:
+        return []
+    finally:
+        conn.close()
+
+
+def get_latest_scrape_status() -> List[Dict[str, Any]]:
+    """Get the most recent scrape result for each source + report_label."""
+    conn = _get_conn()
+    try:
+        cur = conn.execute("""
+            SELECT s.* FROM scrape_log s
+            INNER JOIN (
+                SELECT source, report_label, MAX(id) as max_id
+                FROM scrape_log GROUP BY source, report_label
+            ) latest ON s.id = latest.max_id
+            ORDER BY s.timestamp DESC
+        """)
+        cols = [d[0] for d in cur.description]
+        return [dict(zip(cols, row)) for row in cur.fetchall()]
+    except Exception:
+        return []
     finally:
         conn.close()
 
