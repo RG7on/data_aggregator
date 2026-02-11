@@ -100,7 +100,7 @@ class Worker(BaseWorker):
         
         result = []
         try:
-            self.setup_browser(headless=False)
+            self.setup_browser()
             
             if self.SMAX_USERNAME and self.SMAX_PASSWORD:
                 self.logger.info("Attempting SMAX login...")

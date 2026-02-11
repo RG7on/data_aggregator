@@ -92,6 +92,7 @@ class Worker(BaseWorker):
             self.screenshot("error", is_step=False)
             return []
         finally:
+            self._logout()
             self.teardown_browser()
 
     def scrape(self) -> List[Dict[str, Any]]:
@@ -150,6 +151,40 @@ class Worker(BaseWorker):
         # Final cleanup
         self._close_report_page()
         return all_data
+
+    # ──────────────────────────────────────────────────────────────────────
+    #  Logout – always called before closing the browser
+    # ──────────────────────────────────────────────────────────────────────
+    def _logout(self):
+        """Sign out of CUIC so the session is released.
+        This must run even after scraping errors to prevent
+        'Session Limit Reached' on subsequent runs."""
+        try:
+            if not self.page or self.page.is_closed():
+                self.logger.warning("Page already closed – skipping logout")
+                return
+
+            # Make sure we are on the main page (close extra tabs first)
+            self._close_report_page()
+
+            # Click the user dropdown
+            user_btn = self.page.locator('#user-info-btn')
+            user_btn.wait_for(state='visible', timeout=self.timeout_medium)
+            user_btn.click()
+            self.page.wait_for_timeout(800)
+
+            # Click Sign Out
+            signout = self.page.locator('#signout-btn1')
+            signout.wait_for(state='visible', timeout=self.timeout_medium)
+            signout.click()
+
+            # Wait briefly for the sign-out to process
+            self.page.wait_for_timeout(2000)
+            self.logger.info("Logged out of CUIC successfully")
+            self.screenshot("logout_ok")
+        except Exception as e:
+            self.logger.warning(f"Logout failed (session may persist): {e}")
+            self.screenshot("logout_error", is_step=False)
 
     # ──────────────────────────────────────────────────────────────────────
     #  Navigation helpers for multi-report

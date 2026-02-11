@@ -255,7 +255,7 @@ class BaseWorker(ABC):
         """
         result = {}
         try:
-            self.setup_browser(headless=True)
+            self.setup_browser()
             result = self.scrape()
             self.logger.info(f"Scrape completed: {len(result) if isinstance(result, list) else result}")
         except Exception as e:
