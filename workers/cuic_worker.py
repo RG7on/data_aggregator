@@ -126,7 +126,8 @@ class Worker(BaseWorker):
                                f'Could not open {folder}/{name}')
                     continue
 
-                if not self._run_filter_wizard():
+                filters = report.get('filters', {})
+                if not self._run_filter_wizard(filters):
                     log_scrape('cuic', label, 'error', 0, time.time() - t0,
                                'Filter wizard failed')
                     continue
@@ -423,33 +424,508 @@ class Worker(BaseWorker):
             pass
 
     # ══════════════════════════════════════════════════════════════════════
+    #  WIZARD FIELD READING – CUIC AngularJS-aware
+    # ══════════════════════════════════════════════════════════════════════
+
+    # CUIC uses custom AngularJS widgets (csSelect, cuic-datetime,
+    # cuic-switcher) – standard HTML form scraping won't work.
+    # This JS reads filter params via Angular's scope API.
+    CUIC_WIZARD_READ_JS = r'''() => {
+        if (typeof angular === 'undefined') return null;
+        const el = document.querySelector('[ng-controller="spabCtrl as spab"]');
+        if (!el) return null;
+        let scope;
+        try { scope = angular.element(el).scope(); } catch(e) { return null; }
+        if (!scope || !scope.spab || !scope.spab.data) return null;
+
+        const datePresets = (scope.spab.dateDropdownOptions || []).map(o => ({
+            value: o.value, label: o.label
+        }));
+
+        /* DOM containers: the ng-repeat divs for non-hardcoded items */
+        const containers = document.querySelectorAll(
+            'spab-filters > div[ng-repeat="item in spab.data"]'
+        );
+
+        const params = [];
+        let vi = 0;
+        scope.spab.data.forEach(item => {
+            if (item.hardCodedValue) return;
+
+            /* label & param name from DOM */
+            let label = '', paramName = '', paramName2 = '';
+            const c = containers[vi];
+            if (c) {
+                const spans = c.querySelectorAll('.spab_name .ellipses, .spab_name .ellipsis');
+                if (spans.length >= 2) {
+                    label     = (spans[0].title || spans[0].textContent || '').trim();
+                    paramName = (spans[1].title || spans[1].textContent || '').trim();
+                }
+                if (spans.length >= 3) {
+                    paramName2 = (spans[2].title || spans[2].textContent || '').trim();
+                }
+                if (spans.length === 1) {
+                    label = (spans[0].title || spans[0].textContent || '').trim();
+                }
+            }
+            /* fallback: try scope item properties */
+            if (!label)     label     = item.displayName || item.filterName || item.name || '';
+            if (!paramName) paramName = item.parameterName || item.paramName || '';
+
+            const p = {dataType: item.dataType, label, paramName, paramName2,
+                       isRequired: !!item.isRequired};
+
+            switch (item.dataType) {
+                case 'DATETIME':
+                case 'DATE':
+                    p.type = 'cuic_datetime';
+                    p.datePresets = datePresets;
+                    p.currentPreset = (item.date1 && item.date1.dropDownSelected)
+                        ? item.date1.dropDownSelected.value : '';
+                    p.hasDateRange = !!item.date2;
+                    /* current date values */
+                    if (item.date1 && item.date1.dateValue)
+                        p.currentDate1 = item.date1.dateValue;
+                    if (item.date2 && item.date2.dateValue)
+                        p.currentDate2 = item.date2.dateValue;
+                    /* time range */
+                    p.allTime = item.allTime || 1;
+                    p.hasTimeRange = (item.dataType !== 'DATE' && !!item.date2);
+                    if (item.time1 && item.time1.dateValue)
+                        p.currentTime1 = item.time1.dateValue;
+                    if (item.time2 && item.time2.dateValue)
+                        p.currentTime2 = item.time2.dateValue;
+                    break;
+                case 'VALUELIST': {
+                    p.type = 'cuic_valuelist';
+                    const left  = item.lvaluelist || [];
+                    const right = item.rvaluelist || [];
+                    p.selectedCount   = right.length;
+                    p.selectedValues  = right.map(v => v.name || '');
+                    /* collect ALL available names (flatten groups) */
+                    const allNames = [];
+                    const groups = [];
+                    function collectNames(list) {
+                        (list || []).forEach(v => {
+                            if (v.children && v.children.length > 0) {
+                                const memberNames = [];
+                                function flatMembers(items) {
+                                    (items || []).forEach(c => {
+                                        if (c.children && c.children.length > 0) flatMembers(c.children);
+                                        else memberNames.push(c.name || '');
+                                    });
+                                }
+                                flatMembers(v.children);
+                                groups.push({name: v.name || '',
+                                             count: v.totalElements || v.children.length,
+                                             members: memberNames});
+                                memberNames.forEach(n => allNames.push(n));
+                            } else {
+                                allNames.push(v.name || '');
+                            }
+                        });
+                    }
+                    collectNames(left);
+                    p.availableCount  = allNames.length;
+                    p.availableNames  = allNames;
+                    p.availableGroups = groups;
+                    break;
+                }
+                case 'STRING':
+                    p.type = 'text';
+                    p.currentValue = item.value || '';
+                    break;
+                case 'DECIMAL':
+                    p.type = 'number';
+                    p.currentValue = item.value !== undefined ? String(item.value) : '';
+                    break;
+                case 'BOOLEAN':
+                    p.type = 'checkbox';
+                    p.currentValue = !!item.value;
+                    break;
+                default:
+                    p.type = 'text';
+                    p.currentValue = '';
+            }
+            params.push(p);
+            vi++;
+        });
+
+        return {type: 'cuic_spab', params, datePresets};
+    }'''  # noqa: E501
+
+    # Apply saved filter values via Angular scope manipulation.
+    CUIC_WIZARD_APPLY_JS = r'''(config) => {
+        if (typeof angular === 'undefined') return {error: 'angular not loaded'};
+        const el = document.querySelector('[ng-controller="spabCtrl as spab"]');
+        if (!el) return {error: 'spab controller not found'};
+        const scope = angular.element(el).scope();
+        if (!scope || !scope.spab || !scope.spab.data) return {error: 'spab data missing'};
+
+        const containers = document.querySelectorAll(
+            'spab-filters > div[ng-repeat="item in spab.data"]'
+        );
+        const results = [];
+        let vi = 0;
+
+        scope.spab.data.forEach(item => {
+            if (item.hardCodedValue) return;
+            const c = containers[vi];
+
+            /* resolve param name from DOM */
+            let paramName = '';
+            if (c) {
+                const spans = c.querySelectorAll('.spab_name .ellipses, .spab_name .ellipsis');
+                if (spans.length >= 2)
+                    paramName = (spans[1].title || spans[1].textContent || '').trim();
+            }
+            if (!paramName) paramName = item.parameterName || item.paramName || '';
+
+            const val = config[paramName];
+            if (val === undefined || val === null) { vi++; return; }
+
+            try {
+                switch (item.dataType) {
+                    case 'DATETIME':
+                    case 'DATE': {
+                        /* val can be a string preset like "THISDAY"
+                           or an object: {preset, date1, date2, allTime, time1, time2} */
+                        const cfg = typeof val === 'string' ? {preset: val} : (val || {});
+                        const preset = cfg.preset || null;
+
+                        if (preset && item.date1) {
+                            const opt = (scope.spab.dateDropdownOptions || [])
+                                .find(o => o.value === preset);
+                            if (opt) {
+                                item.date1.dropDownSelected = opt;
+                                if (scope.spab.handleRelativeDateChange)
+                                    scope.spab.handleRelativeDateChange(item);
+                            }
+                        }
+                        /* custom date values */
+                        if (preset === 'CUSTOM') {
+                            if (cfg.date1 && item.date1) {
+                                const d = new Date(cfg.date1);
+                                if (!isNaN(d)) item.date1.dateValue = d;
+                            }
+                            if (cfg.date2 && item.date2) {
+                                const d = new Date(cfg.date2);
+                                if (!isNaN(d)) item.date2.dateValue = d;
+                            }
+                        }
+                        /* time range: 1=All Day, 2=Custom */
+                        if (cfg.allTime !== undefined)
+                            item.allTime = cfg.allTime;
+                        if (cfg.allTime === 2) {
+                            if (cfg.time1 && item.time1) {
+                                const t = new Date(cfg.time1);
+                                if (!isNaN(t)) item.time1.dateValue = t;
+                            }
+                            if (cfg.time2 && item.time2) {
+                                const t = new Date(cfg.time2);
+                                if (!isNaN(t)) item.time2.dateValue = t;
+                            }
+                        }
+                        results.push({param: paramName, ok: true, value: cfg});
+                        break;
+                    }
+                    case 'VALUELIST': {
+                        if (val === 'all') {
+                            /* click "Move all items right" */
+                            const btn = c ? c.querySelector('.icon-right-all') : null;
+                            if (btn) { btn.click(); }
+                            else {
+                                /* fallback: flatten and move all */
+                                function flattenAll(list) {
+                                    const out = [];
+                                    (list||[]).forEach(v => {
+                                        if (v.children && v.children.length)
+                                            out.push(...flattenAll(v.children));
+                                        else out.push(v);
+                                    });
+                                    return out;
+                                }
+                                item.rvaluelist = (item.rvaluelist || [])
+                                    .concat(flattenAll(item.lvaluelist));
+                                item.lvaluelist = [];
+                            }
+                            results.push({param: paramName, ok: true, value: 'all'});
+                        } else if (Array.isArray(val) && val.length) {
+                            /* move specific items by name (search recursively) */
+                            function extractByName(list, names) {
+                                const matched = [], rest = [];
+                                (list||[]).forEach(v => {
+                                    if (v.children && v.children.length) {
+                                        const [m, r] = [[], []];
+                                        v.children.forEach(ch => {
+                                            if (names.includes(ch.name)) m.push(ch);
+                                            else r.push(ch);
+                                        });
+                                        matched.push(...m);
+                                        if (r.length) {
+                                            const copy = Object.assign({}, v, {children: r});
+                                            rest.push(copy);
+                                        }
+                                    } else {
+                                        if (names.includes(v.name)) matched.push(v);
+                                        else rest.push(v);
+                                    }
+                                });
+                                return [matched, rest];
+                            }
+                            const [toMove, remaining] = extractByName(item.lvaluelist, val);
+                            item.lvaluelist = remaining;
+                            item.rvaluelist = (item.rvaluelist || []).concat(toMove);
+                            results.push({param: paramName, ok: true,
+                                          value: toMove.map(v=>v.name)});
+                        }
+                        break;
+                    }
+                    case 'STRING':
+                    case 'DECIMAL':
+                        item.value = val;
+                        results.push({param: paramName, ok: true, value: val});
+                        break;
+                    case 'BOOLEAN':
+                        item.value = !!val;
+                        results.push({param: paramName, ok: true, value: val});
+                        break;
+                }
+            } catch(e) {
+                results.push({param: paramName, ok: false, error: e.message});
+            }
+            vi++;
+        });
+
+        try { scope.$apply(); } catch(e) { /* digest may already be running */ }
+        return {applied: results};
+    }'''  # noqa: E501
+
+    # Fallback: generic HTML form reader (non-CUIC wizards)
+    GENERIC_WIZARD_READ_JS = r'''() => {
+        const fields = [];
+        document.querySelectorAll('select').forEach(sel => {
+            if (!sel.offsetParent && sel.offsetWidth === 0) return;
+            const label = _findLabel(sel);
+            const options = Array.from(sel.options).map(o => ({value: o.value, text: o.textContent.trim(), selected: o.selected}));
+            fields.push({type:'select', label, id:sel.id, name:sel.name, options, value:Array.from(sel.selectedOptions).map(o=>o.value), multiple:sel.multiple});
+        });
+        document.querySelectorAll('input').forEach(inp => {
+            if (!inp.offsetParent && inp.offsetWidth === 0) return;
+            const t = (inp.type||'text').toLowerCase();
+            if (['hidden','button','submit','reset','image'].includes(t)) return;
+            const label = _findLabel(inp);
+            fields.push({type:t==='checkbox'?'checkbox':t==='radio'?'radio':'text', inputType:t,
+                         label, id:inp.id, name:inp.name,
+                         value:inp.type==='checkbox'||inp.type==='radio'?inp.checked:inp.value,
+                         placeholder:inp.placeholder||''});
+        });
+        document.querySelectorAll('textarea').forEach(ta => {
+            if (!ta.offsetParent && ta.offsetWidth === 0) return;
+            fields.push({type:'textarea', label:_findLabel(ta), id:ta.id, name:ta.name, value:ta.value});
+        });
+        return fields.length ? fields : null;
+
+        function _findLabel(el) {
+            if (el.id) { const lb = document.querySelector('label[for="'+el.id+'"]'); if (lb) return lb.textContent.trim(); }
+            const p = el.closest('label'); if (p) return p.textContent.trim();
+            let sib = el.previousElementSibling;
+            if (sib && sib.textContent.trim()) return sib.textContent.trim();
+            return el.name || el.id || '';
+        }
+    }'''  # noqa: E501
+
+    def _read_wizard_step_fields(self) -> dict | None:
+        """Read wizard fields. Tries CUIC Angular scope first, then generic.
+        Returns dict with 'type' key: 'cuic_spab' or 'generic'."""
+        # ── CUIC path (AngularJS scope) ──
+        for f in self.page.frames:
+            try:
+                result = f.evaluate(self.CUIC_WIZARD_READ_JS)
+                if result and result.get('type') == 'cuic_spab':
+                    self.logger.debug(f"  CUIC wizard: {len(result.get('params',[]))} param(s)")
+                    return result
+            except Exception:
+                pass
+
+        # ── Generic fallback (standard HTML forms) ──
+        all_fields = []
+        for f in self.page.frames:
+            try:
+                result = f.evaluate(self.GENERIC_WIZARD_READ_JS)
+                if result:
+                    all_fields.extend(result)
+            except Exception:
+                pass
+        return {'type': 'generic', 'fields': all_fields} if all_fields else None
+
+    def _find_wizard_frame(self):
+        """Find the frame containing the wizard Next/Run buttons."""
+        for f in self.page.frames:
+            try:
+                for sel in ['button:has-text("Next")', 'input[type="button"][value="Next"]',
+                            'button:has-text("Run")',  'input[type="button"][value="Run"]']:
+                    btn = f.query_selector(sel)
+                    if btn and btn.is_visible():
+                        return f
+            except Exception:
+                pass
+        return None
+
+    def _click_wizard_button(self, btn_text: str) -> bool:
+        """Click a wizard button (Next / Run / Back) in any frame."""
+        for f in self.page.frames:
+            try:
+                for sel in [f'button:has-text("{btn_text}")',
+                            f'input[type="button"][value="{btn_text}"]']:
+                    btn = f.query_selector(sel)
+                    if btn and btn.is_visible():
+                        btn.click()
+                        self.page.wait_for_timeout(self.timeout_short)
+                        return True
+            except Exception:
+                pass
+        return False
+
+    def _apply_filters_to_step(self, step_info: dict, saved_values: dict):
+        """Apply filter values. Routes to CUIC Angular path or generic DOM path."""
+        if not step_info or not saved_values:
+            return
+
+        if step_info.get('type') == 'cuic_spab':
+            # ── CUIC: apply via Angular scope ──
+            cuic_params = {k: v for k, v in saved_values.items()
+                          if not k.startswith('_')}
+            if not cuic_params:
+                return
+            for f in self.page.frames:
+                try:
+                    result = f.evaluate(self.CUIC_WIZARD_APPLY_JS, cuic_params)
+                    if result and 'applied' in result:
+                        for r in result['applied']:
+                            status = 'OK' if r.get('ok') else 'FAIL'
+                            self.logger.info(f"    {r.get('param')}: {status} → {r.get('value','')}")
+                        return
+                except Exception:
+                    pass
+        else:
+            # ── Generic: DOM-based ──
+            fields = step_info.get('fields', [])
+            for field in fields:
+                key = field.get('id') or field.get('name') or field.get('label', '')
+                if not key:
+                    continue
+                val = None
+                for attempt in [field.get('id'), field.get('name'), field.get('label')]:
+                    if attempt and attempt in saved_values:
+                        val = saved_values[attempt]
+                        break
+                if val is None:
+                    continue
+                self.logger.info(f"  Setting filter '{key}' = {val}")
+                self._set_field_value(field, val)
+
+    def _set_field_value(self, field: dict, value):
+        """Set a standard form field value in the browser (generic fallback)."""
+        ftype = field.get('type', 'text')
+        fid = field.get('id', '')
+        fname = field.get('name', '')
+        for f in self.page.frames:
+            try:
+                el = None
+                if fid:
+                    el = f.query_selector(f'#{fid}')
+                if not el and fname:
+                    el = f.query_selector(f'[name="{fname}"]')
+                if not el:
+                    continue
+                if ftype == 'select':
+                    if isinstance(value, list):
+                        f.evaluate('''(args) => {
+                            const sel = document.querySelector(args.selector);
+                            if (!sel) return;
+                            Array.from(sel.options).forEach(o => o.selected = args.vals.includes(o.value));
+                            sel.dispatchEvent(new Event('change', {bubbles:true}));
+                        }''', {'selector': f'#{fid}' if fid else f'[name="{fname}"]', 'vals': value})
+                    else:
+                        el.select_option(str(value))
+                elif ftype == 'checkbox':
+                    if bool(value) != field.get('value', False):
+                        el.click()
+                elif ftype in ('text', 'textarea'):
+                    el.fill(str(value))
+                    f.evaluate('''(sel) => {
+                        const el = document.querySelector(sel);
+                        if (el) { el.dispatchEvent(new Event('input',{bubbles:true}));
+                                  el.dispatchEvent(new Event('change',{bubbles:true})); }
+                    }''', f'#{fid}' if fid else f'[name="{fname}"]')
+                break
+            except Exception as e:
+                self.logger.debug(f"  Could not set {fid or fname}: {e}")
+
+    # ══════════════════════════════════════════════════════════════════════
     #  STEP 4 – FILTER WIZARD (Next → Next → Run)
     # ══════════════════════════════════════════════════════════════════════
-    def _run_filter_wizard(self) -> bool:
+    def _run_filter_wizard(self, filters: dict = None) -> bool:
+        """Walk through the wizard steps, applying saved filter values.
+
+        Supported formats:
+          CUIC (flat):  {"@start_date": "THISDAY", "@agent_list": "all",
+                         "_meta": {"type": "cuic_spab", ...}}
+          Step-keyed:   {"step_1": {"field_id": val}, "step_2": {...}}
+          Flat generic: {"field_id": val}  (applied to every step)
+        """
         try:
             self.page.wait_for_timeout(self.timeout_medium)
+            filters = filters or {}
 
-            frames = self.page.frames
-            for btn_text in ["Next", "Next", "Next", "Run"]:
-                clicked = False
-                for f in frames:
-                    try:
-                        for sel in [
-                            f'button:has-text("{btn_text}")',
-                            f'input[type="button"][value="{btn_text}"]',
-                        ]:
-                            btn = f.query_selector(sel)
-                            if btn and btn.is_visible():
-                                btn.click()
-                                self.page.wait_for_timeout(self.timeout_short)
-                                clicked = True
-                                break
-                        if clicked:
-                            break
-                    except Exception:
-                        pass
-                if not clicked:
-                    self.logger.debug(f"'{btn_text}' button not found (may be skipped)")
+            # Separate metadata from actual filter values
+            meta = filters.get('_meta') or {}
+            clean = {k: v for k, v in filters.items() if k != '_meta'}
+            is_stepped = any(k.startswith('step_') for k in clean)
+
+            step = 0
+            max_steps = 10
+
+            while step < max_steps:
+                step += 1
+
+                # Read current step's field structure
+                step_info = self._read_wizard_step_fields()
+
+                if step_info:
+                    stype = step_info.get('type', 'generic')
+                    if stype == 'cuic_spab':
+                        pnames = [p.get('paramName','') for p in step_info.get('params',[])]
+                        self.logger.info(f"  Wizard step {step} (CUIC): {pnames}")
+                        # CUIC uses flat param-name keys
+                        self._apply_filters_to_step(step_info, clean)
+                    elif is_stepped:
+                        step_vals = clean.get(f'step_{step}', {})
+                        fields = step_info.get('fields', [])
+                        labels = [f.get('label') or f.get('id') for f in fields]
+                        self.logger.info(f"  Wizard step {step}: {len(fields)} field(s) — {labels}")
+                        if step_vals:
+                            self._apply_filters_to_step(step_info, step_vals)
+                    else:
+                        fields = step_info.get('fields', [])
+                        labels = [f.get('label') or f.get('id') for f in fields]
+                        self.logger.info(f"  Wizard step {step}: {len(fields)} field(s) — {labels}")
+                        if clean:
+                            self._apply_filters_to_step(step_info, clean)
+
+                    self.page.wait_for_timeout(800)
+
+                # Try Run first (last step), then Next
+                if self._click_wizard_button('Run'):
+                    self.logger.info(f"  Wizard: clicked Run at step {step}")
+                    break
+                elif self._click_wizard_button('Next'):
+                    self.logger.info(f"  Wizard: clicked Next at step {step}")
+                    self.page.wait_for_timeout(self.timeout_short)
+                else:
+                    self.logger.debug(f"  Wizard step {step}: no Next/Run button")
+                    break
 
             self.page.wait_for_timeout(self.timeout_long)
             self.logger.info("Filter wizard done")
@@ -459,6 +935,101 @@ class Worker(BaseWorker):
             self.logger.error(f"Filter wizard failed: {e}")
             self.screenshot("filter_error", is_step=False)
             return False
+
+    # ══════════════════════════════════════════════════════════════════════
+    #  WIZARD DISCOVERY (called from settings server)
+    # ══════════════════════════════════════════════════════════════════════
+    @classmethod
+    def discover_wizard(cls, report_config: dict) -> dict:
+        """Open a report and read all wizard steps' fields.
+
+        Returns:
+          CUIC:    {type: 'cuic_spab', params: [...], datePresets: [...],
+                    steps: [{step:1, ...}], error: ''}
+          Generic: {type: 'generic', steps: [{step:1, fields:[...]}, ...],
+                    error: ''}
+        """
+        worker = cls()
+        worker._load_config()
+        folder = report_config.get('folder', '')
+        name = report_config.get('name', '')
+        result = {'steps': [], 'error': '', 'type': 'generic'}
+
+        try:
+            worker.setup_browser(ignore_https_errors=True)
+
+            if not worker._login():
+                result['error'] = 'Login failed'
+                return result
+
+            frame = worker._get_reports_frame()
+            if not frame:
+                result['error'] = 'Reports iframe not found'
+                return result
+
+            if not worker._open_report(frame, folder, name):
+                result['error'] = f'Could not open {folder}/{name}'
+                return result
+
+            worker.page.wait_for_timeout(worker.timeout_medium)
+
+            # Walk through wizard steps reading fields
+            step = 0
+            max_steps = 10
+            while step < max_steps:
+                step += 1
+                step_info = worker._read_wizard_step_fields()
+
+                if step_info:
+                    stype = step_info.get('type', 'generic')
+                    if stype == 'cuic_spab':
+                        # CUIC Angular wizard — return rich param info
+                        result['type'] = 'cuic_spab'
+                        result['params'] = step_info.get('params', [])
+                        result['datePresets'] = step_info.get('datePresets', [])
+                        result['steps'].append({
+                            'step': step,
+                            'type': 'cuic_spab',
+                            'params': step_info.get('params', [])
+                        })
+                    else:
+                        # Generic HTML fields
+                        result['steps'].append({
+                            'step': step,
+                            'fields': step_info.get('fields', [])
+                        })
+
+                # Check for Run (last step)
+                has_run = False
+                for f in worker.page.frames:
+                    try:
+                        for sel in ['button:has-text("Run")', 'input[type="button"][value="Run"]']:
+                            btn = f.query_selector(sel)
+                            if btn and btn.is_visible():
+                                has_run = True
+                                break
+                        if has_run:
+                            break
+                    except Exception:
+                        pass
+
+                if has_run:
+                    # Last step — record fields but don't click Run
+                    break
+
+                # Click Next
+                if not worker._click_wizard_button('Next'):
+                    break
+                worker.page.wait_for_timeout(worker.timeout_short)
+
+            worker.logger.info(f"Discovery: {len(result['steps'])} wizard steps found")
+            return result
+
+        except Exception as e:
+            result['error'] = str(e)
+            return result
+        finally:
+            worker.teardown_browser()
 
     # ══════════════════════════════════════════════════════════════════════
     #  STEP 5 – SCRAPE ag-grid DATA

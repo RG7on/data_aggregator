@@ -104,6 +104,67 @@
   .server-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
   .server-status.offline .dot { background: var(--red); }
   .server-status.offline { color: var(--red); }
+
+  /* Filter wizard panel */
+  .filter-panel { margin-top: 12px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; }
+  .filter-panel h4 { font-size: 13px; color: var(--accent); margin: 0 0 10px; display: flex; align-items: center; gap: 6px; }
+  .filter-step { margin-bottom: 10px; padding: 8px 10px; background: var(--surface); border-radius: 5px; }
+  .filter-step .step-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 6px; }
+  .filter-field { display: grid; grid-template-columns: 140px 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .filter-field label { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .filter-field input, .filter-field select { padding: 5px 8px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text); font-size: 12px; font-family: inherit; }
+  .filter-field input:focus, .filter-field select:focus { outline: none; border-color: var(--accent); }
+  .filter-field select[multiple] { min-height: 60px; }
+  .filter-field .hint { font-size: 10px; color: var(--muted); grid-column: 2; margin-top: -4px; }
+  .filter-field .vl-badge { display: inline-block; padding: 1px 6px; font-size: 10px; border-radius: 3px;
+    background: rgba(88,166,255,0.12); color: var(--accent); margin-left: 4px; }
+  .filter-sub { margin-left: 0; padding: 6px 0 2px; }
+  .filter-sub .sub-row { display: flex; gap: 8px; align-items: center; margin-bottom: 5px; flex-wrap: wrap; }
+  .filter-sub .sub-row label { font-size: 11px; color: var(--muted); min-width: 56px; }
+  .filter-sub .sub-row input[type="date"], .filter-sub .sub-row input[type="time"] {
+    padding: 4px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-size: 12px; font-family: inherit; }
+  .filter-sub .sub-row input:focus { outline: none; border-color: var(--accent); }
+  .filter-sub .sub-row select { padding: 4px 6px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text); font-size: 12px; }
+  .filter-sub .sub-row span.to { font-size: 11px; color: var(--muted); }
+  .vl-section { margin-top: 6px; }
+  .vl-section .vl-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+  .vl-section .vl-toolbar input[type="text"] { flex: 1; min-width: 140px; padding: 4px 8px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 12px; }
+  .vl-section .vl-toolbar button { padding: 3px 10px; font-size: 11px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted); border-radius: 4px; cursor: pointer; white-space: nowrap; }
+  .vl-section .vl-toolbar button:hover { color: var(--accent); border-color: var(--accent); }
+  .vl-section .vl-count { font-size: 11px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+  .vl-section .vl-checklist { max-height: 220px; overflow-y: auto; border: 1px solid var(--border);
+    border-radius: 4px; background: var(--bg); padding: 2px 0; }
+  .vl-section .vl-checklist label { display: flex; align-items: center; gap: 6px; padding: 3px 10px;
+    font-size: 12px; cursor: pointer; user-select: none; }
+  .vl-section .vl-checklist label:hover { background: var(--surface2); }
+  .vl-section .vl-checklist input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent);
+    cursor: pointer; flex-shrink: 0; }
+  .vl-section .vl-checklist .vl-group-header { padding: 4px 10px; font-size: 11px; font-weight: 600;
+    color: var(--accent); background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  .vl-groups { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+  .vl-groups .vl-group-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+    font-size: 11px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface);
+    color: var(--text); cursor: pointer; user-select: none; transition: .15s; }
+  .vl-groups .vl-group-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .vl-groups .vl-group-btn .vl-g-count { color: var(--muted); font-size: 10px; }
+  .vl-groups .vl-group-btn.active { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); }
+  .btn-discover { padding: 5px 12px; font-size: 12px; font-weight: 600; border: 1px solid var(--accent);
+    background: rgba(88,166,255,0.1); color: var(--accent); border-radius: 5px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px; transition: .15s; }
+  .btn-discover:hover { background: rgba(88,166,255,0.2); }
+  .btn-discover:disabled { opacity: 0.5; cursor: wait; }
+  .btn-discover .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .filter-clear { font-size: 11px; color: var(--muted); cursor: pointer; margin-left: auto; }
+  .filter-clear:hover { color: var(--red); }
 </style>
 </head>
 <body>
@@ -406,12 +467,13 @@ function renderCuicReports() {
     const st = scrapeStatus['cuic:' + r.label];
     let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
     if (st) {
-      const icon = st.status === 'success' ? '✅' : st.status === 'error' ? '❌' : '⚠️';
+      const icon = st.status === 'success' ? '\u2705' : st.status === 'error' ? '\u274C' : '\u26A0\uFE0F';
       const dur = st.duration_s ? st.duration_s.toFixed(1) + 's' : '';
-      const msg = st.message ? ' — ' + esc(st.message) : '';
+      const msg = st.message ? ' \u2014 ' + esc(st.message) : '';
       statusHtml = `<div class="status-bar"><span class="status-dot ${st.status}"></span>
-        <span>${icon} ${esc(st.timestamp)} · ${st.row_count || 0} rows · ${dur}${msg}</span></div>`;
+        <span>${icon} ${esc(st.timestamp)} \u00B7 ${st.row_count || 0} rows \u00B7 ${dur}${msg}</span></div>`;
     }
+    const filterHtml = renderFilterPanel(r, i);
     return `<div class="report-card ${r.enabled ? '' : 'disabled'}">
       <div class="report-card-header">
         <span class="label-tag">${esc(r.label || 'unnamed')}</span>
@@ -421,12 +483,19 @@ function renderCuicReports() {
               onchange="cuicReports[${i}].enabled=this.checked;renderCuicReports()">
             <label for="rpt-en-${i}" style="font-size:12px">Enabled</label>
           </div>
-          <button class="btn btn-icon btn-sm" onclick="removeCuicReport(${i})" title="Remove">🗑️</button>
+          <button class="btn btn-icon btn-sm" onclick="removeCuicReport(${i})" title="Remove">\uD83D\uDDD1\uFE0F</button>
         </div>
       </div>
       <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value" placeholder="e.g. call_type_hist"></div>
       <div class="inline-row"><label>Folder</label><input value="${attr(r.folder)}" onchange="cuicReports[${i}].folder=this.value" placeholder="e.g. Stock/CCE/CCE_AF_Historical"></div>
       <div class="inline-row"><label>Report Name</label><input value="${attr(r.name)}" onchange="cuicReports[${i}].name=this.value" placeholder="Exact name in CUIC"></div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+        <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
+          \u25B6 Discover Filters
+        </button>
+        <span style="font-size:11px;color:var(--muted)">Opens browser to read the report\u2019s filter wizard</span>
+      </div>
+      ${filterHtml}
       ${statusHtml}
     </div>`;
   }).join('');
@@ -446,6 +515,491 @@ function removeCuicReport(i) {
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function attr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+// ══════════════════════════════════════════════════════════════════════════
+//  FILTER WIZARD DISCOVERY & RENDERING
+// ══════════════════════════════════════════════════════════════════════════
+
+function renderFilterPanel(report, idx) {
+  const filters = report.filters || {};
+  const meta = report._wizard_meta || filters._meta || null;
+
+  if (!meta) {
+    // No metadata at all
+    if (Object.keys(filters).length > 0) {
+      return `<div class="filter-panel">
+        <h4>\uD83C\uDFA8 Saved Filters (raw)</h4>
+        <pre style="font-size:11px;color:var(--muted);overflow-x:auto;">${esc(JSON.stringify(filters,null,2))}</pre>
+        <button class="btn-discover" style="margin-top:6px" onclick="discoverFilters(${idx})">\u25B6 Re-discover</button>
+      </div>`;
+    }
+    return '';
+  }
+
+  const isCuic = meta.type === 'cuic_spab';
+
+  let html = `<div class="filter-panel">
+    <h4>${isCuic ? '\uD83C\uDFAF' : '\uD83C\uDFA8'} Filter Wizard Settings
+      <span class="filter-clear" onclick="clearFilters(${idx})">\u2716 Clear all</span>
+    </h4>`;
+
+  if (isCuic) {
+    // ── CUIC AngularJS params (flat param-name keys) ──
+    const params = meta.params || [];
+    params.forEach(p => {
+      const pn = p.paramName || '';
+      const label = p.label || pn;
+      const savedVal = filters[pn];
+
+      if (p.type === 'cuic_datetime') {
+        // Saved value can be a string preset or an object {preset, date1, date2, allTime, time1, time2}
+        const cfg = typeof savedVal === 'string' ? {preset: savedVal}
+                  : (savedVal && typeof savedVal === 'object' ? savedVal : {});
+        const curPreset = cfg.preset || '';
+
+        // Date Range preset dropdown
+        const presets = p.datePresets || [];
+        let opts = presets.map(o => {
+          const sel = curPreset === o.value ? 'selected' : '';
+          return `<option value="${attr(o.value)}" ${sel}>${esc(o.label)}</option>`;
+        }).join('');
+        const noSel = !curPreset ? 'selected' : '';
+        opts = `<option value="" ${noSel}>\u2014 use default \u2014</option>` + opts;
+
+        const dtId = 'dt-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+        html += `<div class="filter-field">
+          <label title="${attr(pn)}">${esc(label)}</label>
+          <select id="${dtId}-preset" onchange="updateCuicDatetime(${idx},'${attr(pn)}','preset',this.value)">${opts}</select>
+        </div>`;
+
+        // Custom date range (shown when preset = CUSTOM)
+        if (p.hasDateRange) {
+          const showDates = curPreset === 'CUSTOM' ? '' : 'style="display:none"';
+          const d1 = cfg.date1 || '';
+          const d2 = cfg.date2 || '';
+          html += `<div class="filter-sub" id="${dtId}-dates" ${showDates}>
+            <div class="sub-row">
+              <label>From</label>
+              <input type="date" value="${attr(d1)}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','date1',this.value)">
+              <span class="to">to</span>
+              <input type="date" value="${attr(d2)}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','date2',this.value)">
+            </div>
+          </div>`;
+        }
+
+        // Time range (All Day / Custom)
+        if (p.hasTimeRange) {
+          const allTime = cfg.allTime || 1;
+          const t1 = cfg.time1 || '';
+          const t2 = cfg.time2 || '';
+          const showTimes = allTime === 2 ? '' : 'style="display:none"';
+          html += `<div class="filter-sub">
+            <div class="sub-row">
+              <label>Time</label>
+              <select onchange="updateCuicDatetime(${idx},'${attr(pn)}','allTime',parseInt(this.value));
+                document.getElementById('${dtId}-times').style.display=this.value==='2'?'':'none'">
+                <option value="1" ${allTime===1?'selected':''}>All Day</option>
+                <option value="2" ${allTime===2?'selected':''}>Custom</option>
+              </select>
+            </div>
+            <div class="sub-row" id="${dtId}-times" ${showTimes}>
+              <label>From</label>
+              <input type="time" step="1" value="${attr(t1)}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','time1',this.value)">
+              <span class="to">to</span>
+              <input type="time" step="1" value="${attr(t2)}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','time2',this.value)">
+            </div>
+          </div>`;
+        }
+
+      } else if (p.type === 'cuic_valuelist') {
+        // Value list with checkbox grid
+        const isAll = savedVal === 'all';
+        const isSpecific = Array.isArray(savedVal);
+        const selectedNames = isSpecific ? savedVal : [];
+        const allNames = p.availableNames || [];
+        const badge = `<span class="vl-badge">${allNames.length} available</span>`;
+        const vlId = 'vl-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+        const selCount = isAll ? allNames.length : selectedNames.length;
+
+        html += `<div class="filter-field">
+          <label title="${attr(pn)}">${esc(label)} ${badge}</label>
+          <span style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+        </div>`;
+
+        // Groups + Toolbar: search + select all / deselect all
+        const groups = p.availableGroups || [];
+        html += `<div class="vl-section" id="${vlId}-section">`;
+
+        // Group toggle buttons
+        if (groups.length) {
+          html += `<div class="vl-groups" id="${vlId}-groups">`;
+          groups.forEach((g, gi) => {
+            const members = g.members || [];
+            const allChecked = members.length > 0 && members.every(m => isAll || selectedNames.includes(m));
+            html += `<button class="vl-group-btn${allChecked?' active':''}" data-gidx="${gi}"
+              onclick="vlToggleGroup(${idx},'${attr(pn)}','${vlId}',${gi})">
+              ${esc(g.name)} <span class="vl-g-count">(${g.count})</span>
+            </button>`;
+          });
+          html += `</div>`;
+        }
+
+        html += `<div class="vl-toolbar">
+            <input type="text" id="${vlId}-search" placeholder="\uD83D\uDD0D Filter names..."
+              oninput="filterVlChecklist('${vlId}',this.value)">
+            <button onclick="vlCheckAll(${idx},'${attr(pn)}','${vlId}')">\u2611 All</button>
+            <button onclick="vlUncheckAll(${idx},'${attr(pn)}','${vlId}')">\u2610 None</button>
+            <span class="vl-count" id="${vlId}-count">${selCount} / ${allNames.length}</span>
+          </div>
+          <div class="vl-checklist" id="${vlId}-list">`;
+
+        // Build a set of group members for highlighting
+        const groupMemberSet = new Set();
+        groups.forEach(g => (g.members || []).forEach(m => groupMemberSet.add(m)));
+
+        // All items as checkboxes
+        allNames.forEach(n => {
+          const checked = isAll || selectedNames.includes(n) ? 'checked' : '';
+          // Tag each checkbox with its group memberships for toggle logic
+          const memberOf = groups.filter(g => (g.members||[]).includes(n)).map(g => g.name).join(',');
+          html += `<label data-name="${attr(n.toLowerCase())}" data-groups="${attr(memberOf)}">
+            <input type="checkbox" value="${attr(n)}" ${checked}
+              onchange="vlToggleItem(${idx},'${attr(pn)}','${vlId}')">
+            <span>${esc(n)}</span>
+          </label>`;
+        });
+
+        html += `</div>
+        </div>`;
+
+      } else if (p.type === 'checkbox') {
+        const checked = savedVal !== undefined ? savedVal : (p.currentValue || false);
+        html += `<div class="filter-field">
+          <label title="${attr(pn)}">${esc(label)}</label>
+          <input type="checkbox" ${checked?'checked':''}
+            onchange="updateCuicFilter(${idx},'${attr(pn)}',this.checked)"
+            style="width:auto;">
+        </div>`;
+
+      } else {
+        // text / number
+        const val = savedVal !== undefined ? savedVal : (p.currentValue || '');
+        const inputType = p.type === 'number' ? 'number' : 'text';
+        html += `<div class="filter-field">
+          <label title="${attr(pn)}">${esc(label)}</label>
+          <input type="${inputType}" value="${attr(String(val))}"
+            onchange="updateCuicFilter(${idx},'${attr(pn)}',this.value)">
+        </div>`;
+      }
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // ── Generic step-based wizard ──
+  (meta.steps || []).forEach(step => {
+    const stepKey = 'step_' + step.step;
+    const savedStep = filters[stepKey] || {};
+    html += `<div class="filter-step">
+      <div class="step-label">Step ${step.step}</div>`;
+
+    (step.fields || []).forEach(field => {
+      const key = field.id || field.name || field.label || '';
+      if (!key) return;
+      const savedVal = savedStep[key];
+      const displayLabel = field.label || field.name || field.id;
+
+      if (field.type === 'select') {
+        const isMulti = field.multiple ? 'multiple' : '';
+        let opts = (field.options || []).map(o => {
+          const sel = savedVal !== undefined
+            ? (Array.isArray(savedVal) ? savedVal.includes(o.value) : savedVal === o.value)
+            : o.selected;
+          return `<option value="${attr(o.value)}" ${sel?'selected':''}>${esc(o.text)}</option>`;
+        }).join('');
+        html += `<div class="filter-field">
+          <label title="${attr(key)}">${esc(displayLabel)}</label>
+          <select ${isMulti} onchange="updateFilterValue(${idx},'${stepKey}','${attr(key)}',this)">${opts}</select>
+        </div>`;
+      } else if (field.type === 'checkbox') {
+        const checked = savedVal !== undefined ? savedVal : field.value;
+        html += `<div class="filter-field">
+          <label title="${attr(key)}">${esc(displayLabel)}</label>
+          <input type="checkbox" ${checked?'checked':''}
+            onchange="updateFilterValue(${idx},'${stepKey}','${attr(key)}',this)"
+            style="width:auto;">
+        </div>`;
+      } else {
+        const val = savedVal !== undefined ? savedVal : (field.value || '');
+        const inputType = field.inputType || 'text';
+        html += `<div class="filter-field">
+          <label title="${attr(key)}">${esc(displayLabel)}</label>
+          <input type="${inputType}" value="${attr(String(val))}"
+            onchange="updateFilterValue(${idx},'${stepKey}','${attr(key)}',this)">
+        </div>`;
+      }
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+/* ── CUIC flat filter update ── */
+function updateCuicFilter(reportIdx, paramName, value) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (value === '' || value === undefined) {
+    delete report.filters[paramName];
+  } else {
+    report.filters[paramName] = value;
+  }
+}
+
+/* ── CUIC datetime update (builds object: {preset, date1, date2, allTime, time1, time2}) ── */
+function updateCuicDatetime(reportIdx, paramName, field, value) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+
+  let cur = report.filters[paramName];
+  // Normalize to object
+  if (typeof cur === 'string') cur = {preset: cur};
+  if (!cur || typeof cur !== 'object') cur = {};
+
+  cur[field] = value;
+
+  // When preset changes, toggle custom date fields visibility
+  if (field === 'preset') {
+    const dtId = 'dt-' + reportIdx + '-' + paramName.replace(/[^a-zA-Z0-9]/g,'_');
+    const datesEl = document.getElementById(dtId + '-dates');
+    if (datesEl) datesEl.style.display = value === 'CUSTOM' ? '' : 'none';
+  }
+
+  // If only preset and it's not CUSTOM, store as simple string
+  const keys = Object.keys(cur).filter(k => cur[k] !== undefined && cur[k] !== '');
+  if (keys.length === 1 && keys[0] === 'preset' && cur.preset !== 'CUSTOM') {
+    report.filters[paramName] = cur.preset || undefined;
+    if (!cur.preset) delete report.filters[paramName];
+  } else {
+    report.filters[paramName] = cur;
+  }
+}
+
+/* ── CUIC valuelist: toggle a single checkbox ── */
+function vlToggleItem(reportIdx, paramName, vlId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  const checked = Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+  const total = listEl.querySelectorAll('input[type=checkbox]').length;
+  report.filters[paramName] = checked.length === total ? 'all' : checked;
+  // Update count
+  const countEl = document.getElementById(vlId + '-count');
+  if (countEl) countEl.textContent = checked.length + ' / ' + total;
+  // Update group button highlights
+  vlUpdateGroupButtons(vlId, reportIdx, paramName);
+}
+
+/* ── CUIC valuelist: check all (visible) ── */
+function vlCheckAll(reportIdx, paramName, vlId) {
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = true;
+    }
+  });
+  vlToggleItem(reportIdx, paramName, vlId);
+}
+
+/* ── CUIC valuelist: uncheck all (visible) ── */
+function vlUncheckAll(reportIdx, paramName, vlId) {
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = false;
+    }
+  });
+  vlToggleItem(reportIdx, paramName, vlId);
+}
+
+/* ── CUIC valuelist: filter checklist by search text ── */
+function filterVlChecklist(vlId, query) {
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  const q = (query || '').toLowerCase();
+  listEl.querySelectorAll('label').forEach(lbl => {
+    const name = lbl.getAttribute('data-name') || '';
+    lbl.style.display = (!q || name.includes(q)) ? '' : 'none';
+  });
+}
+
+/* ── CUIC valuelist: toggle a group (select/deselect all its members) ── */
+function vlToggleGroup(reportIdx, paramName, vlId, groupIdx) {
+  const report = cuicReports[reportIdx];
+  const meta = report._wizard_meta || (report.filters && report.filters._meta) || {};
+  const params = meta.params || [];
+  const p = params.find(pp => pp.paramName === paramName);
+  if (!p) return;
+  const group = (p.availableGroups || [])[groupIdx];
+  if (!group || !group.members) return;
+
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+
+  // Determine current state: if all members are checked, uncheck them; otherwise check all
+  const memberSet = new Set(group.members);
+  const memberCbs = Array.from(listEl.querySelectorAll('input[type=checkbox]'))
+    .filter(cb => memberSet.has(cb.value));
+  const allChecked = memberCbs.every(cb => cb.checked);
+
+  memberCbs.forEach(cb => cb.checked = !allChecked);
+
+  // Update data model
+  vlToggleItem(reportIdx, paramName, vlId);
+
+  // Update group button active state
+  vlUpdateGroupButtons(vlId, reportIdx, paramName);
+}
+
+/* ── Update group button active/inactive styling ── */
+function vlUpdateGroupButtons(vlId, reportIdx, paramName) {
+  const groupsEl = document.getElementById(vlId + '-groups');
+  if (!groupsEl) return;
+  const report = cuicReports[reportIdx];
+  const meta = report._wizard_meta || (report.filters && report.filters._meta) || {};
+  const params = meta.params || [];
+  const p = params.find(pp => pp.paramName === paramName);
+  if (!p) return;
+
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  const checkedVals = new Set(Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value));
+
+  groupsEl.querySelectorAll('.vl-group-btn').forEach(btn => {
+    const gi = parseInt(btn.getAttribute('data-gidx'));
+    const g = (p.availableGroups || [])[gi];
+    if (!g || !g.members) return;
+    const allIn = g.members.every(m => checkedVals.has(m));
+    btn.classList.toggle('active', allIn);
+  });
+}
+
+/* ── Generic step-based filter update ── */
+function updateFilterValue(reportIdx, stepKey, fieldKey, el) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+
+  if (el.type === 'checkbox') {
+    report.filters[stepKey][fieldKey] = el.checked;
+  } else if (el.tagName === 'SELECT' && el.multiple) {
+    report.filters[stepKey][fieldKey] = Array.from(el.selectedOptions).map(o => o.value);
+  } else {
+    report.filters[stepKey][fieldKey] = el.value;
+  }
+}
+
+function clearFilters(reportIdx) {
+  const report = cuicReports[reportIdx];
+  const meta = report._wizard_meta || (report.filters && report.filters._meta) || null;
+  report.filters = {};
+  if (meta) report.filters._meta = meta;
+  renderCuicReports();
+  showToast('Filters cleared for ' + (report.label || 'report'), 'info');
+}
+
+async function discoverFilters(reportIdx) {
+  const report = cuicReports[reportIdx];
+  const btn = document.getElementById('discover-btn-' + reportIdx);
+
+  if (!report.folder || !report.name) {
+    showToast('Set folder and report name first', 'error');
+    return;
+  }
+
+  const origHtml = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> Discovering...';
+  btn.disabled = true;
+  showToast('Launching browser to discover wizard fields... This may take 30-60s.', 'info');
+
+  try {
+    const res = await fetch('/api/discover-filters', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ folder: report.folder, name: report.name })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      showToast('Discovery error: ' + data.error, 'error');
+      return;
+    }
+
+    if (!data.steps || data.steps.length === 0) {
+      showToast('No wizard steps found', 'error');
+      return;
+    }
+
+    const isCuic = data.type === 'cuic_spab';
+
+    if (isCuic) {
+      // ── CUIC format: flat param-name keys ──
+      const params = data.params || [];
+      const metaObj = {
+        type: 'cuic_spab',
+        params: params,
+        datePresets: data.datePresets || []
+      };
+      report._wizard_meta = metaObj;
+      if (!report.filters) report.filters = {};
+      report.filters._meta = metaObj;
+
+      // Pre-populate with safe defaults (don't overwrite existing)
+      params.forEach(p => {
+        const pn = p.paramName;
+        if (!pn || report.filters[pn] !== undefined) return;
+        // Set sensible defaults
+        if (p.type === 'cuic_datetime' && p.currentPreset) {
+          report.filters[pn] = p.currentPreset;
+        }
+        // Leave valuelist empty — user must choose
+      });
+      showToast(`Discovered ${params.length} CUIC parameter(s)!`, 'success');
+
+    } else {
+      // ── Generic step-based format ──
+      report._wizard_meta = { steps: data.steps };
+      if (!report.filters) report.filters = {};
+      report.filters._meta = { steps: data.steps };
+
+      data.steps.forEach(step => {
+        const stepKey = 'step_' + step.step;
+        if (!report.filters[stepKey]) report.filters[stepKey] = {};
+        (step.fields || []).forEach(field => {
+          const key = field.id || field.name || field.label;
+          if (!key) return;
+          if (report.filters[stepKey][key] === undefined) {
+            report.filters[stepKey][key] = field.value;
+          }
+        });
+      });
+      showToast(`Discovered ${data.steps.length} wizard step(s)!`, 'success');
+    }
+
+    renderCuicReports();
+
+  } catch(e) {
+    showToast('Discovery failed: ' + e.message, 'error');
+  } finally {
+    btn.innerHTML = origHtml;
+    btn.disabled = false;
+  }
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 //  BUILD / POPULATE
@@ -477,7 +1031,11 @@ function buildSettings() {
       cuic: {
         enabled:            document.getElementById('cuic-enabled').checked,
         url:                document.getElementById('cuic-url').value,
-        reports:            cuicReports.map(r => ({ label: r.label, folder: r.folder, name: r.name, enabled: r.enabled !== false, filters: r.filters || {} })),
+        reports:            cuicReports.map(r => {
+          const f = Object.assign({}, r.filters || {});
+          if (r._wizard_meta) f._meta = r._wizard_meta;
+          return { label: r.label, folder: r.folder, name: r.name, enabled: r.enabled !== false, filters: f };
+        }),
         timeout_nav_ms:     parseInt(document.getElementById('cuic-t-nav').value) || 30000,
         timeout_short_ms:   parseInt(document.getElementById('cuic-t-short').value) || 1500,
         timeout_medium_ms:  parseInt(document.getElementById('cuic-t-medium').value) || 2500,
@@ -518,9 +1076,11 @@ function populateSettings(s) {
   const cuic = (s.workers || {}).cuic || {};
   setBool('cuic-enabled', cuic.enabled, true);
   setVal('cuic-url', cuic.url || 'https://148.151.32.77:8444/cuicui/Main.jsp');
-  cuicReports = (cuic.reports || []).map(r => ({
-    label: r.label||'', folder: r.folder||'', name: r.name||'', enabled: r.enabled !== false, filters: r.filters||{}
-  }));
+  cuicReports = (cuic.reports || []).map(r => {
+    const rep = { label: r.label||'', folder: r.folder||'', name: r.name||'', enabled: r.enabled !== false, filters: r.filters||{} };
+    if (rep.filters._meta) rep._wizard_meta = rep.filters._meta;
+    return rep;
+  });
   if (!cuicReports.length) cuicReports.push({ label:'call_type_hist', folder:'Test', name:'Z Call Type Historical All Fields', enabled:true, filters:{} });
   renderCuicReports();
   setVal('cuic-t-nav', cuic.timeout_nav_ms || 30000);

@@ -30,6 +30,10 @@ from core.database import init_db, get_scrape_log, get_latest_scrape_status
 PORT = 8580
 UI_FILE = os.path.join(PROJECT_ROOT, 'ui', 'settings.html')
 
+# Track running discovery tasks
+_discovery_lock = threading.Lock()
+_discovery_running = False
+
 
 class SettingsHandler(BaseHTTPRequestHandler):
     """Handle API requests and serve the control panel HTML."""
@@ -57,8 +61,42 @@ class SettingsHandler(BaseHTTPRequestHandler):
             self._save_json_file(SETTINGS_PATH)
         elif path == '/api/credentials':
             self._save_json_file(CREDENTIALS_PATH)
+        elif path == '/api/discover-filters':
+            self._discover_filters()
         else:
             self.send_error(404)
+
+    # ── Filter wizard discovery ───────────────────────────────────────────
+
+    def _discover_filters(self):
+        """Launch a browser to read wizard fields for a given report config."""
+        global _discovery_running
+        try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length).decode('utf-8')
+            report_config = json.loads(body)
+
+            with _discovery_lock:
+                if _discovery_running:
+                    self._send_json({'error': 'A discovery is already running. Please wait.'}, status=409)
+                    return
+                _discovery_running = True
+
+            # Run discovery in the current thread (request blocks until done)
+            try:
+                from workers.cuic_worker import Worker as CuicWorker
+                result = CuicWorker.discover_wizard(report_config)
+                self._send_json(result)
+            finally:
+                with _discovery_lock:
+                    _discovery_running = False
+
+        except json.JSONDecodeError as e:
+            self._send_json({'error': f'Invalid JSON: {e}'}, status=400)
+        except Exception as e:
+            with _discovery_lock:
+                _discovery_running = False
+            self._send_json({'error': str(e)}, status=500)
 
     # ── File serving ──────────────────────────────────────────────────────
 
