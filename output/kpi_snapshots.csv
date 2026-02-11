@@ -276,25 +276,25 @@ date,timestamp,source,metric_title,category,sub_category,value
 2026-02-10,2026-02-10 15:02:39,cuic,CUIC_Short Calls,General_IT_CT,,0
 2026-02-10,2026-02-10 15:02:39,cuic,CUIC_Short Calls,RTPS_CT,,0
 2026-02-10,2026-02-10 15:02:39,cuic,CUIC_Short Calls,SAP_CT,,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_% Aban,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_% Queued,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Abandoned,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Abandoned Within Service Level,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Answer Wait Time,,call_type_hist,4
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Answered,,call_type_hist,1
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Assigned From Queue,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Average Abandon Delay,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Avg Speed of Answer,,call_type_hist,4
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Calls Error,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_DateTime,,call_type_hist,1770706800000
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Default_Treatment,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Flow Out,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Handled,,call_type_hist,1
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Longest Queued,,call_type_hist,4
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Max Queued,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Network Routed,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Offered,,call_type_hist,1
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Other,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Return,,call_type_hist,0
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Service Level,,call_type_hist,1
-2026-02-11,2026-02-11 08:44:15,cuic,CUIC_Short Calls,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_% Aban,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_% Queued,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Abandoned,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Abandoned Within Service Level,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Answer Wait Time,,call_type_hist,4
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Answered,,call_type_hist,1
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Assigned From Queue,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Average Abandon Delay,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Avg Speed of Answer,,call_type_hist,4
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Calls Error,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_DateTime,,call_type_hist,1770706800000
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Default_Treatment,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Flow Out,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Handled,,call_type_hist,1
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Longest Queued,,call_type_hist,4
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Max Queued,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Network Routed,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Offered,,call_type_hist,1
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Other,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Return,,call_type_hist,0
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Service Level,,call_type_hist,1
+2026-02-11,2026-02-11 08:53:09,cuic,CUIC_Short Calls,,call_type_hist,0

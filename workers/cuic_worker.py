@@ -160,14 +160,38 @@ class Worker(BaseWorker):
             while len(pages) > 1:
                 pages[-1].close()
                 pages = self.context.pages
+            # Ensure focus is on the main page
+            self.page.bring_to_front()
         except Exception:
             pass
 
     def _navigate_to_reports_root(self):
-        """Click the Reports tab to reset back to the reports list root."""
+        """Reset back to the reports list. If the ngGrid is still hidden
+        after clicking the Reports tab, reload the page to restore UI state."""
         try:
+            # Attempt 1: click the Reports tab
             self.page.click(self.REPORTS_TAB_CSS)
             self.page.wait_for_timeout(self.timeout_medium)
+
+            # Check if the ngGrid is visible in the reports iframe
+            frame = self.page.frame(name=self.REPORTS_IFRAME_NAME)
+            if frame:
+                try:
+                    grid = frame.query_selector(self.GRID_CONTAINER)
+                    if grid and grid.is_visible():
+                        self.logger.info("Reports grid visible after tab click")
+                        return
+                except Exception:
+                    pass
+
+            # Attempt 2: full page reload to reset CUIC UI state
+            # (session cookie persists — no re-login needed)
+            self.logger.info("ngGrid hidden after tab click — reloading page")
+            self.page.goto(self.url, wait_until='domcontentloaded',
+                           timeout=self.timeout_nav)
+            self.page.wait_for_timeout(self.timeout_medium)
+            self.page.wait_for_selector(self.REPORTS_TAB_CSS,
+                                        timeout=self.timeout_nav)
         except Exception as e:
             self.logger.warning(f"Navigate to reports root: {e}")
 
