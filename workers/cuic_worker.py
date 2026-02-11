@@ -1064,6 +1064,7 @@ class Worker(BaseWorker):
             result['error'] = str(e)
             return result
         finally:
+            worker._logout()
             worker.teardown_browser()
 
     # ══════════════════════════════════════════════════════════════════════

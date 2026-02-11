@@ -1,6 +1,6 @@
 {
   "global": {
-    "headless": true,
+    "headless": false,
     "use_system_chrome": true,
     "screenshot_steps": false,
     "screenshot_errors": true,
