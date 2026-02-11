@@ -84,6 +84,7 @@
   .status-dot.error { background: var(--red); }
   .status-dot.no_data { background: var(--yellow); }
   .status-dot.pending { background: var(--border); }
+  .status-dot.skipped { background: var(--accent); }
 
   /* Dashboard */
   .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
@@ -99,6 +100,7 @@
   .status-pill.success { background: rgba(63,185,80,0.15); color: var(--green); }
   .status-pill.error { background: rgba(248,81,73,0.15); color: var(--red); }
   .status-pill.no_data { background: rgba(210,153,34,0.15); color: var(--yellow); }
+  .status-pill.skipped { background: rgba(88,166,255,0.15); color: var(--accent); }
 
   .server-status { font-size: 12px; color: var(--green); display: flex; align-items: center; gap: 6px; }
   .server-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
@@ -106,9 +108,21 @@
   .server-status.offline { color: var(--red); }
 
   /* Filter wizard panel */
-  .filter-panel { margin-top: 12px; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
+  .filter-panel { padding: 12px 14px; background: var(--bg); border: 1px solid var(--border);
     border-radius: 6px; }
   .filter-panel h4 { font-size: 13px; color: var(--accent); margin: 0 0 10px; display: flex; align-items: center; gap: 6px; }
+
+  /* Collapsible panel wrapper */
+  .filter-panel-collapsible { margin-top: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); overflow: hidden; }
+  .filter-panel-collapsible > .filter-panel { border: none; border-radius: 0; }
+  .filter-panel-toggle { padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--accent); cursor: pointer;
+    display: flex; align-items: center; gap: 6px; list-style: none; user-select: none; }
+  .filter-panel-toggle::-webkit-details-marker { display: none; }
+  .filter-panel-toggle::after { content: '▶'; font-size: 10px; transition: transform 0.2s; color: var(--muted); margin-left: 8px; }
+  .filter-panel-toggle:not(:has(.filter-clear))::after { margin-left: auto; }
+  details[open] > .filter-panel-toggle::after { transform: rotate(90deg); }
+  .filter-panel-toggle:hover { background: rgba(88,166,255,0.05); }
+  .filter-panel-toggle .filter-clear { margin-left: auto; }
   .filter-step { margin-bottom: 10px; padding: 8px 10px; background: var(--surface); border-radius: 5px; }
   .filter-step .step-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase;
     letter-spacing: 0.05em; margin-bottom: 6px; }
@@ -183,6 +197,11 @@
   .smax-enum-opts { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
   .smax-enum-opt { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 3px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); }
   .smax-enum-opt.active { background: rgba(63,185,80,0.15); color: var(--green); border-color: var(--green); }
+
+  /* ── Data Type Badges ─────────────────────────────────────────────── */
+  .data-type-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .data-type-badge.ongoing { background: rgba(88,166,255,0.15); color: var(--accent); border: 1px solid rgba(88,166,255,0.3); }
+  .data-type-badge.historical { background: rgba(210,153,34,0.15); color: #d29a22; border: 1px solid rgba(210,153,34,0.3); }
 </style>
 </head>
 <body>
@@ -503,7 +522,10 @@ function renderCuicReports() {
     const filterHtml = renderFilterPanel(r, i);
     return `<div class="report-card ${r.enabled ? '' : 'disabled'}">
       <div class="report-card-header">
-        <span class="label-tag">${esc(r.label || 'unnamed')}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="label-tag">${esc(r.label || 'unnamed')}</span>
+          <span class="data-type-badge ${r.data_type === 'historical' ? 'historical' : 'ongoing'}">${r.data_type === 'historical' ? '\ud83d\udce6 Historical' : '\ud83d\udce1 Ongoing'}</span>
+        </div>
         <div style="display:flex;gap:6px;align-items:center">
           <div class="toggle-switch" style="margin:0">
             <input type="checkbox" id="rpt-en-${i}" ${r.enabled ? 'checked' : ''}
@@ -516,6 +538,12 @@ function renderCuicReports() {
       <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value" placeholder="e.g. call_type_hist"></div>
       <div class="inline-row"><label>Folder</label><input value="${attr(r.folder)}" onchange="cuicReports[${i}].folder=this.value" placeholder="e.g. Stock/CCE/CCE_AF_Historical"></div>
       <div class="inline-row"><label>Report Name</label><input value="${attr(r.name)}" onchange="cuicReports[${i}].name=this.value" placeholder="Exact name in CUIC"></div>
+      <div class="inline-row"><label>Data Type</label>
+        <select onchange="cuicReports[${i}].data_type=this.value;renderCuicReports()" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--fg);font-size:13px">
+          <option value="ongoing" ${(r.data_type||'ongoing')==='ongoing'?'selected':''}>📡 Ongoing (re-scrape every run)</option>
+          <option value="historical" ${r.data_type==='historical'?'selected':''}>📦 Historical (scrape once)</option>
+        </select>
+      </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
         <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
           \u25B6 Discover Filters
@@ -529,9 +557,9 @@ function renderCuicReports() {
 }
 
 function addCuicReport() {
-  cuicReports.push({ label: '', folder: '', name: '', enabled: true, filters: {} });
+  cuicReports.unshift({ label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', filters: {} });
   renderCuicReports();
-  document.getElementById('cuic-reports-list').lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('cuic-reports-list').firstElementChild?.scrollIntoView({ behavior: 'smooth' });
 }
 
 function removeCuicReport(i) {
@@ -554,21 +582,19 @@ function renderFilterPanel(report, idx) {
   if (!meta) {
     // No metadata at all
     if (Object.keys(filters).length > 0) {
-      return `<div class="filter-panel">
-        <h4>\uD83C\uDFA8 Saved Filters (raw)</h4>
+      return `<details class="filter-panel-collapsible"><summary class="filter-panel-toggle">\uD83C\uDFA8 Saved Filters (raw)</summary><div class="filter-panel">
         <pre style="font-size:11px;color:var(--muted);overflow-x:auto;">${esc(JSON.stringify(filters,null,2))}</pre>
         <button class="btn-discover" style="margin-top:6px" onclick="discoverFilters(${idx})">\u25B6 Re-discover</button>
-      </div>`;
+      </div></details>`;
     }
     return '';
   }
 
   const isCuic = meta.type === 'cuic_spab';
 
-  let html = `<div class="filter-panel">
-    <h4>${isCuic ? '\uD83C\uDFAF' : '\uD83C\uDFA8'} Filter Wizard Settings
-      <span class="filter-clear" onclick="clearFilters(${idx})">\u2716 Clear all</span>
-    </h4>`;
+  let html = `<details class="filter-panel-collapsible"><summary class="filter-panel-toggle">${isCuic ? '\uD83C\uDFAF' : '\uD83C\uDFA8'} Filter Wizard Settings
+      <span class="filter-clear" onclick="event.stopPropagation();clearFilters(${idx})">\u2716 Clear all</span>
+    </summary><div class="filter-panel">`;
 
   if (isCuic) {
     // ── CUIC AngularJS params (flat param-name keys) ──
@@ -768,7 +794,7 @@ function renderFilterPanel(report, idx) {
     });
     html += '</div>';
   });
-  html += '</div>';
+  html += '</div></details>';
   return html;
 }
 
@@ -1039,6 +1065,27 @@ function renderSmaxReports() {
     return;
   }
   container.innerHTML = smaxReports.map((r, i) => {
+    // Check if this is a new empty report (no label/properties yet)
+    const isEmpty = !r.label && !r.properties?.report_name;
+    
+    if (isEmpty) {
+      // Minimal card: just URL + discover button
+      return `<div class="report-card">
+        <div class="report-card-header">
+          <span class="label-tag" style="color:var(--muted);font-style:italic">New Report</span>
+          <button class="btn btn-icon btn-sm" onclick="removeSmaxReport(${i})" title="Remove">\uD83D\uDDD1\uFE0F</button>
+        </div>
+        <div class="inline-row"><label>Report URL</label><input value="${attr(r.url)}" onchange="smaxReports[${i}].url=this.value" placeholder="https://smax.corp.pdo.om/reports/report/..." style="grid-column:2"></div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+          <button class="btn-discover" id="smax-discover-btn-${i}" onclick="discoverSmaxProperties(${i})">
+            \u25B6 Discover Report
+          </button>
+          <span style="font-size:11px;color:var(--muted)">Fetch report name, filters, and settings automatically</span>
+        </div>
+      </div>`;
+    }
+
+    // Full card with all details
     const st = scrapeStatus['smax:' + r.label];
     let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
     if (st) {
@@ -1051,7 +1098,10 @@ function renderSmaxReports() {
     const propsHtml = renderSmaxPropertiesPanel(r, i);
     return `<div class="report-card ${r.enabled ? '' : 'disabled'}">
       <div class="report-card-header">
-        <span class="label-tag">${esc(r.label || 'unnamed')}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="label-tag">${esc(r.label || 'unnamed')}</span>
+          <span class="data-type-badge ${r.data_type === 'historical' ? 'historical' : 'ongoing'}">${r.data_type === 'historical' ? '\ud83d\udce6 Historical' : '\ud83d\udce1 Ongoing'}</span>
+        </div>
         <div style="display:flex;gap:6px;align-items:center">
           <div class="toggle-switch" style="margin:0">
             <input type="checkbox" id="smax-rpt-en-${i}" ${r.enabled ? 'checked' : ''}
@@ -1063,11 +1113,17 @@ function renderSmaxReports() {
       </div>
       <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="smaxReports[${i}].label=this.value" placeholder="e.g. sla_fcr_month"></div>
       <div class="inline-row"><label>Report URL</label><input value="${attr(r.url)}" onchange="smaxReports[${i}].url=this.value" placeholder="https://smax.corp.pdo.om/reports/report/..."></div>
+      <div class="inline-row"><label>Data Type</label>
+        <select onchange="smaxReports[${i}].data_type=this.value;renderSmaxReports()" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--fg);font-size:13px">
+          <option value="ongoing" ${(r.data_type||'ongoing')==='ongoing'?'selected':''}>📡 Ongoing (re-scrape every run)</option>
+          <option value="historical" ${r.data_type==='historical'?'selected':''}>📦 Historical (scrape once)</option>
+        </select>
+      </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
         <button class="btn-discover" id="smax-discover-btn-${i}" onclick="discoverSmaxProperties(${i})">
-          \u25B6 Discover Properties
+          \u25B6 Re-discover Properties
         </button>
-        <span style="font-size:11px;color:var(--muted)">Opens browser to read report properties (filters, group-by, etc.)</span>
+        <span style="font-size:11px;color:var(--muted)">Re-read report properties from browser (filters, group-by, etc.)</span>
       </div>
       ${propsHtml}
       ${statusHtml}
@@ -1076,9 +1132,9 @@ function renderSmaxReports() {
 }
 
 function addSmaxReport() {
-  smaxReports.push({ label: '', url: '', enabled: true, properties: {} });
+  smaxReports.unshift({ label: '', url: '', enabled: true, data_type: 'ongoing', properties: {} });
   renderSmaxReports();
-  document.getElementById('smax-reports-list').lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('smax-reports-list').firstElementChild?.scrollIntoView({ behavior: 'smooth' });
 }
 
 function removeSmaxReport(i) {
@@ -1090,7 +1146,7 @@ function renderSmaxPropertiesPanel(report, idx) {
   const props = report.properties || {};
   if (!props.report_name && !props.filters) return '';
 
-  let html = '<div class="filter-panel"><h4>\uD83D\uDCC4 Report Properties</h4>';
+  let html = '<details class="filter-panel-collapsible"><summary class="filter-panel-toggle">\uD83D\uDCC4 Report Properties</summary><div class="filter-panel">';
 
   // Report metadata
   if (props.report_name) html += `<div class="smax-prop-row"><span class="smax-prop-label">Report Name</span><span>${esc(props.report_name)}</span></div>`;
@@ -1116,9 +1172,6 @@ function renderSmaxPropertiesPanel(report, idx) {
         if (f.date_presets && f.date_presets.length) {
           valueHtml += `<div class="smax-presets">Presets: ${f.date_presets.map(p => '<span class="smax-preset-tag">' + esc(p.label) + '</span>').join(' ')}</div>`;
         }
-      } else if (f.type === 'dropdown' || f.type === 'entity_picker') {
-        const vals = f.selected_values || [];
-        valueHtml = vals.map(v => '<span class="smax-chip">' + esc(v) + '</span>').join(' ');
       } else if (f.type === 'enum') {
         valueHtml = negBadge + esc(f.display_value || '');
         if (f.enum_options && f.enum_options.length) {
@@ -1126,6 +1179,13 @@ function renderSmaxPropertiesPanel(report, idx) {
             `<span class="smax-enum-opt${o.checked ? ' active' : ''}">${esc(o.label)}</span>`
           ).join(' ') + '</div>';
         }
+      } else if (f.selected_values && f.selected_values.length) {
+        // Render selected_values as chips (for dropdown, entity_picker, or any with array)
+        valueHtml = f.selected_values.map(v => '<span class="smax-chip">' + esc(v) + '</span>').join(' ');
+      } else if (f.display_value && f.display_value.includes(',')) {
+        // Fallback: if display_value has commas, split and render as chips
+        const vals = f.display_value.split(',').map(v => v.trim()).filter(Boolean);
+        valueHtml = vals.map(v => '<span class="smax-chip">' + esc(v) + '</span>').join(' ');
       } else {
         valueHtml = esc(f.display_value || '');
       }
@@ -1148,7 +1208,7 @@ function renderSmaxPropertiesPanel(report, idx) {
 
   html += `<div style="margin-top:8px"><button class="btn-discover" style="font-size:11px;padding:4px 10px" onclick="discoverSmaxProperties(${idx})">\u25B6 Re-discover</button>
     <button class="btn-discover" style="font-size:11px;padding:4px 10px;margin-left:4px" onclick="clearSmaxProperties(${idx})">\u2716 Clear</button></div>`;
-  html += '</div>';
+  html += '</div></details>';
   return html;
 }
 
@@ -1156,6 +1216,36 @@ function clearSmaxProperties(idx) {
   smaxReports[idx].properties = {};
   renderSmaxReports();
   showToast('Properties cleared', 'info');
+}
+
+// ── Auto-detect data type from report properties ──
+function suggestDataType(props) {
+  // Look at date filter display values and presets for time-range keywords
+  const filters = props.filters || [];
+  const dateFilters = filters.filter(f => f.type === 'date');
+  if (!dateFilters.length) return null;
+
+  // Collect all text from date filter values and preset labels
+  const allText = dateFilters.map(f => {
+    const parts = [f.display_value || ''];
+    (f.date_presets || []).forEach(p => parts.push(p.label || ''));
+    return parts.join(' ');
+  }).join(' ').toLowerCase();
+
+  // Historical indicators: past/fixed time periods
+  const historicalPatterns = /previous\s+month|last\s+month|previous\s+year|last\s+year|previous\s+quarter|last\s+quarter|yesterday/;
+  // Ongoing indicators: current/rolling time periods
+  const ongoingPatterns = /this\s+month|current\s+month|today|this\s+year|current\s+year|this\s+quarter|current\s+quarter|this\s+week|current\s+week|rolling/;
+
+  const hasHistorical = historicalPatterns.test(allText);
+  const hasOngoing = ongoingPatterns.test(allText);
+
+  // If only historical keywords found, suggest historical
+  if (hasHistorical && !hasOngoing) return 'historical';
+  // If ongoing keywords found, prefer ongoing
+  if (hasOngoing) return 'ongoing';
+  // Can't determine
+  return null;
 }
 
 async function discoverSmaxProperties(idx) {
@@ -1194,8 +1284,15 @@ async function discoverSmaxProperties(idx) {
         .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 30);
     }
 
+    // Auto-suggest data_type from date filter presets
+    const suggested = suggestDataType(data);
+    if (suggested) {
+      report.data_type = suggested;
+    }
+
     const filterCount = (data.filters || []).length;
-    showToast(`Discovered: "${data.report_name || 'report'}" with ${filterCount} filter(s)!`, 'success');
+    const typeLabel = report.data_type === 'historical' ? ' (auto-detected: historical)' : ' (auto-detected: ongoing)';
+    showToast(`Discovered: "${data.report_name || 'report'}" with ${filterCount} filter(s)${suggested ? typeLabel : ''}!`, 'success');
     renderSmaxReports();
 
   } catch(e) {
@@ -1244,7 +1341,7 @@ function buildSettings() {
         reports:            cuicReports.map(r => {
           const f = Object.assign({}, r.filters || {});
           if (r._wizard_meta) f._meta = r._wizard_meta;
-          return { label: r.label, folder: r.folder, name: r.name, enabled: r.enabled !== false, filters: f };
+          return { label: r.label, folder: r.folder, name: r.name, enabled: r.enabled !== false, data_type: r.data_type || 'ongoing', filters: f };
         }),
         timeout_nav_ms:     parseInt(document.getElementById('cuic-t-nav').value) || 30000,
         timeout_short_ms:   parseInt(document.getElementById('cuic-t-short').value) || 1500,
@@ -1256,6 +1353,7 @@ function buildSettings() {
         base_url:             document.getElementById('smax-url').value,
         reports:              smaxReports.map(r => ({
           label: r.label, url: r.url, enabled: r.enabled !== false,
+          data_type: r.data_type || 'ongoing',
           properties: r.properties || {}
         })),
         page_load_timeout_ms: parseInt(document.getElementById('smax-t-load').value) || 120000,
@@ -1290,7 +1388,7 @@ function populateSettings(s) {
   setBool('cuic-enabled', cuic.enabled, true);
   setVal('cuic-url', cuic.url || 'https://148.151.32.77:8444/cuicui/Main.jsp');
   cuicReports = (cuic.reports || []).map(r => {
-    const rep = { label: r.label||'', folder: r.folder||'', name: r.name||'', enabled: r.enabled !== false, filters: r.filters||{} };
+    const rep = { label: r.label||'', folder: r.folder||'', name: r.name||'', enabled: r.enabled !== false, data_type: r.data_type || 'ongoing', filters: r.filters||{} };
     if (rep.filters._meta) rep._wizard_meta = rep.filters._meta;
     return rep;
   });
@@ -1306,9 +1404,9 @@ function populateSettings(s) {
   setVal('smax-url', smax.base_url || 'https://smax.corp.pdo.om');
   // Support both new 'reports' format and legacy 'report_urls' list
   if (smax.reports && smax.reports.length) {
-    smaxReports = smax.reports.map(r => ({ label: r.label||'', url: r.url||'', enabled: r.enabled !== false, properties: r.properties||{} }));
+    smaxReports = smax.reports.map(r => ({ label: r.label||'', url: r.url||'', enabled: r.enabled !== false, data_type: r.data_type || 'ongoing', properties: r.properties||{} }));
   } else if (smax.report_urls && smax.report_urls.length) {
-    smaxReports = smax.report_urls.map((u, i) => ({ label: 'report_' + (i+1), url: u, enabled: true, properties: {} }));
+    smaxReports = smax.report_urls.map((u, i) => ({ label: 'report_' + (i+1), url: u, enabled: true, data_type: 'ongoing', properties: {} }));
   } else {
     smaxReports = [];
   }

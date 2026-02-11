@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.base_worker import BaseWorker
 from core.config import get_worker_settings, get_worker_credentials
-from core.database import log_scrape
+from core.database import log_scrape, has_historical_data
 from typing import Dict, Any, List
 
 
@@ -109,6 +109,13 @@ class Worker(BaseWorker):
 
             self.logger.info(f"━━━ Report {i+1}/{len(enabled)}: {label} ({folder}/{name}) ━━━")
             t0 = time.time()
+
+            # Skip historical reports that already have data
+            if report.get('data_type') == 'historical':
+                if has_historical_data('cuic', label):
+                    self.logger.info(f"Report '{label}': HISTORICAL — already scraped, skipping")
+                    log_scrape('cuic', label, 'skipped', 0, 0, 'Historical data already exists')
+                    continue
 
             try:
                 # Between reports: close extra tabs, navigate back to reports root

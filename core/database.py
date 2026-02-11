@@ -369,4 +369,41 @@ def get_latest_scrape_status() -> List[Dict[str, Any]]:
     finally:
         conn.close()
 
+
+def has_historical_data(source: str, metric_title: str) -> bool:
+    """
+    Check if we already have successfully-scraped data for a historical report.
+
+    Returns True if there is at least one row in kpi_snapshots for the given
+    source + metric_title AND the last scrape_log entry for it was a success.
+    This lets the worker skip re-scraping reports whose data never changes.
+    """
+    conn = _get_conn()
+    try:
+        # Check 1: do we have actual data rows?
+        cur = conn.execute(
+            "SELECT COUNT(*) FROM kpi_snapshots WHERE source = ? AND metric_title = ?",
+            (source, metric_title)
+        )
+        data_count = cur.fetchone()[0]
+        if data_count == 0:
+            return False
+
+        # Check 2: was the last scrape successful?
+        cur = conn.execute(
+            "SELECT status FROM scrape_log "
+            "WHERE source = ? AND report_label = ? "
+            "ORDER BY id DESC LIMIT 1",
+            (source, metric_title)
+        )
+        row = cur.fetchone()
+        if row and row[0] == 'success':
+            return True
+
+        return False
+    except Exception:
+        return False
+    finally:
+        conn.close()
+
     return imported

@@ -40,6 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.base_worker import BaseWorker
 from core.config import get_worker_settings, get_worker_credentials
+from core.database import has_historical_data, log_scrape
 from typing import Dict, Any, List, Tuple
 
 
@@ -99,17 +100,15 @@ class Worker(BaseWorker):
             chart_function: ''
         };
 
-        /* ── Report Name ── */
-        const nameEl = document.querySelector(
-            '[data-aid="report-properties-general-tab-content_Name"]'
-        );
+        /* ── Report Name (visible title at top) ── */
+        const nameEl = document.querySelector('[data-aid="report-name"]');
         if (nameEl) result.report_name = nameEl.textContent.trim();
 
-        /* ── Display Label ── */
+        /* ── Display Label (from properties sidebar - fallback) ── */
         const labelEl = document.querySelector(
-            'span[ng-controller="multiLangEditorViewerCtrl"]'
+            '[data-aid="report-properties-general-tab-content_Name"]'
         );
-        if (labelEl) result.display_label = labelEl.textContent.trim();
+        if (labelEl && !result.report_name) result.report_name = labelEl.textContent.trim();
 
         /* ── Record Type ── */
         const rtEl = document.querySelector(
@@ -391,9 +390,18 @@ class Worker(BaseWorker):
 
         for i, report in enumerate(enabled):
             url = report.get('url', '')
+            label = report.get('label', url.split('/')[-1] if url else f'report_{i}')
             if not url:
                 self.logger.warning(f"  Report {i+1}: no URL configured, skipping")
                 continue
+
+            # Skip historical reports that already have data
+            if report.get('data_type') == 'historical':
+                if has_historical_data('smax', label):
+                    self.logger.info(f"  Report {i+1} '{label}': HISTORICAL — already scraped, skipping")
+                    log_scrape('smax', label, 'skipped', 0, 0, 'Historical data already exists')
+                    continue
+
             try:
                 if i == 0:
                     tab = self.page
@@ -403,7 +411,7 @@ class Worker(BaseWorker):
 
                 tab.goto(url, wait_until='commit', timeout=self.PAGE_LOAD_TIMEOUT)
                 tabs.append((tab, report))
-                self.logger.info(f"  Tab {i+1}: navigation started -> {report.get('label', url.split('/')[-1])}")
+                self.logger.info(f"  Tab {i+1}: navigation started -> {label}")
 
             except Exception as e:
                 self.logger.error(f"  Tab {i+1}: failed to open {url}: {e}")

@@ -20,6 +20,7 @@
           "folder": "Test",
           "name": "Z Call Type Historical All Fields",
           "enabled": true,
+          "data_type": "ongoing",
           "filters": {}
         },
         {
@@ -27,6 +28,7 @@
           "folder": "Stock/CCE/CCE_AF_Historical",
           "name": "Agent Historical All Fields",
           "enabled": true,
+          "data_type": "ongoing",
           "filters": {
             "_meta": {
               "type": "cuic_spab",
@@ -852,12 +854,120 @@
     "smax": {
       "enabled": false,
       "base_url": "https://smax.corp.pdo.om",
-      "report_urls": [
-        "https://smax.corp.pdo.om/reports/report/69808de7e4b05f4efa3fa48f",
-        "https://smax.corp.pdo.om/reports/report/6721c16be4b07e954f2bcb7e",
-        "https://smax.corp.pdo.om/reports/report/60238f97e4b04b36af700a76",
-        "https://smax.corp.pdo.om/reports/report/684a818ae4b07b034c72581b",
-        "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640"
+      "reports": [
+        {
+          "label": "aging_requests",
+          "url": "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640",
+          "enabled": true,
+          "data_type": "ongoing",
+          "properties": {
+            "error": "",
+            "report_name": "Aging Requests",
+            "display_label": "Aging Requests",
+            "record_type": "Request",
+            "filters": [
+              {
+                "field_id": "ServiceDeskGroup",
+                "field_label": "Service desk group",
+                "negated": false,
+                "operator": "Is",
+                "type": "text",
+                "display_value": "SMX-HELPDESK-CALLOFF, SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-HELPDESK, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access"
+              },
+              {
+                "field_id": "PhaseId",
+                "field_label": "Phase Id",
+                "negated": false,
+                "operator": "Is",
+                "type": "dropdown",
+                "display_value": "First line support, Fulfill, Review, Escalate",
+                "selected_values": [
+                  "First line support",
+                  "Fulfill",
+                  "Review",
+                  "Escalate"
+                ],
+                "value_ids": "FirstLineSupport,Fulfill,Review,Escalate"
+              },
+              {
+                "field_id": "CurrentAssignment",
+                "field_label": "Current assignment",
+                "negated": false,
+                "operator": "Is",
+                "type": "enum",
+                "display_value": "Service Desk, Expert Group, Incident",
+                "enum_options": [
+                  {
+                    "id": "Unassigned",
+                    "label": "Unassigned",
+                    "checked": false
+                  },
+                  {
+                    "id": "ServiceDesk",
+                    "label": "Service Desk",
+                    "checked": true
+                  },
+                  {
+                    "id": "ExpertGroup",
+                    "label": "Expert Group",
+                    "checked": true
+                  },
+                  {
+                    "id": "Incident",
+                    "label": "Incident",
+                    "checked": true
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Service Desk",
+                  "Expert Group",
+                  "Incident"
+                ]
+              },
+              {
+                "field_id": "CreateTime",
+                "field_label": "Created time",
+                "negated": false,
+                "operator": "Is",
+                "type": "date",
+                "display_value": "Past year",
+                "date_presets": []
+              }
+            ],
+            "group_by": [
+              "Created time",
+              "Phase Id"
+            ],
+            "func": {
+              "main": "Count",
+              "secondary": ""
+            },
+            "chart_function": "Count",
+            "chart_legend": [
+              {
+                "label": "First line support",
+                "value": null
+              },
+              {
+                "label": "Escalate",
+                "value": null
+              },
+              {
+                "label": "Fulfill",
+                "value": null
+              },
+              {
+                "label": "Review",
+                "value": null
+              }
+            ]
+          }
+        }
       ],
       "page_load_timeout_ms": 120000,
       "element_wait_timeout_ms": 30000,
