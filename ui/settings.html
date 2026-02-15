@@ -169,6 +169,18 @@
   .vl-groups .vl-group-btn:hover { border-color: var(--accent); color: var(--accent); }
   .vl-groups .vl-group-btn .vl-g-count { color: var(--muted); font-size: 10px; }
   .vl-groups .vl-group-btn.active { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); }
+
+  /* Wizard step tabs (multi-step wizards) */
+  .wizard-step-tabs { display: flex; gap: 0; margin-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .wizard-step-tabs .wst-tab { padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--muted);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: .15s;
+    user-select: none; display: flex; align-items: center; gap: 5px; }
+  .wizard-step-tabs .wst-tab:hover { color: var(--accent); }
+  .wizard-step-tabs .wst-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .wizard-step-tabs .wst-tab .wst-arrow { font-size: 10px; color: var(--border); margin-right: -5px; }
+  .wizard-step-body { display: none; }
+  .wizard-step-body.active { display: block; }
+
   .btn-discover { padding: 5px 12px; font-size: 12px; font-weight: 600; border: 1px solid var(--accent);
     background: rgba(88,166,255,0.1); color: var(--accent); border-radius: 5px; cursor: pointer;
     display: inline-flex; align-items: center; gap: 4px; transition: .15s; }
@@ -177,6 +189,16 @@
   .btn-discover .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--border);
     border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  
+  /* ── Highlight new report animation ─────────────────────────────── */
+  @keyframes highlightFade {
+    0% { box-shadow: 0 0 0 3px rgba(88,166,255,0.6); }
+    100% { box-shadow: 0 0 0 3px rgba(88,166,255,0); }
+  }
+  .report-card.highlight-new {
+    animation: highlightFade 1s ease-out;
+  }
+  
   .filter-clear { font-size: 11px; color: var(--muted); cursor: pointer; margin-left: auto; }
   .filter-clear:hover { color: var(--red); }
 
@@ -220,6 +242,7 @@
 <div class="tabs">
   <div class="tab active" data-tab="dashboard">Dashboard</div>
   <div class="tab" data-tab="global">Global</div>
+  <div class="tab" data-tab="workers-settings">Workers Settings</div>
   <div class="tab" data-tab="cuic">CUIC Worker</div>
   <div class="tab" data-tab="smax">SMAX Worker</div>
   <div class="tab" data-tab="export">Export / Import</div>
@@ -324,9 +347,9 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!--  CUIC TAB                                                              -->
+<!--  WORKERS SETTINGS TAB                                                  -->
 <!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-content" id="tab-cuic">
+<div class="tab-content" id="tab-workers-settings">
   <div class="card">
     <h2>CUIC Worker <span class="badge">cuic_worker.py</span></h2>
     <div class="toggle-switch">
@@ -349,22 +372,7 @@
         <input type="password" id="cuic-pass" value="">
       </div>
     </div>
-  </div>
 
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-      <h2 style="margin:0">Reports</h2>
-      <button class="btn btn-secondary btn-sm" onclick="addCuicReport()">+ Add Report</button>
-    </div>
-    <div class="help">
-      Each report specifies a <strong>folder path</strong> and <strong>report name</strong> as they appear in the CUIC reports list.
-      Use <code>/</code> to separate nested folders (e.g. <code>Stock/CCE/CCE_AF_Historical</code>).
-      The <strong>label</strong> is a short unique identifier used for tracking (e.g. <code>agent_hist</code>).
-    </div>
-    <div id="cuic-reports-list"></div>
-  </div>
-
-  <div class="card">
     <h3>Timeouts (ms)</h3>
     <div class="help">Lower values = faster, but may cause failures on slow networks. Raise if the worker times out.</div>
     <div class="row">
@@ -376,12 +384,7 @@
       <div class="field"><label>Long wait</label><input type="number" id="cuic-t-long" value="8000"></div>
     </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<!--  SMAX TAB                                                              -->
-<!-- ═══════════════════════════════════════════════════════════════════════ -->
-<div class="tab-content" id="tab-smax">
   <div class="card">
     <h2>SMAX Worker <span class="badge">smax_worker.py</span></h2>
     <div class="toggle-switch">
@@ -398,8 +401,41 @@
       <div class="field"><label>Username</label><input type="text" id="smax-user" value=""></div>
       <div class="field"><label>Password</label><input type="password" id="smax-pass" value=""></div>
     </div>
-  </div>
 
+    <h3>Timeouts (ms)</h3>
+    <div class="row">
+      <div class="field"><label>Page Load</label><input type="number" id="smax-t-load" value="120000"></div>
+      <div class="field"><label>Element Wait</label><input type="number" id="smax-t-elem" value="30000"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Tab Stagger Delay</label><input type="number" id="smax-t-stagger" value="2000"></div>
+      <div class="field"><label>Max Retries</label><input type="number" id="smax-retries" value="2" min="0"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  CUIC TAB                                                              -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-cuic">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <h2 style="margin:0">Reports</h2>
+      <button class="btn btn-secondary btn-sm" onclick="addCuicReport()">+ Add Report</button>
+    </div>
+    <div class="help">
+      Each report specifies a <strong>folder path</strong> and <strong>report name</strong> as they appear in the CUIC reports list.
+      Use <code>/</code> to separate nested folders (e.g. <code>Stock/CCE/CCE_AF_Historical</code>).
+      The <strong>label</strong> is a short unique identifier used for tracking (e.g. <code>agent_hist</code>).
+    </div>
+    <div id="cuic-reports-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  SMAX TAB                                                              -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-smax">
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <h2 style="margin:0">Reports</h2>
@@ -410,18 +446,6 @@
       Use <strong>Discover Properties</strong> to read the report's filters, group-by, function, and other settings from the live page.
     </div>
     <div id="smax-reports-list"></div>
-  </div>
-
-  <div class="card">
-    <h3>Timeouts (ms)</h3>
-    <div class="row">
-      <div class="field"><label>Page Load</label><input type="number" id="smax-t-load" value="120000"></div>
-      <div class="field"><label>Element Wait</label><input type="number" id="smax-t-elem" value="30000"></div>
-    </div>
-    <div class="row">
-      <div class="field"><label>Tab Stagger Delay</label><input type="number" id="smax-t-stagger" value="2000"></div>
-      <div class="field"><label>Max Retries</label><input type="number" id="smax-retries" value="2" min="0"></div>
-    </div>
   </div>
 </div>
 
@@ -510,6 +534,27 @@ function renderCuicReports() {
     return;
   }
   container.innerHTML = cuicReports.map((r, i) => {
+    // Check if this is a new empty report (no folder/name and no filters discovered)
+    const isEmpty = !r.folder && !r.name && (!r.filters || Object.keys(r.filters).length === 0);
+    
+    if (isEmpty) {
+      // Minimal card: just report path + validate button
+      return `<div class="report-card">
+        <div class="report-card-header">
+          <span class="label-tag" style="color:var(--muted);font-style:italic">New Report</span>
+          <button class="btn btn-icon btn-sm" onclick="removeCuicReport(${i})" title="Remove">\uD83D\uDDD1\uFE0F</button>
+        </div>
+        <div class="inline-row"><label>Report Path</label><input value="${attr((r.folder ? r.folder + '/' : '') + (r.name || ''))}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields" style="grid-column:2"></div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+          <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
+            \u25B6 Validate Path
+          </button>
+          <span style="font-size:11px;color:var(--muted)">Opens browser to validate the report path and read filters</span>
+        </div>
+      </div>`;
+    }
+    
+    // Full card with all details
     const st = scrapeStatus['cuic:' + r.label];
     let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
     if (st) {
@@ -535,9 +580,8 @@ function renderCuicReports() {
           <button class="btn btn-icon btn-sm" onclick="removeCuicReport(${i})" title="Remove">\uD83D\uDDD1\uFE0F</button>
         </div>
       </div>
-      <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value" placeholder="e.g. call_type_hist"></div>
-      <div class="inline-row"><label>Folder</label><input value="${attr(r.folder)}" onchange="cuicReports[${i}].folder=this.value" placeholder="e.g. Stock/CCE/CCE_AF_Historical"></div>
-      <div class="inline-row"><label>Report Name</label><input value="${attr(r.name)}" onchange="cuicReports[${i}].name=this.value" placeholder="Exact name in CUIC"></div>
+      <div class="inline-row"><label>Report Path</label><input value="${attr((r.folder ? r.folder + '/' : '') + (r.name || ''))}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields"></div>
+      <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value" placeholder="Auto-generated from report name"></div>
       <div class="inline-row"><label>Data Type</label>
         <select onchange="cuicReports[${i}].data_type=this.value;renderCuicReports()" style="padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--fg);font-size:13px">
           <option value="ongoing" ${(r.data_type||'ongoing')==='ongoing'?'selected':''}>📡 Ongoing (re-scrape every run)</option>
@@ -546,9 +590,9 @@ function renderCuicReports() {
       </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
         <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
-          \u25B6 Discover Filters
+          \u25B6 Re-validate Path
         </button>
-        <span style="font-size:11px;color:var(--muted)">Opens browser to read the report\u2019s filter wizard</span>
+        <span style="font-size:11px;color:var(--muted)">Re-open browser to update report filters</span>
       </div>
       ${filterHtml}
       ${statusHtml}
@@ -557,9 +601,25 @@ function renderCuicReports() {
 }
 
 function addCuicReport() {
+  // Check if there's already an empty report (no folder or name)
+  const hasEmptyReport = cuicReports.some(r => !r.folder && !r.name);
+  if (hasEmptyReport) {
+    showToast('Please fill in the existing empty report first', 'warning');
+    return;
+  }
+  
   cuicReports.unshift({ label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', filters: {} });
   renderCuicReports();
-  document.getElementById('cuic-reports-list').firstElementChild?.scrollIntoView({ behavior: 'smooth' });
+  
+  // Highlight the newly added report card
+  setTimeout(() => {
+    const firstCard = document.getElementById('cuic-reports-list').firstElementChild;
+    if (firstCard) {
+      firstCard.classList.add('highlight-new');
+      // Remove the class after animation completes
+      setTimeout(() => firstCard.classList.remove('highlight-new'), 1000);
+    }
+  }, 50);
 }
 
 function removeCuicReport(i) {
@@ -570,6 +630,36 @@ function removeCuicReport(i) {
 
 function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function attr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+// Helper: Generate label from report name (convert to snake_case)
+function generateLabelFromName(name) {
+  if (!name) return '';
+  return name
+    .trim()
+    .replace(/[^a-zA-Z0-9]+/g, '_')  // Replace non-alphanumeric with underscore
+    .replace(/^_+|_+$/g, '')          // Remove leading/trailing underscores
+    .toLowerCase();
+}
+
+// Helper: Update CUIC report path (splits into folder/name and auto-updates label if empty)
+function updateCuicReportPath(idx, path) {
+  const lastSlash = path.lastIndexOf('/');
+  if (lastSlash === -1) {
+    // No slash, treat entire path as name
+    cuicReports[idx].folder = '';
+    cuicReports[idx].name = path;
+  } else {
+    cuicReports[idx].folder = path.substring(0, lastSlash);
+    cuicReports[idx].name = path.substring(lastSlash + 1);
+  }
+  
+  // Auto-generate label if it's empty
+  if (!cuicReports[idx].label) {
+    cuicReports[idx].label = generateLabelFromName(cuicReports[idx].name);
+  }
+  
+  renderCuicReports();
+}
 
 // ══════════════════════════════════════════════════════════════════════════
 //  FILTER WIZARD DISCOVERY & RENDERING
@@ -591,10 +681,172 @@ function renderFilterPanel(report, idx) {
   }
 
   const isCuic = meta.type === 'cuic_spab';
+  const isMultiStep = meta.type === 'cuic_multistep';
+  const icon = isMultiStep ? '\uD83E\uDDE9' : (isCuic ? '\uD83C\uDFAF' : '\uD83C\uDFA8');
 
-  let html = `<details class="filter-panel-collapsible"><summary class="filter-panel-toggle">${isCuic ? '\uD83C\uDFAF' : '\uD83C\uDFA8'} Filter Wizard Settings
+  let html = `<details class="filter-panel-collapsible"><summary class="filter-panel-toggle">${icon} Filter Wizard Settings
       <span class="filter-clear" onclick="event.stopPropagation();clearFilters(${idx})">\u2716 Clear all</span>
     </summary><div class="filter-panel">`;
+
+  if (isMultiStep) {
+    // ── CUIC multi-step wizard (e.g., call_type_hist) ──
+    const steps = meta.steps || [];
+    const stepTitles = meta.stepTitles || steps.map((s,i) => 'Step ' + (i+1));
+    console.log('[renderFilterPanel] Multi-step meta:', JSON.stringify(meta, null, 2));
+
+    // Step navigation tabs
+    html += `<div class="wizard-step-tabs" id="wst-${idx}">`;
+    stepTitles.forEach((title, si) => {
+      if (si > 0) html += `<span class="wst-arrow">\u25B6</span>`;
+      html += `<span class="wst-tab${si===0?' active':''}" onclick="switchWizardTab(${idx},${si})">${esc(title)}</span>`;
+    });
+    html += `</div>`;
+
+    // Step bodies
+    steps.forEach((step, si) => {
+      const stepKey = 'step_' + step.step;
+      const savedStep = filters[stepKey] || {};
+      const activeClass = si === 0 ? ' active' : '';
+
+      html += `<div class="wizard-step-body${activeClass}" id="wsb-${idx}-${si}">`;
+
+      (step.params || []).forEach(p => {
+        const pn = p.paramName || '';
+        const label = p.label || pn;
+        const savedVal = savedStep[pn];
+
+        if (p.type === 'cuic_datetime') {
+          const cfg = typeof savedVal === 'string' ? {preset: savedVal}
+                    : (savedVal && typeof savedVal === 'object' ? savedVal : {});
+          const curPreset = cfg.preset || '';
+          const presets = p.datePresets || meta.datePresets || [];
+          let opts = presets.map(o => {
+            const sel = curPreset === o.value ? 'selected' : '';
+            return `<option value="${attr(o.value)}" ${sel}>${esc(o.label)}</option>`;
+          }).join('');
+          const noSel = !curPreset ? 'selected' : '';
+          opts = `<option value="" ${noSel}>\u2014 use default \u2014</option>` + opts;
+          const dtId = 'dt-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+
+          html += `<div class="filter-field">
+            <label title="${attr(pn)}">${esc(label)}</label>
+            <select id="${dtId}-preset" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','preset',this.value)">${opts}</select>
+          </div>`;
+
+          if (p.hasDateRange) {
+            const showDates = curPreset === 'CUSTOM' ? '' : 'style="display:none"';
+            const d1 = cfg.date1 || '';
+            const d2 = cfg.date2 || '';
+            html += `<div class="filter-sub" id="${dtId}-dates" ${showDates}>
+              <div class="sub-row">
+                <label>From</label>
+                <input type="date" value="${attr(d1)}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','date1',this.value)">
+                <span class="to">to</span>
+                <input type="date" value="${attr(d2)}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','date2',this.value)">
+              </div>
+            </div>`;
+          }
+
+          if (p.hasTimeRange) {
+            const allTime = cfg.allTime || 1;
+            const t1 = cfg.time1 || '';
+            const t2 = cfg.time2 || '';
+            const showTimes = allTime === 2 ? '' : 'style="display:none"';
+            html += `<div class="filter-sub">
+              <div class="sub-row">
+                <label>Time</label>
+                <select onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','allTime',parseInt(this.value));
+                  document.getElementById('${dtId}-times').style.display=this.value==='2'?'':'none'">
+                  <option value="1" ${allTime===1?'selected':''}>All Day</option>
+                  <option value="2" ${allTime===2?'selected':''}>Custom</option>
+                </select>
+              </div>
+              <div class="sub-row" id="${dtId}-times" ${showTimes}>
+                <label>From</label>
+                <input type="time" step="1" value="${attr(t1)}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','time1',this.value)">
+                <span class="to">to</span>
+                <input type="time" step="1" value="${attr(t2)}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','time2',this.value)">
+              </div>
+            </div>`;
+          }
+
+        } else if (p.type === 'cuic_valuelist') {
+          const isAll = savedVal === 'all';
+          const isSpecific = Array.isArray(savedVal);
+          const selectedNames = isSpecific ? savedVal : [];
+          const allNames = p.availableNames || [];
+          const badge = `<span class="vl-badge">${allNames.length} available</span>`;
+          const vlId = 'vl-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+          const selCount = isAll ? allNames.length : selectedNames.length;
+
+          html += `<div class="filter-field">
+            <label title="${attr(pn)}">${esc(label)} ${badge}</label>
+            <span style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+          </div>`;
+
+          const groups = p.availableGroups || [];
+          html += `<div class="vl-section" id="${vlId}-section">`;
+
+          if (groups.length) {
+            html += `<div class="vl-groups" id="${vlId}-groups">`;
+            groups.forEach((g, gi) => {
+              const members = g.members || [];
+              const allChecked = members.length > 0 && members.every(m => isAll || selectedNames.includes(m));
+              html += `<button class="vl-group-btn${allChecked?' active':''}" data-gidx="${gi}"
+                onclick="vlMsToggleGroup(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}',${gi})">
+                ${esc(g.name)} <span class="vl-g-count">(${g.count})</span>
+              </button>`;
+            });
+            html += `</div>`;
+          }
+
+          html += `<div class="vl-toolbar">
+              <input type="text" id="${vlId}-search" placeholder="\uD83D\uDD0D Filter names..."
+                oninput="filterVlChecklist('${vlId}',this.value)">
+              <button onclick="vlMsCheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}')">\u2611 All</button>
+              <button onclick="vlMsUncheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}')">\u2610 None</button>
+              <span class="vl-count" id="${vlId}-count">${selCount} / ${allNames.length}</span>
+            </div>
+            <div class="vl-checklist" id="${vlId}-list">`;
+
+          allNames.forEach(n => {
+            const checked = isAll || selectedNames.includes(n) ? 'checked' : '';
+            const memberOf = groups.filter(g => (g.members||[]).includes(n)).map(g => g.name).join(',');
+            html += `<label data-name="${attr(n.toLowerCase())}" data-groups="${attr(memberOf)}">
+              <input type="checkbox" value="${attr(n)}" ${checked}
+                onchange="vlMsToggleItem(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}')">
+              <span>${esc(n)}</span>
+            </label>`;
+          });
+
+          html += `</div></div>`;
+
+        } else if (p.type === 'checkbox') {
+          const checked = savedVal !== undefined ? savedVal : (p.currentValue || false);
+          html += `<div class="filter-field">
+            <label title="${attr(pn)}">${esc(label)}</label>
+            <input type="checkbox" ${checked?'checked':''}
+              onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(pn)}',this.checked)"
+              style="width:auto;">
+          </div>`;
+
+        } else {
+          const val = savedVal !== undefined ? savedVal : (p.currentValue || '');
+          const inputType = p.type === 'number' ? 'number' : 'text';
+          html += `<div class="filter-field">
+            <label title="${attr(pn)}">${esc(label)}</label>
+            <input type="${inputType}" value="${attr(String(val))}"
+              onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(pn)}',this.value)">
+          </div>`;
+        }
+      });
+
+      html += `</div>`; // close wizard-step-body
+    });
+
+    html += '</div></details>';
+    return html;
+  }
 
   if (isCuic) {
     // ── CUIC AngularJS params (flat param-name keys) ──
@@ -942,6 +1194,151 @@ function vlUpdateGroupButtons(vlId, reportIdx, paramName) {
   });
 }
 
+/* ────────────────────────────────────────────────────────────────────────
+   MULTI-STEP WIZARD HELPERS
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* ── Find a param in multi-step meta by stepKey + paramName ── */
+function _findMsParam(meta, stepKey, paramName) {
+  const stepNum = parseInt(stepKey.replace('step_', ''));
+  const step = (meta.steps || []).find(s => s.step === stepNum);
+  if (!step) return null;
+  return (step.params || []).find(p => p.paramName === paramName) || null;
+}
+
+/* ── Switch wizard step tab ── */
+function switchWizardTab(idx, tabIdx) {
+  const tabs = document.getElementById('wst-' + idx);
+  if (!tabs) return;
+  tabs.querySelectorAll('.wst-tab').forEach((t, i) => t.classList.toggle('active', i === tabIdx));
+  let si = 0, body;
+  while ((body = document.getElementById('wsb-' + idx + '-' + si))) {
+    body.classList.toggle('active', si === tabIdx);
+    si++;
+  }
+}
+
+/* ── Multi-step: basic filter update ── */
+function updateMsFilter(reportIdx, stepKey, paramName, value) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+  if (value === '' || value === undefined) {
+    delete report.filters[stepKey][paramName];
+  } else {
+    report.filters[stepKey][paramName] = value;
+  }
+}
+
+/* ── Multi-step: datetime update ── */
+function updateMsDatetime(reportIdx, stepKey, paramName, field, value) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+
+  let cur = report.filters[stepKey][paramName];
+  if (typeof cur === 'string') cur = {preset: cur};
+  if (!cur || typeof cur !== 'object') cur = {};
+  cur[field] = value;
+
+  if (field === 'preset') {
+    const sn = stepKey.replace('step_','');
+    const dtId = 'dt-' + reportIdx + '-s' + sn + '-' + paramName.replace(/[^a-zA-Z0-9]/g,'_');
+    const datesEl = document.getElementById(dtId + '-dates');
+    if (datesEl) datesEl.style.display = value === 'CUSTOM' ? '' : 'none';
+  }
+
+  const keys = Object.keys(cur).filter(k => cur[k] !== undefined && cur[k] !== '');
+  if (keys.length === 1 && keys[0] === 'preset' && cur.preset !== 'CUSTOM') {
+    report.filters[stepKey][paramName] = cur.preset || undefined;
+    if (!cur.preset) delete report.filters[stepKey][paramName];
+  } else {
+    report.filters[stepKey][paramName] = cur;
+  }
+}
+
+/* ── Multi-step valuelist: toggle single item ── */
+function vlMsToggleItem(reportIdx, stepKey, paramName, vlId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  const checked = Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+  const total = listEl.querySelectorAll('input[type=checkbox]').length;
+  report.filters[stepKey][paramName] = checked.length === total ? 'all' : checked;
+  const countEl = document.getElementById(vlId + '-count');
+  if (countEl) countEl.textContent = checked.length + ' / ' + total;
+  vlMsUpdateGroupButtons(vlId, reportIdx, stepKey, paramName);
+}
+
+/* ── Multi-step valuelist: check all visible ── */
+function vlMsCheckAll(reportIdx, stepKey, paramName, vlId) {
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = true;
+    }
+  });
+  vlMsToggleItem(reportIdx, stepKey, paramName, vlId);
+}
+
+/* ── Multi-step valuelist: uncheck all visible ── */
+function vlMsUncheckAll(reportIdx, stepKey, paramName, vlId) {
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = false;
+    }
+  });
+  vlMsToggleItem(reportIdx, stepKey, paramName, vlId);
+}
+
+/* ── Multi-step valuelist: toggle group ── */
+function vlMsToggleGroup(reportIdx, stepKey, paramName, vlId, groupIdx) {
+  const report = cuicReports[reportIdx];
+  const meta = report._wizard_meta || (report.filters && report.filters._meta) || {};
+  const p = _findMsParam(meta, stepKey, paramName);
+  if (!p) return;
+  const group = (p.availableGroups || [])[groupIdx];
+  if (!group || !group.members) return;
+
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  const memberSet = new Set(group.members);
+  const memberCbs = Array.from(listEl.querySelectorAll('input[type=checkbox]'))
+    .filter(cb => memberSet.has(cb.value));
+  const allChecked = memberCbs.every(cb => cb.checked);
+  memberCbs.forEach(cb => cb.checked = !allChecked);
+  vlMsToggleItem(reportIdx, stepKey, paramName, vlId);
+}
+
+/* ── Multi-step valuelist: update group button styles ── */
+function vlMsUpdateGroupButtons(vlId, reportIdx, stepKey, paramName) {
+  const groupsEl = document.getElementById(vlId + '-groups');
+  if (!groupsEl) return;
+  const report = cuicReports[reportIdx];
+  const meta = report._wizard_meta || (report.filters && report.filters._meta) || {};
+  const p = _findMsParam(meta, stepKey, paramName);
+  if (!p) return;
+
+  const listEl = document.getElementById(vlId + '-list');
+  if (!listEl) return;
+  const checkedVals = new Set(Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value));
+
+  groupsEl.querySelectorAll('.vl-group-btn').forEach(btn => {
+    const gi = parseInt(btn.getAttribute('data-gidx'));
+    const g = (p.availableGroups || [])[gi];
+    if (!g || !g.members) return;
+    const allIn = g.members.every(m => checkedVals.has(m));
+    btn.classList.toggle('active', allIn);
+  });
+}
+
 /* ── Generic step-based filter update ── */
 function updateFilterValue(reportIdx, stepKey, fieldKey, el) {
   const report = cuicReports[reportIdx];
@@ -987,6 +1384,7 @@ async function discoverFilters(reportIdx) {
       body: JSON.stringify({ folder: report.folder, name: report.name })
     });
     const data = await res.json();
+    console.log('[discoverFilters] Raw response:', JSON.stringify(data, null, 2));
 
     if (data.error) {
       showToast('Discovery error: ' + data.error, 'error');
@@ -999,8 +1397,38 @@ async function discoverFilters(reportIdx) {
     }
 
     const isCuic = data.type === 'cuic_spab';
+    const isMultiStep = data.type === 'cuic_multistep';
 
-    if (isCuic) {
+    if (isMultiStep) {
+      // ── CUIC multi-step wizard ──
+      const steps = data.steps || [];
+      const metaObj = {
+        type: 'cuic_multistep',
+        steps: steps,
+        stepTitles: data.stepTitles || steps.map(s => s.title || 'Step ' + s.step),
+        datePresets: data.datePresets || []
+      };
+      report._wizard_meta = metaObj;
+      if (!report.filters) report.filters = {};
+      report.filters._meta = metaObj;
+
+      // Pre-populate per-step defaults
+      let totalParams = 0;
+      steps.forEach(step => {
+        const stepKey = 'step_' + step.step;
+        if (!report.filters[stepKey]) report.filters[stepKey] = {};
+        (step.params || []).forEach(p => {
+          totalParams++;
+          const pn = p.paramName;
+          if (!pn || report.filters[stepKey][pn] !== undefined) return;
+          if (p.type === 'cuic_datetime' && p.currentPreset) {
+            report.filters[stepKey][pn] = p.currentPreset;
+          }
+        });
+      });
+      showToast(`Discovered ${steps.length} wizard step(s) with ${totalParams} parameter(s)!`, 'success');
+
+    } else if (isCuic) {
       // ── CUIC format: flat param-name keys ──
       const params = data.params || [];
       const metaObj = {
@@ -1045,6 +1473,12 @@ async function discoverFilters(reportIdx) {
     }
 
     renderCuicReports();
+    
+    // Auto-set label from report name if label is empty
+    if (!report.label && report.name) {
+      report.label = generateLabelFromName(report.name);
+      renderCuicReports();
+    }
 
   } catch(e) {
     showToast('Discovery failed: ' + e.message, 'error');
@@ -1078,9 +1512,9 @@ function renderSmaxReports() {
         <div class="inline-row"><label>Report URL</label><input value="${attr(r.url)}" onchange="smaxReports[${i}].url=this.value" placeholder="https://smax.corp.pdo.om/reports/report/..." style="grid-column:2"></div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
           <button class="btn-discover" id="smax-discover-btn-${i}" onclick="discoverSmaxProperties(${i})">
-            \u25B6 Discover Report
+            \u25B6 Validate Link
           </button>
-          <span style="font-size:11px;color:var(--muted)">Fetch report name, filters, and settings automatically</span>
+          <span style="font-size:11px;color:var(--muted)">Opens browser to validate the URL and fetch report properties</span>
         </div>
       </div>`;
     }
@@ -1121,9 +1555,9 @@ function renderSmaxReports() {
       </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
         <button class="btn-discover" id="smax-discover-btn-${i}" onclick="discoverSmaxProperties(${i})">
-          \u25B6 Re-discover Properties
+          \u25B6 Re-validate Link
         </button>
-        <span style="font-size:11px;color:var(--muted)">Re-read report properties from browser (filters, group-by, etc.)</span>
+        <span style="font-size:11px;color:var(--muted)">Re-open browser to update report properties</span>
       </div>
       ${propsHtml}
       ${statusHtml}
@@ -1132,9 +1566,25 @@ function renderSmaxReports() {
 }
 
 function addSmaxReport() {
+  // Check if there's already an empty report (no label or URL)
+  const hasEmptyReport = smaxReports.some(r => !r.label && !r.url);
+  if (hasEmptyReport) {
+    showToast('Please fill in the existing empty report first', 'warning');
+    return;
+  }
+  
   smaxReports.unshift({ label: '', url: '', enabled: true, data_type: 'ongoing', properties: {} });
   renderSmaxReports();
-  document.getElementById('smax-reports-list').firstElementChild?.scrollIntoView({ behavior: 'smooth' });
+  
+  // Highlight the newly added report card
+  setTimeout(() => {
+    const firstCard = document.getElementById('smax-reports-list').firstElementChild;
+    if (firstCard) {
+      firstCard.classList.add('highlight-new');
+      // Remove the class after animation completes
+      setTimeout(() => firstCard.classList.remove('highlight-new'), 1000);
+    }
+  }, 50);
 }
 
 function removeSmaxReport(i) {
@@ -1280,8 +1730,7 @@ async function discoverSmaxProperties(idx) {
 
     // Auto-set label from report name if label is empty
     if (!report.label && data.report_name) {
-      report.label = data.report_name.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').substring(0, 30);
+      report.label = generateLabelFromName(data.report_name);
     }
 
     // Auto-suggest data_type from date filter presets

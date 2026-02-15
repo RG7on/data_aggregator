@@ -176,15 +176,39 @@ class Worker(BaseWorker):
           3. Force-click – click through overlays with force=True
         """
         try:
-            if not self.page or self.page.is_closed():
-                self.logger.warning("Page already closed – skipping logout")
+            if not self.context:
+                self.logger.warning("No browser context – skipping logout")
+                return
+
+            # Always use the FIRST page (main CUIC tab) for logout
+            pages = self.context.pages
+            if not pages:
+                self.logger.warning("No pages open – skipping logout")
+                return
+
+            # Close all extra tabs/popups first
+            while len(pages) > 1:
+                try:
+                    pages[-1].close()
+                except Exception:
+                    pass
+                pages = self.context.pages
+
+            main_page = pages[0]
+            if main_page.is_closed():
+                self.logger.warning("Main page already closed – skipping logout")
                 return
 
             self.logger.info("Starting logout sequence...")
 
-            # Close extra tabs so we're on the main page
-            self._close_report_page()
-            self.page.wait_for_timeout(500)
+            # Dismiss any open dialogs/modals by pressing Escape
+            try:
+                main_page.keyboard.press('Escape')
+                main_page.wait_for_timeout(500)
+                main_page.keyboard.press('Escape')
+                main_page.wait_for_timeout(500)
+            except Exception:
+                pass
 
             logged_out = False
 
@@ -197,19 +221,20 @@ class Worker(BaseWorker):
             ]
             for url in logout_urls:
                 try:
-                    resp = self.page.goto(url, wait_until='domcontentloaded',
-                                          timeout=10000)
+                    resp = main_page.goto(url, wait_until='domcontentloaded',
+                                          timeout=15000)
                     if resp and resp.status < 400:
                         self.logger.info(f"Logged out via URL: {url} (status {resp.status})")
                         logged_out = True
                         break
-                except Exception:
+                except Exception as e:
+                    self.logger.debug(f"Logout URL {url} failed: {e}")
                     continue
 
             # ── Strategy 2: JavaScript – call Angular's signout() ────────
             if not logged_out:
                 try:
-                    result = self.page.evaluate('''() => {
+                    result = main_page.evaluate('''() => {
                         const btn = document.querySelector('#signout-btn1')
                                   || document.querySelector('#so_anchor')
                                   || document.querySelector('[ng-click*="signout"]');
@@ -244,12 +269,12 @@ class Worker(BaseWorker):
             # ── Strategy 3: force-click through any overlay ──────────────
             if not logged_out:
                 try:
-                    user_btn = self.page.locator('#user-info-btn')
+                    user_btn = main_page.locator('#user-info-btn')
                     if user_btn.count() > 0:
                         user_btn.first.click(force=True)
-                        self.page.wait_for_timeout(1500)
+                        main_page.wait_for_timeout(1500)
                         for sel in ['#signout-btn1', '#so_anchor']:
-                            signout = self.page.locator(sel)
+                            signout = main_page.locator(sel)
                             if signout.count() > 0:
                                 signout.first.click(force=True)
                                 self.logger.info(f"Logged out via force-click ({sel})")
@@ -259,19 +284,22 @@ class Worker(BaseWorker):
                     self.logger.debug(f"Force-click approach failed: {fc_err}")
 
             # ── Verification ─────────────────────────────────────────────
-            self.page.wait_for_timeout(2000)
-            final_url = self.page.url
-            # After logout, CUIC typically redirects to the login page
-            is_login_page = any(kw in final_url.lower() for kw in
-                                ['logout', 'login', 'main.jsp', 'sso'])
-            if logged_out:
-                self.logger.info(f"✓ Logout confirmed — landed on: {final_url}")
-            else:
-                self.logger.warning(f"All logout strategies exhausted — final URL: {final_url}")
+            main_page.wait_for_timeout(2000)
+            try:
+                final_url = main_page.url
+                if logged_out:
+                    self.logger.info(f"✓ Logout confirmed — landed on: {final_url}")
+                else:
+                    self.logger.warning(f"All logout strategies exhausted — final URL: {final_url}")
+            except Exception:
+                pass
 
         except Exception as e:
             self.logger.error(f"Logout failed (session may persist): {e}")
-            self.screenshot("logout_error", is_step=False)
+            try:
+                self.screenshot("logout_error", is_step=False)
+            except Exception:
+                pass
 
     # ──────────────────────────────────────────────────────────────────────
     #  Navigation helpers for multi-report
@@ -549,6 +577,217 @@ class Worker(BaseWorker):
     #  WIZARD FIELD READING – CUIC AngularJS-aware
     # ══════════════════════════════════════════════════════════════════════
 
+    # ── Multi-step wizard reader ─────────────────────────────────────────
+    # CUIC multi-step wizards use <filter-wizard> with wizardConfig.steps.
+    # Each step has its own Angular controller (HCFFilterCtrl for datetime,
+    # cuic-filter for valuelists, individual-filters for field filters).
+    # This JS reads the CURRENT visible step's data via Angular scopes.
+    CUIC_MULTISTEP_READ_JS = r'''() => {
+        if (typeof angular === 'undefined') return {_debug: 'no_angular'};
+
+        /* ── locate the filter-wizard element ── */
+        const wizEl = document.querySelector('filter-wizard');
+        if (!wizEl) return {_debug: 'no_filter_wizard_element',
+            hasModal: !!document.querySelector('.modal-dialog'),
+            hasRunReport: !!document.querySelector('run-report-filter'),
+            bodyClasses: document.body.className.substring(0, 200)};
+        let wizScope;
+        try { wizScope = angular.element(wizEl).scope(); } catch(e) {
+            return {_debug: 'scope_error', error: e.message};
+        }
+        if (!wizScope) return {_debug: 'no_scope_on_wizard'};
+
+        /* Walk up to find wizardConfig */
+        let wc = wizScope.wizardConfig || wizScope.$parent?.wizardConfig
+              || wizScope.$parent?.$parent?.wizardConfig;
+        if (!wc) return {_debug: 'no_wizardConfig', 
+            scopeKeys: Object.keys(wizScope).filter(k => !k.startsWith('$')).slice(0,20),
+            parentKeys: wizScope.$parent ? Object.keys(wizScope.$parent).filter(k => !k.startsWith('$')).slice(0,20) : []};
+        if (!wc.steps || wc.steps.length < 2) return {_debug: 'not_multistep', stepsCount: wc.steps?.length || 0};
+
+        /* Read step tabs (titles) */
+        const stepTitles = wc.steps.map(s => s.title || s.wzTitle || '');
+
+        /* Read the CURRENTLY VISIBLE step's filters */
+        const sections = document.querySelectorAll('filter-wizard .steps > section');
+        let currentIdx = -1;
+        sections.forEach((sec, i) => {
+            if (sec.style.display !== 'none') currentIdx = i;
+        });
+        if (currentIdx < 0) return null;
+
+        const sec = sections[currentIdx];
+        const stepTitle = stepTitles[currentIdx] || ('Step ' + (currentIdx+1));
+
+        /* Detect what kind of filter is in this step */
+        const result = {
+            type: 'cuic_multistep',
+            stepIndex: currentIdx,
+            stepTitle: stepTitle,
+            stepCount: wc.steps.length,
+            stepTitles: stepTitles,
+            params: []
+        };
+
+        /* ── DATETIME filter (HCFFilterCtrl / datetime-filter) ── */
+        const dtFilter = sec.querySelector('datetime-filter');
+        if (dtFilter) {
+            let dtScope;
+            try { dtScope = angular.element(dtFilter).scope(); } catch(e) {}
+            if (dtScope) {
+                /* Read the heading text for label */
+                const heading = sec.querySelector('.accordion--navigation a');
+                const label = heading ? heading.textContent.replace(/[^a-zA-Z0-9_ ()]/g,'').trim() : 'DateTime';
+
+                /* Date preset options */
+                const datePresets = [];
+                const selEl = dtFilter.querySelector('.csSelect-container');
+                if (selEl) {
+                    try {
+                        const selScope = angular.element(selEl).scope();
+                        const opts = selScope?.csSelect?.options || selScope?.sel?.options || [];
+                        opts.forEach(o => datePresets.push({
+                            value: o.value || o.id || '',
+                            label: o.label || o.name || o.value || ''
+                        }));
+                    } catch(e) {}
+                }
+                /* If no options found from scope, try DOM */
+                if (datePresets.length === 0) {
+                    dtFilter.querySelectorAll('.select-options li a').forEach(a => {
+                        datePresets.push({value: a.title || a.textContent.trim(),
+                                         label: a.textContent.trim()});
+                    });
+                }
+
+                /* Current preset from selected display */
+                const selText = dtFilter.querySelector('.select-toggle');
+                let currentPreset = selText ? selText.textContent.trim() : '';
+                const matched = datePresets.find(p => p.label === currentPreset);
+                if (matched) currentPreset = matched.value;
+
+                /* Detect filterType from scope */
+                const dtField = dtScope.dateTimeField || dtScope.hcfCtrl?.historicalFilterField || {};
+                const filterType = dtField.filterType || 'DATETIME';
+                const hasTimeRange = filterType === 'DATETIME';
+
+                result.params.push({
+                    dataType: filterType,
+                    type: 'cuic_datetime',
+                    label: label,
+                    paramName: label,
+                    datePresets: datePresets,
+                    currentPreset: currentPreset,
+                    hasDateRange: true,
+                    hasTimeRange: hasTimeRange,
+                    isRequired: true
+                });
+            }
+        }
+
+        /* ── VALUELIST filter (cuic-filter / cuic-switcher) ── */
+        const vlFilter = sec.querySelector('[ng-switch-when="VALUELIST"]');
+        if (vlFilter) {
+            const heading = sec.querySelector('.accordion--navigation a');
+            const rawLabel = heading ? heading.textContent.trim() : 'Values';
+            /* Extract label and paramName: "Call Types(CallTypeID)" → label="Call Types", paramName="CallTypeID" */
+            const labelMatch = rawLabel.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+            const label = labelMatch ? labelMatch[1].trim() : rawLabel;
+            const paramName = labelMatch ? labelMatch[2].trim() : rawLabel;
+
+            /* Read available values from left pane scope */
+            const leftPane = vlFilter.querySelector('[cuic-pane="left"]');
+            const rightPane = vlFilter.querySelector('[cuic-pane="right"]');
+            const allNames = [];
+            const groups = [];
+            const selectedNames = [];
+
+            if (leftPane) {
+                try {
+                    const lpScope = angular.element(leftPane).scope();
+                    const model = lpScope?.model || lpScope?.$parent?.leftModel || [];
+                    function collectFromModel(list) {
+                        (list || []).forEach(v => {
+                            if (v.children && v.children.length > 0) {
+                                const memberNames = [];
+                                function flatMembers(items) {
+                                    (items || []).forEach(c => {
+                                        if (c.children && c.children.length > 0) flatMembers(c.children);
+                                        else memberNames.push(c.name || '');
+                                    });
+                                }
+                                flatMembers(v.children);
+                                groups.push({name: v.name || '',
+                                             count: v.totalElements || v.children.length,
+                                             members: memberNames});
+                                memberNames.forEach(n => allNames.push(n));
+                            } else {
+                                allNames.push(v.name || '');
+                            }
+                        });
+                    }
+                    collectFromModel(model);
+                } catch(e) {}
+                /* Fallback: read from DOM titles */
+                if (allNames.length === 0) {
+                    leftPane.querySelectorAll('.cuic-switcher-name').forEach(el => {
+                        allNames.push((el.title || el.textContent || '').trim());
+                    });
+                }
+            }
+            if (rightPane) {
+                try {
+                    const rpScope = angular.element(rightPane).scope();
+                    const model = rpScope?.model || rpScope?.$parent?.rightModel || [];
+                    (model || []).forEach(v => selectedNames.push(v.name || ''));
+                } catch(e) {}
+                if (selectedNames.length === 0) {
+                    rightPane.querySelectorAll('.cuic-switcher-name').forEach(el => {
+                        selectedNames.push((el.title || el.textContent || '').trim());
+                    });
+                }
+            }
+
+            result.params.push({
+                dataType: 'VALUELIST',
+                type: 'cuic_valuelist',
+                label: label,
+                paramName: paramName,
+                isRequired: true,
+                availableCount: allNames.length,
+                availableNames: allNames,
+                availableGroups: groups,
+                selectedCount: selectedNames.length,
+                selectedValues: selectedNames
+            });
+        }
+
+        /* ── Individual Field Filters (step 3 type) ── */
+        const iffFields = sec.querySelector('#cuic-iff-fields');
+        if (iffFields) {
+            const availableFields = [];
+            iffFields.querySelectorAll('.select-options li a').forEach(a => {
+                const txt = (a.title || a.textContent || '').trim();
+                const m = txt.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+                availableFields.push({
+                    label: m ? m[1].trim() : txt,
+                    fieldId: m ? m[2].trim() : txt,
+                    combined: txt
+                });
+            });
+            result.params.push({
+                dataType: 'FIELD_FILTER',
+                type: 'cuic_field_filter',
+                label: 'Field Filters',
+                paramName: '_field_filters',
+                availableFields: availableFields
+            });
+        }
+
+        return result.params.length > 0 ? result : null;
+    }'''  # noqa: E501
+
+    # ── SPAB (single-step) wizard reader ─────────────────────────────────
     # CUIC uses custom AngularJS widgets (csSelect, cuic-datetime,
     # cuic-switcher) – standard HTML form scraping won't work.
     # This JS reads filter params via Angular's scope API.
@@ -858,9 +1097,42 @@ class Worker(BaseWorker):
     }'''  # noqa: E501
 
     def _read_wizard_step_fields(self) -> dict | None:
-        """Read wizard fields. Tries CUIC Angular scope first, then generic.
-        Returns dict with 'type' key: 'cuic_spab' or 'generic'."""
-        # ── CUIC path (AngularJS scope) ──
+        """Read wizard fields. Tries CUIC multi-step first, then SPAB, then generic.
+        Returns dict with 'type' key: 'cuic_multistep', 'cuic_spab', or 'generic'."""
+        
+        # ── Debug: check what's on the page ──
+        for f in self.page.frames:
+            try:
+                diag = f.evaluate(r'''() => {
+                    return {
+                        hasAngular: typeof angular !== 'undefined',
+                        hasFilterWizard: !!document.querySelector('filter-wizard'),
+                        hasSpabCtrl: !!document.querySelector('[ng-controller*="spab"]'),
+                        visibleSections: document.querySelectorAll('filter-wizard .steps > section').length,
+                        hasModalDialog: !!document.querySelector('.modal-dialog'),
+                        url: window.location.href
+                    };
+                }''')
+                self.logger.info(f"  Page diagnostic: {diag}")
+            except Exception as e:
+                self.logger.debug(f"  Diagnostic failed: {e}")
+        
+        # ── CUIC multi-step wizard (filter-wizard with wizardConfig.steps) ──
+        for f in self.page.frames:
+            try:
+                result = f.evaluate(self.CUIC_MULTISTEP_READ_JS)
+                if result and result.get('_debug'):
+                    self.logger.info(f"  Multi-step reader debug ({f.url[:60]}): {result}")
+                    continue
+                if result and result.get('type') == 'cuic_multistep':
+                    self.logger.info(f"  ✓ CUIC multi-step wizard step {result.get('stepIndex',0)+1}: "
+                                     f"{len(result.get('params',[]))} param(s)")
+                    return result
+            except Exception as e:
+                self.logger.warning(f"  Multi-step reader exception ({f.url[:60]}): {e}")
+                pass
+
+        # ── CUIC SPAB (single-step) path ──
         for f in self.page.frames:
             try:
                 result = f.evaluate(self.CUIC_WIZARD_READ_JS)
@@ -914,8 +1186,10 @@ class Worker(BaseWorker):
         if not step_info or not saved_values:
             return
 
-        if step_info.get('type') == 'cuic_spab':
-            # ── CUIC: apply via Angular scope ──
+        stype = step_info.get('type', '')
+
+        if stype == 'cuic_spab':
+            # ── CUIC SPAB: apply via Angular scope ──
             cuic_params = {k: v for k, v in saved_values.items()
                           if not k.startswith('_')}
             if not cuic_params:
@@ -930,6 +1204,130 @@ class Worker(BaseWorker):
                         return
                 except Exception:
                     pass
+
+        elif stype == 'cuic_multistep':
+            # ── CUIC multi-step: apply to current visible step ──
+            # saved_values are keyed by paramName within this step
+            params = step_info.get('params', [])
+            for p in params:
+                pn = p.get('paramName', '')
+                val = saved_values.get(pn)
+                if val is None:
+                    continue
+
+                if p.get('type') == 'cuic_datetime':
+                    # Apply datetime preset via the HCFFilterCtrl scope
+                    cfg = {'preset': val} if isinstance(val, str) else (val or {})
+                    try:
+                        for f in self.page.frames:
+                            try:
+                                result = f.evaluate(r'''(cfg) => {
+                                    if (typeof angular === 'undefined') return null;
+                                    const dtFilter = document.querySelector(
+                                        'filter-wizard .steps > section[style*="display: flex"] datetime-filter'
+                                    );
+                                    if (!dtFilter) return null;
+                                    const scope = angular.element(dtFilter).scope();
+                                    if (!scope) return null;
+
+                                    const preset = cfg.preset || null;
+                                    if (preset) {
+                                        const opts = scope.sel?.options || [];
+                                        const opt = opts.find(o => o.value === preset);
+                                        if (opt) {
+                                            scope.relativeRangeSelected = opt;
+                                            if (scope.updateRDChange) scope.updateRDChange(0);
+                                            try { scope.$apply(); } catch(e) {}
+                                            return {ok: true, value: preset};
+                                        }
+                                    }
+                                    return null;
+                                }''', cfg)
+                                if result and result.get('ok'):
+                                    self.logger.info(f"    {pn}: OK → {result.get('value','')}")
+                                    break
+                            except Exception:
+                                pass
+                    except Exception as e:
+                        self.logger.debug(f"    {pn}: datetime apply failed: {e}")
+
+                elif p.get('type') == 'cuic_valuelist':
+                    # Apply valuelist via cuic-switcher scope
+                    try:
+                        for f in self.page.frames:
+                            try:
+                                result = f.evaluate(r'''(cfg) => {
+                                    if (typeof angular === 'undefined') return null;
+                                    const section = document.querySelector(
+                                        'filter-wizard .steps > section[style*="display: flex"]'
+                                    );
+                                    if (!section) return null;
+                                    const switcher = section.querySelector('[cuic-switcher]');
+                                    if (!switcher) return null;
+                                    const scope = angular.element(switcher).scope();
+                                    if (!scope) return null;
+
+                                    const leftModel = scope.leftModel || [];
+                                    const rightModel = scope.rightModel || [];
+
+                                    if (cfg.value === 'all') {
+                                        // Move all to right
+                                        if (scope.moveAllToRight) {
+                                            scope.moveAllToRight();
+                                        } else {
+                                            function flattenAll(list) {
+                                                const out = [];
+                                                (list||[]).forEach(v => {
+                                                    if (v.children && v.children.length)
+                                                        out.push(...flattenAll(v.children));
+                                                    else out.push(v);
+                                                });
+                                                return out;
+                                            }
+                                            const all = flattenAll(leftModel);
+                                            rightModel.push(...all);
+                                            leftModel.length = 0;
+                                        }
+                                        try { scope.$apply(); } catch(e) {}
+                                        return {ok: true, value: 'all'};
+                                    } else if (Array.isArray(cfg.value)) {
+                                        // Move specific items by name
+                                        const names = new Set(cfg.value);
+                                        function extractByName(list) {
+                                            const matched = [], rest = [];
+                                            (list||[]).forEach(v => {
+                                                if (v.children && v.children.length) {
+                                                    const [m, r] = [[], []];
+                                                    v.children.forEach(ch => {
+                                                        if (names.has(ch.name)) m.push(ch);
+                                                        else r.push(ch);
+                                                    });
+                                                    matched.push(...m);
+                                                    if (r.length) rest.push(Object.assign({}, v, {children: r}));
+                                                } else {
+                                                    if (names.has(v.name)) matched.push(v);
+                                                    else rest.push(v);
+                                                }
+                                            });
+                                            return [matched, rest];
+                                        }
+                                        const [toMove, remaining] = extractByName(leftModel);
+                                        leftModel.length = 0;
+                                        remaining.forEach(v => leftModel.push(v));
+                                        toMove.forEach(v => rightModel.push(v));
+                                        try { scope.$apply(); } catch(e) {}
+                                        return {ok: true, value: toMove.map(v=>v.name)};
+                                    }
+                                    return null;
+                                }''', {'value': val})
+                                if result and result.get('ok'):
+                                    self.logger.info(f"    {pn}: OK → {result.get('value','')}")
+                                    break
+                            except Exception:
+                                pass
+                    except Exception as e:
+                        self.logger.debug(f"    {pn}: valuelist apply failed: {e}")
+
         else:
             # ── Generic: DOM-based ──
             fields = step_info.get('fields', [])
@@ -992,10 +1390,10 @@ class Worker(BaseWorker):
         """Walk through the wizard steps, applying saved filter values.
 
         Supported formats:
-          CUIC (flat):  {"@start_date": "THISDAY", "@agent_list": "all",
-                         "_meta": {"type": "cuic_spab", ...}}
-          Step-keyed:   {"step_1": {"field_id": val}, "step_2": {...}}
-          Flat generic: {"field_id": val}  (applied to every step)
+          CUIC SPAB (flat):      {"@start_date": "THISDAY", "@agent_list": "all", ...}
+          CUIC multi-step:       {"step_1": {...}, "step_2": {...}, ...}
+          Step-keyed generic:    {"step_1": {"field_id": val}, ...}
+          Flat generic:          {"field_id": val}  (applied to every step)
         """
         try:
             self.page.wait_for_timeout(self.timeout_medium)
@@ -1005,6 +1403,7 @@ class Worker(BaseWorker):
             meta = filters.get('_meta') or {}
             clean = {k: v for k, v in filters.items() if k != '_meta'}
             is_stepped = any(k.startswith('step_') for k in clean)
+            wizard_type = meta.get('type', '')
 
             step = 0
             max_steps = 10
@@ -1017,11 +1416,23 @@ class Worker(BaseWorker):
 
                 if step_info:
                     stype = step_info.get('type', 'generic')
-                    if stype == 'cuic_spab':
+
+                    if stype == 'cuic_multistep':
+                        # Multi-step CUIC: filters stored per-step
+                        step_key = f'step_{step}'
+                        step_vals = clean.get(step_key, {})
+                        step_title = step_info.get('stepTitle', f'Step {step}')
                         pnames = [p.get('paramName','') for p in step_info.get('params',[])]
-                        self.logger.info(f"  Wizard step {step} (CUIC): {pnames}")
-                        # CUIC uses flat param-name keys
+                        self.logger.info(f"  Wizard step {step} '{step_title}' (CUIC multi): {pnames}")
+                        if step_vals:
+                            self._apply_filters_to_step(step_info, step_vals)
+
+                    elif stype == 'cuic_spab':
+                        pnames = [p.get('paramName','') for p in step_info.get('params',[])]
+                        self.logger.info(f"  Wizard step {step} (CUIC SPAB): {pnames}")
+                        # CUIC SPAB uses flat param-name keys
                         self._apply_filters_to_step(step_info, clean)
+
                     elif is_stepped:
                         step_vals = clean.get(f'step_{step}', {})
                         fields = step_info.get('fields', [])
@@ -1065,11 +1476,14 @@ class Worker(BaseWorker):
     def discover_wizard(cls, report_config: dict) -> dict:
         """Open a report and read all wizard steps' fields.
 
-        Returns:
-          CUIC:    {type: 'cuic_spab', params: [...], datePresets: [...],
-                    steps: [{step:1, ...}], error: ''}
-          Generic: {type: 'generic', steps: [{step:1, fields:[...]}, ...],
-                    error: ''}
+        Returns a unified format:
+          {type: 'cuic_spab' | 'cuic_multistep' | 'generic',
+           steps: [{step:1, title:'...', params:[...]}],
+           datePresets: [...],
+           error: ''}
+
+        For SPAB (single-step) reports, there is one step with all params.
+        For multi-step wizards, each step has its own params array.
         """
         worker = cls()
         worker._load_config()
@@ -1104,13 +1518,34 @@ class Worker(BaseWorker):
 
                 if step_info:
                     stype = step_info.get('type', 'generic')
-                    if stype == 'cuic_spab':
-                        # CUIC Angular wizard — return rich param info
+
+                    if stype == 'cuic_multistep':
+                        # Multi-step wizard — each call returns one step
+                        result['type'] = 'cuic_multistep'
+                        step_params = step_info.get('params', [])
+                        step_title = step_info.get('stepTitle', f'Step {step}')
+                        # Collect datePresets from datetime params
+                        for p in step_params:
+                            if p.get('type') == 'cuic_datetime' and p.get('datePresets'):
+                                result['datePresets'] = p['datePresets']
+                        result['steps'].append({
+                            'step': step,
+                            'title': step_title,
+                            'type': 'cuic_multistep',
+                            'params': step_params
+                        })
+                        # Store step titles on first discovery
+                        if 'stepTitles' not in result:
+                            result['stepTitles'] = step_info.get('stepTitles', [])
+
+                    elif stype == 'cuic_spab':
+                        # SPAB single-step wizard — all params on one page
                         result['type'] = 'cuic_spab'
                         result['params'] = step_info.get('params', [])
                         result['datePresets'] = step_info.get('datePresets', [])
                         result['steps'].append({
                             'step': step,
+                            'title': 'Parameters',
                             'type': 'cuic_spab',
                             'params': step_info.get('params', [])
                         })
@@ -1118,11 +1553,13 @@ class Worker(BaseWorker):
                         # Generic HTML fields
                         result['steps'].append({
                             'step': step,
+                            'title': f'Step {step}',
                             'fields': step_info.get('fields', [])
                         })
 
-                # Check for Run (last step)
+                # Check for Run (last step) — but NOT Next+Run (intermediate)
                 has_run = False
+                has_next = False
                 for f in worker.page.frames:
                     try:
                         for sel in ['button:has-text("Run")', 'input[type="button"][value="Run"]']:
@@ -1130,21 +1567,34 @@ class Worker(BaseWorker):
                             if btn and btn.is_visible():
                                 has_run = True
                                 break
+                        for sel in ['button:has-text("Next")', 'input[type="button"][value="Next"]']:
+                            btn = f.query_selector(sel)
+                            if btn and btn.is_visible():
+                                has_next = True
+                                break
                         if has_run:
                             break
                     except Exception:
                         pass
 
-                if has_run:
-                    # Last step — record fields but don't click Run
+                if has_run and not has_next:
+                    # Final step — record but don't click Run
                     break
 
-                # Click Next
-                if not worker._click_wizard_button('Next'):
+                # Click Next to advance to the next step
+                if has_next:
+                    if worker._click_wizard_button('Next'):
+                        worker.logger.info(f"  Discovery: clicked Next at step {step}")
+                        worker.page.wait_for_timeout(worker.timeout_short)
+                    else:
+                        break
+                elif has_run:
+                    # Run is available but Next is too — last functional step
                     break
-                worker.page.wait_for_timeout(worker.timeout_short)
+                else:
+                    break
 
-            worker.logger.info(f"Discovery: {len(result['steps'])} wizard steps found")
+            worker.logger.info(f"Discovery: {len(result['steps'])} wizard step(s) found, type={result['type']}")
             return result
 
         except Exception as e:
