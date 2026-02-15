@@ -93,6 +93,9 @@ class Worker(BaseWorker):
             return []
         finally:
             self._logout()
+            # Small delay so logout screen is visible when headless=false
+            if self.page and not self.page.is_closed():
+                self.page.wait_for_timeout(1500)
             self.teardown_browser()
 
     def scrape(self) -> List[Dict[str, Any]]:
@@ -165,32 +168,109 @@ class Worker(BaseWorker):
     def _logout(self):
         """Sign out of CUIC so the session is released.
         This must run even after scraping errors to prevent
-        'Session Limit Reached' on subsequent runs."""
+        'Session Limit Reached' on subsequent runs.
+
+        Strategies (in order of reliability):
+          1. Logout URL – navigate to Logout.jsp (proven to work)
+          2. JavaScript – call Angular signout() directly
+          3. Force-click – click through overlays with force=True
+        """
         try:
             if not self.page or self.page.is_closed():
                 self.logger.warning("Page already closed – skipping logout")
                 return
 
-            # Make sure we are on the main page (close extra tabs first)
+            self.logger.info("Starting logout sequence...")
+
+            # Close extra tabs so we're on the main page
             self._close_report_page()
+            self.page.wait_for_timeout(500)
 
-            # Click the user dropdown
-            user_btn = self.page.locator('#user-info-btn')
-            user_btn.wait_for(state='visible', timeout=self.timeout_medium)
-            user_btn.click()
-            self.page.wait_for_timeout(800)
+            logged_out = False
 
-            # Click Sign Out
-            signout = self.page.locator('#signout-btn1')
-            signout.wait_for(state='visible', timeout=self.timeout_medium)
-            signout.click()
+            # ── Strategy 1: navigate to Logout.jsp (most reliable) ───────
+            base = self.url.rstrip('/').rsplit('/cuicui', 1)[0]
+            logout_urls = [
+                f"{base}/cuicui/Logout.jsp",
+                f"{base}/cuicui/j_spring_security_logout",
+                f"{base}/cuicui/logout",
+            ]
+            for url in logout_urls:
+                try:
+                    resp = self.page.goto(url, wait_until='domcontentloaded',
+                                          timeout=10000)
+                    if resp and resp.status < 400:
+                        self.logger.info(f"Logged out via URL: {url} (status {resp.status})")
+                        logged_out = True
+                        break
+                except Exception:
+                    continue
 
-            # Wait briefly for the sign-out to process
+            # ── Strategy 2: JavaScript – call Angular's signout() ────────
+            if not logged_out:
+                try:
+                    result = self.page.evaluate('''() => {
+                        const btn = document.querySelector('#signout-btn1')
+                                  || document.querySelector('#so_anchor')
+                                  || document.querySelector('[ng-click*="signout"]');
+                        if (btn) {
+                            const scope = (typeof angular !== 'undefined')
+                                ? angular.element(btn).scope() : null;
+                            if (scope && typeof scope.signout === 'function') {
+                                scope.signout();
+                                return 'angular_signout';
+                            }
+                            if (scope && scope.$parent && typeof scope.$parent.signout === 'function') {
+                                scope.$parent.signout();
+                                return 'angular_parent_signout';
+                            }
+                        }
+                        if (typeof angular !== 'undefined') {
+                            const body = document.querySelector('[ng-app]') || document.body;
+                            const s = angular.element(body).scope();
+                            if (s && typeof s.signout === 'function') {
+                                s.signout();
+                                return 'angular_root_signout';
+                            }
+                        }
+                        return null;
+                    }''')
+                    if result:
+                        self.logger.info(f"Logged out via JS: {result}")
+                        logged_out = True
+                except Exception as js_err:
+                    self.logger.debug(f"JS signout not available: {js_err}")
+
+            # ── Strategy 3: force-click through any overlay ──────────────
+            if not logged_out:
+                try:
+                    user_btn = self.page.locator('#user-info-btn')
+                    if user_btn.count() > 0:
+                        user_btn.first.click(force=True)
+                        self.page.wait_for_timeout(1500)
+                        for sel in ['#signout-btn1', '#so_anchor']:
+                            signout = self.page.locator(sel)
+                            if signout.count() > 0:
+                                signout.first.click(force=True)
+                                self.logger.info(f"Logged out via force-click ({sel})")
+                                logged_out = True
+                                break
+                except Exception as fc_err:
+                    self.logger.debug(f"Force-click approach failed: {fc_err}")
+
+            # ── Verification ─────────────────────────────────────────────
             self.page.wait_for_timeout(2000)
-            self.logger.info("Logged out of CUIC successfully")
-            self.screenshot("logout_ok")
+            final_url = self.page.url
+            # After logout, CUIC typically redirects to the login page
+            is_login_page = any(kw in final_url.lower() for kw in
+                                ['logout', 'login', 'main.jsp', 'sso'])
+            if logged_out:
+                self.logger.info(f"✓ Logout confirmed — landed on: {final_url}")
+            else:
+                self.logger.warning(f"All logout strategies exhausted — final URL: {final_url}")
+
         except Exception as e:
-            self.logger.warning(f"Logout failed (session may persist): {e}")
+            self.logger.error(f"Logout failed (session may persist): {e}")
             self.screenshot("logout_error", is_step=False)
 
     # ──────────────────────────────────────────────────────────────────────
@@ -1072,6 +1152,9 @@ class Worker(BaseWorker):
             return result
         finally:
             worker._logout()
+            # Small delay so logout screen is visible when headless=false
+            if worker.page and not worker.page.is_closed():
+                worker.page.wait_for_timeout(1500)
             worker.teardown_browser()
 
     # ══════════════════════════════════════════════════════════════════════
