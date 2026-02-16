@@ -527,6 +527,11 @@ class Worker(BaseWorker):
             # Split folder path into segments — supports / or \ delimiters
             folders = [f.strip() for f in folder_path.replace('\\', '/').split('/') if f.strip()]
 
+            # Defensive: remove report name from folder segments if it slipped in
+            if folders and report_name and folders[-1] == report_name:
+                self.logger.warning(f"Report name '{report_name}' found in folder path — removing duplicate")
+                folders = folders[:-1]
+
             for depth, folder in enumerate(folders):
                 if not self._click_grid_item(frame, folder, is_folder=True):
                     # Try scrolling to find it
@@ -1024,12 +1029,27 @@ class Worker(BaseWorker):
                     combined: txt
                 });
             });
+
+            /* Capture already-selected fields from the Angular vm.selectedList */
+            let selectedFieldIds = [];
+            try {
+                const iffScope = angular.element(iffFields).scope();
+                if (iffScope && iffScope.vm && iffScope.vm.selectedList) {
+                    selectedFieldIds = iffScope.vm.selectedList.map(f => {
+                        const cn = (f.combinedName || '').trim();
+                        const pm = cn.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+                        return pm ? pm[2].trim() : (f.id || f.name || f.fieldName || cn);
+                    });
+                }
+            } catch(e) {}
+
             result.params.push({
                 dataType: 'FIELD_FILTER',
                 type: 'cuic_field_filter',
                 label: 'Field Filters',
                 paramName: '_field_filters',
-                availableFields: availableFields
+                availableFields: availableFields,
+                selectedFieldIds: selectedFieldIds
             });
         }
 
@@ -1548,117 +1568,215 @@ class Worker(BaseWorker):
                     continue
 
                 if p.get('type') == 'cuic_datetime':
-                    # Apply datetime preset via the HCFFilterCtrl scope
+                    # Apply datetime preset via Angular scope on datetime-filter element
                     cfg = {'preset': val} if isinstance(val, str) else (val or {})
-                    try:
-                        for f in self.page.frames:
-                            try:
-                                result = f.evaluate(r'''(cfg) => {
-                                    if (typeof angular === 'undefined') return null;
-                                    const dtFilter = document.querySelector(
-                                        'filter-wizard .steps > section[style*="display: flex"] datetime-filter'
-                                    );
-                                    if (!dtFilter) return null;
-                                    const scope = angular.element(dtFilter).scope();
-                                    if (!scope) return null;
+                    applied = False
+                    for f in self.page.frames:
+                        try:
+                            result = f.evaluate(r'''(cfg) => {
+                                if (typeof angular === 'undefined') return {error: 'no_angular'};
+                                const dtFilter = document.querySelector(
+                                    'filter-wizard .steps > section[style*="display: flex"] datetime-filter'
+                                );
+                                if (!dtFilter) return {error: 'no_datetime_filter_element'};
 
-                                    const preset = cfg.preset || null;
-                                    if (preset) {
-                                        const opts = scope.sel?.options || [];
-                                        const opt = opts.find(o => o.value === preset);
-                                        if (opt) {
-                                            scope.relativeRangeSelected = opt;
-                                            if (scope.updateRDChange) scope.updateRDChange(0);
-                                            try { scope.$apply(); } catch(e) {}
-                                            return {ok: true, value: preset};
-                                        }
+                                // Try isolateScope first, then regular scope
+                                let scope = null;
+                                try { scope = angular.element(dtFilter).isolateScope(); } catch(e) {}
+                                if (!scope) {
+                                    try { scope = angular.element(dtFilter).scope(); } catch(e) {}
+                                }
+                                if (!scope) return {error: 'no_scope'};
+
+                                const preset = cfg.preset || null;
+                                if (!preset) return {error: 'no_preset_in_cfg'};
+
+                                // Find the csSelect options — walk scope chain to find sel/csSelect
+                                let opts = [];
+                                const selContainer = dtFilter.querySelector('.csSelect-container');
+                                if (selContainer) {
+                                    try {
+                                        let selScope = angular.element(selContainer).isolateScope()
+                                                    || angular.element(selContainer).scope();
+                                        opts = selScope?.csSelect?.options || selScope?.sel?.options || [];
+                                    } catch(e) {}
+                                }
+                                // Fallback: walk up from datetime-filter scope
+                                if (!opts.length) {
+                                    opts = scope.sel?.options || scope.csSelect?.options || [];
+                                    let s = scope;
+                                    for (let d = 0; !opts.length && s && d < 5; d++, s = s.$parent) {
+                                        opts = s.sel?.options || s.csSelect?.options || [];
                                     }
-                                    return null;
-                                }''', cfg)
-                                if result and result.get('ok'):
-                                    self.logger.info(f"    {pn}: OK → {result.get('value','')}")
-                                    break
-                            except Exception:
-                                pass
-                    except Exception as e:
-                        self.logger.debug(f"    {pn}: datetime apply failed: {e}")
+                                }
+                                if (!opts.length) return {error: 'no_options_found', scopeKeys: Object.keys(scope).filter(k=>!k.startsWith('$')).slice(0,20)};
+
+                                const opt = opts.find(o => o.value === preset);
+                                if (!opt) return {error: 'preset_not_found', preset: preset, available: opts.map(o=>o.value)};
+
+                                // Apply the selected preset
+                                scope.relativeRangeSelected = opt;
+                                if (scope.updateRDChange) scope.updateRDChange(0);
+                                else if (scope.onRelativeRangeChange) scope.onRelativeRangeChange();
+                                try { scope.$apply(); } catch(e) {}
+                                return {ok: true, value: preset};
+                            }''', cfg)
+                            if result and result.get('ok'):
+                                self.logger.info(f"    {pn}: OK → {result.get('value','')}")
+                                applied = True
+                                break
+                            elif result and result.get('error'):
+                                self.logger.debug(f"    {pn}: datetime frame skip: {result}")
+                        except Exception as e:
+                            self.logger.debug(f"    {pn}: datetime frame error: {e}")
+                    if not applied:
+                        self.logger.warning(f"    {pn}: datetime preset '{cfg.get('preset','')}' could NOT be applied")
 
                 elif p.get('type') == 'cuic_valuelist':
-                    # Apply valuelist via cuic-switcher scope
+                    # Apply valuelist via cuic-switcher isolateScope
+                    # MUST: (1) clear existing right pane, (2) move only desired items to right
+                    applied = False
+                    for f in self.page.frames:
+                        try:
+                            result = f.evaluate(r'''(cfg) => {
+                                if (typeof angular === 'undefined') return {error: 'no_angular'};
+                                const section = document.querySelector(
+                                    'filter-wizard .steps > section[style*="display: flex"]'
+                                );
+                                if (!section) return {error: 'no_visible_section'};
+                                const switcher = section.querySelector('[cuic-switcher]');
+                                if (!switcher) return {error: 'no_cuic_switcher'};
+
+                                // MUST use isolateScope to get the directive's own scope
+                                let scope = null;
+                                try { scope = angular.element(switcher).isolateScope(); } catch(e) {}
+                                if (!scope) {
+                                    try { scope = angular.element(switcher).scope(); } catch(e) {}
+                                }
+                                if (!scope) return {error: 'no_scope_on_switcher'};
+
+                                const leftModel = scope.leftModel;
+                                const rightModel = scope.rightModel;
+                                if (!leftModel || !rightModel)
+                                    return {error: 'no_leftModel_or_rightModel',
+                                            keys: Object.keys(scope).filter(k=>!k.startsWith('$')).slice(0,20)};
+
+                                // Helper: flatten grouped items
+                                function flattenAll(list) {
+                                    const out = [];
+                                    (list||[]).forEach(v => {
+                                        if (v.children && v.children.length)
+                                            out.push(...flattenAll(v.children));
+                                        else out.push(v);
+                                    });
+                                    return out;
+                                }
+
+                                // Step 1: Move ALL existing right items back to left first
+                                const existingRight = flattenAll(rightModel);
+                                if (existingRight.length > 0) {
+                                    leftModel.push(...existingRight);
+                                    rightModel.length = 0;
+                                }
+
+                                if (cfg.value === 'all') {
+                                    // Move everything to right
+                                    const all = flattenAll(leftModel);
+                                    rightModel.push(...all);
+                                    leftModel.length = 0;
+                                    try { scope.$apply(); } catch(e) {}
+                                    return {ok: true, value: 'all', count: rightModel.length};
+
+                                } else if (Array.isArray(cfg.value)) {
+                                    // Move only the specified items to right
+                                    const names = new Set(cfg.value);
+                                    const allFlat = flattenAll(leftModel);
+                                    const toRight = [], toLeft = [];
+                                    allFlat.forEach(v => {
+                                        if (names.has(v.name)) toRight.push(v);
+                                        else toLeft.push(v);
+                                    });
+                                    leftModel.length = 0;
+                                    toLeft.forEach(v => leftModel.push(v));
+                                    toRight.forEach(v => rightModel.push(v));
+                                    try { scope.$apply(); } catch(e) {}
+                                    return {ok: true, value: toRight.map(v=>v.name),
+                                            wanted: cfg.value.length, got: toRight.length};
+                                }
+                                return {error: 'invalid_value_type'};
+                            }''', {'value': val})
+                            if result and result.get('ok'):
+                                self.logger.info(f"    {pn}: OK → {result.get('value','')}")
+                                if isinstance(result.get('value'), list):
+                                    wanted = result.get('wanted', 0)
+                                    got = result.get('got', 0)
+                                    if got < wanted:
+                                        self.logger.warning(f"    {pn}: only {got}/{wanted} items found in available list")
+                                applied = True
+                                break
+                            elif result and result.get('error'):
+                                self.logger.debug(f"    {pn}: valuelist frame skip: {result}")
+                        except Exception as e:
+                            self.logger.debug(f"    {pn}: valuelist frame error: {e}")
+                    if not applied:
+                        self.logger.warning(f"    {pn}: valuelist could NOT be applied (val={val})")
+
+                elif p.get('type') == 'cuic_field_filter':
+                    # Apply field filters — select fields from the csSelect dropdown
+                    # Field filters are optional; val is a list of fieldId strings or 'all'
+                    if val == 'all' or not val:
+                        self.logger.info(f"    {pn}: field_filter = {'all (no filtering)' if val == 'all' else 'none'}")
+                        continue
+                    if not isinstance(val, list):
+                        continue
                     try:
                         for f in self.page.frames:
                             try:
-                                result = f.evaluate(r'''(cfg) => {
+                                result = f.evaluate(r'''(fieldIds) => {
                                     if (typeof angular === 'undefined') return null;
                                     const section = document.querySelector(
                                         'filter-wizard .steps > section[style*="display: flex"]'
                                     );
                                     if (!section) return null;
-                                    const switcher = section.querySelector('[cuic-switcher]');
-                                    if (!switcher) return null;
-                                    const scope = angular.element(switcher).scope();
-                                    if (!scope) return null;
+                                    const iffDiv = section.querySelector('#cuic-iff-fields');
+                                    if (!iffDiv) return null;
+                                    const selEl = iffDiv.querySelector('.iff-available-fields, .csSelect-container');
+                                    if (!selEl) return null;
+                                    const scope = angular.element(selEl).scope();
+                                    if (!scope || !scope.csSelect) return null;
 
-                                    const leftModel = scope.leftModel || [];
-                                    const rightModel = scope.rightModel || [];
+                                    const added = [];
+                                    const nameSet = new Set(fieldIds);
 
-                                    if (cfg.value === 'all') {
-                                        // Move all to right
-                                        if (scope.moveAllToRight) {
-                                            scope.moveAllToRight();
-                                        } else {
-                                            function flattenAll(list) {
-                                                const out = [];
-                                                (list||[]).forEach(v => {
-                                                    if (v.children && v.children.length)
-                                                        out.push(...flattenAll(v.children));
-                                                    else out.push(v);
-                                                });
-                                                return out;
+                                    // The csSelect options have combinedName like "Label (fieldId)"
+                                    // and an id property matching the field
+                                    const opts = scope.csSelect.options || [];
+                                    for (const fid of fieldIds) {
+                                        const opt = opts.find(o =>
+                                            o.id === fid || o.name === fid || o.fieldName === fid ||
+                                            (o.combinedName && o.combinedName.includes('(' + fid + ')'))
+                                        );
+                                        if (opt) {
+                                            // Select and add the field
+                                            scope.csSelect.selected = opt;
+                                            if (scope.vm && scope.vm.addField) {
+                                                scope.vm.addField();
+                                            } else if (scope.csSelect.selectOption) {
+                                                scope.csSelect.selectOption(opt);
                                             }
-                                            const all = flattenAll(leftModel);
-                                            rightModel.push(...all);
-                                            leftModel.length = 0;
+                                            try { scope.$apply(); } catch(e) {}
+                                            added.push(fid);
                                         }
-                                        try { scope.$apply(); } catch(e) {}
-                                        return {ok: true, value: 'all'};
-                                    } else if (Array.isArray(cfg.value)) {
-                                        // Move specific items by name
-                                        const names = new Set(cfg.value);
-                                        function extractByName(list) {
-                                            const matched = [], rest = [];
-                                            (list||[]).forEach(v => {
-                                                if (v.children && v.children.length) {
-                                                    const [m, r] = [[], []];
-                                                    v.children.forEach(ch => {
-                                                        if (names.has(ch.name)) m.push(ch);
-                                                        else r.push(ch);
-                                                    });
-                                                    matched.push(...m);
-                                                    if (r.length) rest.push(Object.assign({}, v, {children: r}));
-                                                } else {
-                                                    if (names.has(v.name)) matched.push(v);
-                                                    else rest.push(v);
-                                                }
-                                            });
-                                            return [matched, rest];
-                                        }
-                                        const [toMove, remaining] = extractByName(leftModel);
-                                        leftModel.length = 0;
-                                        remaining.forEach(v => leftModel.push(v));
-                                        toMove.forEach(v => rightModel.push(v));
-                                        try { scope.$apply(); } catch(e) {}
-                                        return {ok: true, value: toMove.map(v=>v.name)};
                                     }
-                                    return null;
-                                }''', {'value': val})
+                                    return {ok: added.length > 0, added: added, total: fieldIds.length};
+                                }''', val)
                                 if result and result.get('ok'):
-                                    self.logger.info(f"    {pn}: OK → {result.get('value','')}")
+                                    self.logger.info(f"    {pn}: OK → {result.get('added',[])} field filter(s)")
                                     break
                             except Exception:
                                 pass
                     except Exception as e:
-                        self.logger.debug(f"    {pn}: valuelist apply failed: {e}")
+                        self.logger.debug(f"    {pn}: field_filter apply failed: {e}")
 
         else:
             # ── Generic: DOM-based ──
@@ -1737,6 +1855,11 @@ class Worker(BaseWorker):
             is_stepped = any(k.startswith('step_') for k in clean)
             wizard_type = meta.get('type', '')
 
+            self.logger.info(f"  Filter wizard: type={wizard_type}, stepped={is_stepped}, "
+                             f"keys={list(clean.keys())}")
+            for ck, cv in clean.items():
+                self.logger.info(f"    filter[{ck}] = {cv}")
+
             step = 0
             max_steps = 10
 
@@ -1755,9 +1878,12 @@ class Worker(BaseWorker):
                         step_vals = clean.get(step_key, {})
                         step_title = step_info.get('stepTitle', f'Step {step}')
                         pnames = [p.get('paramName','') for p in step_info.get('params',[])]
-                        self.logger.info(f"  Wizard step {step} '{step_title}' (CUIC multi): {pnames}")
+                        self.logger.info(f"  Wizard step {step} '{step_title}' (CUIC multi): params={pnames}")
+                        self.logger.info(f"    Saved filter values for {step_key}: {step_vals}")
                         if step_vals:
                             self._apply_filters_to_step(step_info, step_vals)
+                        else:
+                            self.logger.info(f"    No saved values for {step_key} — using CUIC defaults")
 
                     elif stype == 'cuic_spab':
                         pnames = [p.get('paramName','') for p in step_info.get('params',[])]
@@ -1781,13 +1907,13 @@ class Worker(BaseWorker):
 
                     self.page.wait_for_timeout(800)
 
-                # Try Run first (last step), then Next
-                if self._click_wizard_button('Run'):
-                    self.logger.info(f"  Wizard: clicked Run at step {step}")
-                    break
-                elif self._click_wizard_button('Next'):
+                # Try Next first (middle steps), then Run (last step)
+                if self._click_wizard_button('Next'):
                     self.logger.info(f"  Wizard: clicked Next at step {step}")
                     self.page.wait_for_timeout(self.timeout_short)
+                elif self._click_wizard_button('Run'):
+                    self.logger.info(f"  Wizard: clicked Run at step {step}")
+                    break
                 else:
                     self.logger.debug(f"  Wizard step {step}: no Next/Run button")
                     break

@@ -170,6 +170,38 @@
   .vl-groups .vl-group-btn .vl-g-count { color: var(--muted); font-size: 10px; }
   .vl-groups .vl-group-btn.active { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); }
 
+  /* Selected-values summary tags */
+  .vl-selected-summary { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; padding: 6px 8px;
+    background: rgba(63,185,80,0.06); border: 1px solid rgba(63,185,80,0.2); border-radius: 6px; }
+  .vl-selected-summary:empty { display: none; }
+  .vl-selected-summary .vl-sel-label { font-size: 11px; font-weight: 600; color: var(--green);
+    margin-right: 4px; white-space: nowrap; align-self: center; }
+  .vl-selected-summary .vl-sel-tag { display: inline-flex; align-items: center; gap: 3px; font-size: 11px;
+    padding: 2px 8px; background: rgba(63,185,80,0.12); color: var(--green); border-radius: 3px;
+    border: 1px solid rgba(63,185,80,0.2); }
+  .vl-selected-summary .vl-sel-tag .vl-sel-x { cursor: pointer; font-weight: 700; font-size: 13px;
+    color: var(--muted); margin-left: 2px; line-height: 1; }
+  .vl-selected-summary .vl-sel-tag .vl-sel-x:hover { color: var(--red); }
+  .vl-selected-summary .vl-sel-more { font-size: 10px; color: var(--muted); align-self: center; }
+
+  /* Field-filter checklist (reuses vl-section styles) */
+  .ff-section { margin-top: 6px; }
+  .ff-section .ff-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+  .ff-section .ff-toolbar input[type="text"] { flex: 1; min-width: 140px; padding: 4px 8px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 12px; }
+  .ff-section .ff-toolbar button { padding: 3px 10px; font-size: 11px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted); border-radius: 4px; cursor: pointer; white-space: nowrap; }
+  .ff-section .ff-toolbar button:hover { color: var(--accent); border-color: var(--accent); }
+  .ff-section .ff-count { font-size: 11px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+  .ff-section .ff-checklist { max-height: 220px; overflow-y: auto; border: 1px solid var(--border);
+    border-radius: 4px; background: var(--bg); padding: 2px 0; }
+  .ff-section .ff-checklist label { display: flex; align-items: center; gap: 6px; padding: 3px 10px;
+    font-size: 12px; cursor: pointer; user-select: none; }
+  .ff-section .ff-checklist label:hover { background: var(--surface2); }
+  .ff-section .ff-checklist input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent);
+    cursor: pointer; flex-shrink: 0; }
+  .ff-section .ff-checklist label .ff-field-id { font-size: 10px; color: var(--muted); margin-left: auto; }
+
   /* Wizard step tabs (multi-step wizards) */
   .wizard-step-tabs { display: flex; gap: 0; margin-bottom: 10px; border-bottom: 2px solid var(--border); }
   .wizard-step-tabs .wst-tab { padding: 8px 14px; font-size: 12px; font-weight: 600; color: var(--muted);
@@ -269,6 +301,13 @@
       <div class="stat-value" id="stat-total-rows">-</div>
       <div class="stat-label">Total Rows (Last Run)</div>
     </div>
+  </div>
+
+  <div class="card" style="display:flex;align-items:center;gap:16px;padding:14px 20px;">
+    <button class="btn-discover" id="manual-scrape-btn" onclick="startManualScrape()" style="font-size:14px;padding:10px 24px;">
+      ▶ Start Scrape Now
+    </button>
+    <span id="manual-scrape-status" style="font-size:13px;color:var(--muted)">Run all enabled workers manually</span>
   </div>
 
   <div class="card">
@@ -770,6 +809,67 @@ function renderFilterPanel(report, idx) {
             </div>`;
           }
 
+        } else if (p.type === 'cuic_field_filter') {
+          // Field Filters — searchable multi-select checklist
+          const fields = p.availableFields || [];
+          const isAll = savedVal === 'all';
+          const isSpecific = Array.isArray(savedVal);
+          // Fall back to pre-selected fields from CUIC when no saved config
+          const selectedIds = isSpecific ? savedVal
+            : (savedVal === undefined && p.selectedFieldIds && p.selectedFieldIds.length > 0 ? p.selectedFieldIds : []);
+          const ffId = 'ff-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+          const selCount = isAll ? fields.length : selectedIds.length;
+          const badge = `<span class="vl-badge">${fields.length} fields</span>`;
+          // Build label map: fieldId → label for summary tag display
+          const ffLabelMap = {};
+          fields.forEach(f => { ffLabelMap[f.fieldId || f.label] = f.label; });
+
+          html += `<div class="filter-field">
+            <label title="${attr(pn)}">${esc(label)} ${badge}</label>
+            <span id="${ffId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+          </div>`;
+
+          /* ── Selected fields summary (green tags — always rendered, updated in-place) ── */
+          html += `<div class="vl-selected-summary" id="${ffId}-summary"
+            data-type="ff-ms" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(pn)}" data-baseid="${ffId}"
+            data-labelmap='${JSON.stringify(ffLabelMap).replace(/'/g,"&#39;")}'>`;
+          const showFields = isAll ? fields : fields.filter(f => selectedIds.includes(f.fieldId || f.label));
+          if (showFields.length > 0) {
+            const MAX_TAGS = 20;
+            html += `<span class="vl-sel-label">✅ Selected:</span>`;
+            showFields.slice(0, MAX_TAGS).forEach(f => {
+              const fid = f.fieldId || f.label;
+              html += `<span class="vl-sel-tag">${esc(f.label)}<span class="vl-sel-x" onclick="deselectAndRefresh('${ffId}','${attr(fid)}')">&times;</span></span>`;
+            });
+            if (showFields.length > MAX_TAGS) {
+              html += `<span class="vl-sel-more">+${showFields.length - MAX_TAGS} more</span>`;
+            }
+          }
+          html += `</div>`;
+
+          html += `<div class="ff-section" id="${ffId}-section">
+            <div class="ff-toolbar">
+              <input type="text" id="${ffId}-search" placeholder="\uD83D\uDD0D Filter fields..."
+                oninput="filterFfChecklist('${ffId}',this.value)">
+              <button onclick="ffMsCheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">☑ All</button>
+              <button onclick="ffMsUncheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">☐ None</button>
+              <span class="ff-count" id="${ffId}-count">${selCount} / ${fields.length}</span>
+            </div>
+            <div class="ff-checklist" id="${ffId}-list">`;
+
+          fields.forEach(f => {
+            const fid = f.fieldId || f.label;
+            const checked = isAll || selectedIds.includes(fid) ? 'checked' : '';
+            html += `<label data-name="${attr((f.combined || f.label || '').toLowerCase())}" data-label="${attr(f.label)}">
+              <input type="checkbox" value="${attr(fid)}" ${checked}
+                onchange="ffMsToggleItem(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">
+              <span>${esc(f.label)}</span>
+              <span class="ff-field-id">${esc(f.fieldId)}</span>
+            </label>`;
+          });
+
+          html += `</div></div>`;
+
         } else if (p.type === 'cuic_valuelist') {
           const isAll = savedVal === 'all';
           const isSpecific = Array.isArray(savedVal);
@@ -783,8 +883,24 @@ function renderFilterPanel(report, idx) {
 
           html += `<div class="filter-field">
             <label title="${attr(pn)}">${esc(label)} ${badge}</label>
-            <span style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+            <span id="${vlId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
           </div>`;
+
+          /* ── Selected values summary (green tags — always rendered, updated in-place) ── */
+          html += `<div class="vl-selected-summary" id="${vlId}-summary"
+            data-type="vl-ms" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(pn)}" data-baseid="${vlId}">`;
+          const showNames = isAll ? allNames : selectedNames;
+          if (showNames.length > 0) {
+            const MAX_TAGS = 20;
+            html += `<span class="vl-sel-label">✅ Selected:</span>`;
+            showNames.slice(0, MAX_TAGS).forEach(n => {
+              html += `<span class="vl-sel-tag">${esc(n)}<span class="vl-sel-x" onclick="deselectAndRefresh('${vlId}','${attr(n)}')">&times;</span></span>`;
+            });
+            if (showNames.length > MAX_TAGS) {
+              html += `<span class="vl-sel-more">+${showNames.length - MAX_TAGS} more</span>`;
+            }
+          }
+          html += `</div>`;
 
           const groups = p.availableGroups || [];
           html += `<div class="vl-section" id="${vlId}-section">`;
@@ -918,6 +1034,66 @@ function renderFilterPanel(report, idx) {
           </div>`;
         }
 
+      } else if (p.type === 'cuic_field_filter') {
+        // Field Filters — searchable multi-select checklist (SPAB)
+        const fields = p.availableFields || [];
+        const isAll = savedVal === 'all';
+        const isSpecific = Array.isArray(savedVal);
+        // Fall back to pre-selected fields from CUIC when no saved config
+        const selectedIds = isSpecific ? savedVal
+          : (savedVal === undefined && p.selectedFieldIds && p.selectedFieldIds.length > 0 ? p.selectedFieldIds : []);
+        const ffId = 'ff-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+        const selCount = isAll ? fields.length : selectedIds.length;
+        const badge = `<span class="vl-badge">${fields.length} fields</span>`;
+        const ffLabelMapSp = {};
+        fields.forEach(f => { ffLabelMapSp[f.fieldId || f.label] = f.label; });
+
+        html += `<div class="filter-field">
+          <label title="${attr(pn)}">${esc(label)} ${badge}</label>
+          <span id="${ffId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+        </div>`;
+
+        /* ── Selected fields summary (green tags — always rendered) ── */
+        html += `<div class="vl-selected-summary" id="${ffId}-summary"
+          data-type="ff" data-ridx="${idx}" data-pn="${attr(pn)}" data-baseid="${ffId}"
+          data-labelmap='${JSON.stringify(ffLabelMapSp).replace(/'/g,"&#39;")}'>`;
+        const showFieldsSp = isAll ? fields : fields.filter(f => selectedIds.includes(f.fieldId || f.label));
+        if (showFieldsSp.length > 0) {
+          const MAX_TAGS = 20;
+          html += `<span class="vl-sel-label">✅ Selected:</span>`;
+          showFieldsSp.slice(0, MAX_TAGS).forEach(f => {
+            const fid = f.fieldId || f.label;
+            html += `<span class="vl-sel-tag">${esc(f.label)}<span class="vl-sel-x" onclick="deselectAndRefresh('${ffId}','${attr(fid)}')">&times;</span></span>`;
+          });
+          if (showFieldsSp.length > MAX_TAGS) {
+            html += `<span class="vl-sel-more">+${showFieldsSp.length - MAX_TAGS} more</span>`;
+          }
+        }
+        html += `</div>`;
+
+        html += `<div class="ff-section" id="${ffId}-section">
+          <div class="ff-toolbar">
+            <input type="text" id="${ffId}-search" placeholder="\uD83D\uDD0D Filter fields..."
+              oninput="filterFfChecklist('${ffId}',this.value)">
+            <button onclick="ffCheckAll(${idx},'${attr(pn)}','${ffId}')">☑ All</button>
+            <button onclick="ffUncheckAll(${idx},'${attr(pn)}','${ffId}')">☐ None</button>
+            <span class="ff-count" id="${ffId}-count">${selCount} / ${fields.length}</span>
+          </div>
+          <div class="ff-checklist" id="${ffId}-list">`;
+
+        fields.forEach(f => {
+          const fid = f.fieldId || f.label;
+          const checked = isAll || selectedIds.includes(fid) ? 'checked' : '';
+          html += `<label data-name="${attr((f.combined || f.label || '').toLowerCase())}" data-label="${attr(f.label)}">
+            <input type="checkbox" value="${attr(fid)}" ${checked}
+              onchange="ffToggleItem(${idx},'${attr(pn)}','${ffId}')">
+            <span>${esc(f.label)}</span>
+            <span class="ff-field-id">${esc(f.fieldId)}</span>
+          </label>`;
+        });
+
+        html += `</div></div>`;
+
       } else if (p.type === 'cuic_valuelist') {
         // Value list with checkbox grid
         const isAll = savedVal === 'all';
@@ -932,8 +1108,24 @@ function renderFilterPanel(report, idx) {
 
         html += `<div class="filter-field">
           <label title="${attr(pn)}">${esc(label)} ${badge}</label>
-          <span style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+          <span id="${vlId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
         </div>`;
+
+        /* ── Selected values summary (green tags — always rendered) ── */
+        html += `<div class="vl-selected-summary" id="${vlId}-summary"
+          data-type="vl" data-ridx="${idx}" data-pn="${attr(pn)}" data-baseid="${vlId}">`;
+        const showNamesSp = isAll ? allNames : selectedNames;
+        if (showNamesSp.length > 0) {
+          const MAX_TAGS = 20;
+          html += `<span class="vl-sel-label">✅ Selected:</span>`;
+          showNamesSp.slice(0, MAX_TAGS).forEach(n => {
+            html += `<span class="vl-sel-tag">${esc(n)}<span class="vl-sel-x" onclick="deselectAndRefresh('${vlId}','${attr(n)}')">&times;</span></span>`;
+          });
+          if (showNamesSp.length > MAX_TAGS) {
+            html += `<span class="vl-sel-more">+${showNamesSp.length - MAX_TAGS} more</span>`;
+          }
+        }
+        html += `</div>`;
 
         // Groups + Toolbar: search + select all / deselect all
         const groups = p.availableGroups || [];
@@ -1108,6 +1300,8 @@ function vlToggleItem(reportIdx, paramName, vlId) {
   if (countEl) countEl.textContent = checked.length + ' / ' + total;
   // Update group button highlights
   vlUpdateGroupButtons(vlId, reportIdx, paramName);
+  // Refresh summary tags in-place
+  _refreshSummaryTags(vlId);
 }
 
 /* ── CUIC valuelist: check all (visible) ── */
@@ -1274,6 +1468,8 @@ function vlMsToggleItem(reportIdx, stepKey, paramName, vlId) {
   const countEl = document.getElementById(vlId + '-count');
   if (countEl) countEl.textContent = checked.length + ' / ' + total;
   vlMsUpdateGroupButtons(vlId, reportIdx, stepKey, paramName);
+  // Refresh summary tags in-place
+  _refreshSummaryTags(vlId);
 }
 
 /* ── Multi-step valuelist: check all visible ── */
@@ -1340,6 +1536,150 @@ function vlMsUpdateGroupButtons(vlId, reportIdx, stepKey, paramName) {
     if (!g || !g.members) return;
     const allIn = g.members.every(m => checkedVals.has(m));
     btn.classList.toggle('active', allIn);
+  });
+}
+
+/* ── Unified deselect: uncheck a value and refresh summary in-place ── */
+function deselectAndRefresh(baseId, value) {
+  const listEl = document.getElementById(baseId + '-list');
+  if (listEl) {
+    const cb = listEl.querySelector(`input[type=checkbox][value="${CSS.escape(value)}"]`);
+    if (cb) {
+      cb.checked = false;
+      // Trigger the onchange to update the data model
+      cb.dispatchEvent(new Event('change', {bubbles: true}));
+    }
+  }
+}
+
+/* ── Rebuild summary tags from checklist state (no full re-render) ── */
+function _refreshSummaryTags(baseId) {
+  const summaryEl = document.getElementById(baseId + '-summary');
+  const selcountEl = document.getElementById(baseId + '-selcount');
+  const listEl = document.getElementById(baseId + '-list');
+  if (!summaryEl || !listEl) return;
+
+  const checkedCbs = Array.from(listEl.querySelectorAll('input[type=checkbox]:checked'));
+  const checkedVals = checkedCbs.map(cb => cb.value);
+  const MAX_TAGS = 20;
+
+  // Determine label for each checked value
+  // For field-filters: use data-labelmap on summary div; for valuelists: value IS the label
+  let labelMap = null;
+  try { labelMap = JSON.parse(summaryEl.getAttribute('data-labelmap') || 'null'); } catch(e) {}
+
+  // Build tags HTML
+  let html = '';
+  if (checkedVals.length > 0) {
+    html += `<span class="vl-sel-label">\u2705 Selected:</span>`;
+    checkedVals.slice(0, MAX_TAGS).forEach(v => {
+      const displayLabel = (labelMap && labelMap[v]) ? labelMap[v] : v;
+      html += `<span class="vl-sel-tag">${esc(displayLabel)}<span class="vl-sel-x" onclick="deselectAndRefresh('${baseId}','${attr(v)}')">&times;</span></span>`;
+    });
+    if (checkedVals.length > MAX_TAGS) {
+      html += `<span class="vl-sel-more">+${checkedVals.length - MAX_TAGS} more</span>`;
+    }
+  }
+  summaryEl.innerHTML = html;
+
+  // Update the "N selected" count span
+  if (selcountEl) {
+    selcountEl.textContent = checkedVals.length + ' selected';
+    selcountEl.style.color = checkedVals.length > 0 ? 'var(--green)' : 'var(--muted)';
+  }
+}
+
+/* ── Multi-step field-filter: toggle single item ── */
+function ffMsToggleItem(reportIdx, stepKey, paramName, ffId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  const checked = Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+  const total = listEl.querySelectorAll('input[type=checkbox]').length;
+  report.filters[stepKey][paramName] = checked.length === total ? 'all' : checked;
+  const countEl = document.getElementById(ffId + '-count');
+  if (countEl) countEl.textContent = checked.length + ' / ' + total;
+  // Refresh summary tags in-place
+  _refreshSummaryTags(ffId);
+}
+
+/* ── Multi-step field-filter: check all visible ── */
+function ffMsCheckAll(reportIdx, stepKey, paramName, ffId) {
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = true;
+    }
+  });
+  ffMsToggleItem(reportIdx, stepKey, paramName, ffId);
+}
+
+/* ── Multi-step field-filter: uncheck all visible ── */
+function ffMsUncheckAll(reportIdx, stepKey, paramName, ffId) {
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = false;
+    }
+  });
+  ffMsToggleItem(reportIdx, stepKey, paramName, ffId);
+}
+
+/* ── SPAB field-filter: toggle single item ── */
+function ffToggleItem(reportIdx, paramName, ffId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  const checked = Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+  const total = listEl.querySelectorAll('input[type=checkbox]').length;
+  report.filters[paramName] = checked.length === total ? 'all' : checked;
+  const countEl = document.getElementById(ffId + '-count');
+  if (countEl) countEl.textContent = checked.length + ' / ' + total;
+  // Refresh summary tags in-place
+  _refreshSummaryTags(ffId);
+}
+
+/* ── SPAB field-filter: check all visible ── */
+function ffCheckAll(reportIdx, paramName, ffId) {
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = true;
+    }
+  });
+  ffToggleItem(reportIdx, paramName, ffId);
+}
+
+/* ── SPAB field-filter: uncheck all visible ── */
+function ffUncheckAll(reportIdx, paramName, ffId) {
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  listEl.querySelectorAll('label').forEach(lbl => {
+    if (lbl.style.display !== 'none') {
+      const cb = lbl.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = false;
+    }
+  });
+  ffToggleItem(reportIdx, paramName, ffId);
+}
+
+/* ── Field-filter: filter checklist by search text ── */
+function filterFfChecklist(ffId, query) {
+  const listEl = document.getElementById(ffId + '-list');
+  if (!listEl) return;
+  const q = query.toLowerCase().trim();
+  listEl.querySelectorAll('label').forEach(lbl => {
+    const name = lbl.getAttribute('data-name') || '';
+    lbl.style.display = (!q || name.includes(q)) ? '' : 'none';
   });
 }
 
@@ -1431,6 +1771,10 @@ async function discoverFilters(reportIdx) {
           // Pre-select values that were already selected in CUIC
           if (p.type === 'cuic_valuelist' && p.selectedValues && p.selectedValues.length > 0) {
             report.filters[stepKey][pn] = p.selectedValues;
+          }
+          // Pre-select field filters that were already selected in CUIC
+          if (p.type === 'cuic_field_filter' && p.selectedFieldIds && p.selectedFieldIds.length > 0) {
+            report.filters[stepKey][pn] = p.selectedFieldIds;
           }
         });
       });
@@ -1769,9 +2113,19 @@ async function discoverSmaxProperties(idx) {
 function syncReportInputs() {
   document.querySelectorAll('#cuic-reports-list .report-card').forEach((card, i) => {
     const inputs = card.querySelectorAll('.inline-row input');
-    if (inputs[0]) cuicReports[i].label  = inputs[0].value;
-    if (inputs[1]) cuicReports[i].folder = inputs[1].value;
-    if (inputs[2]) cuicReports[i].name   = inputs[2].value;
+    // inputs[0] = Report Path (combined folder/name), inputs[1] = Label (full cards only)
+    if (inputs[0]) {
+      const path = inputs[0].value.trim();
+      const lastSlash = path.lastIndexOf('/');
+      if (lastSlash === -1) {
+        cuicReports[i].folder = '';
+        cuicReports[i].name = path;
+      } else {
+        cuicReports[i].folder = path.substring(0, lastSlash);
+        cuicReports[i].name = path.substring(lastSlash + 1);
+      }
+    }
+    if (inputs[1]) cuicReports[i].label = inputs[1].value;
   });
   document.querySelectorAll('#smax-reports-list .report-card').forEach((card, i) => {
     const inputs = card.querySelectorAll('.inline-row input');
@@ -1900,6 +2254,62 @@ async function saveAll() {
     else showToast('Save failed: ' + (await r1.text()) + (await r2.text()), 'error');
   } catch(e) {
     showToast('Server offline — use Export tab to copy JSON manually', 'error');
+  }
+}
+
+// ── Manual scrape trigger ────────────────────────────────────────────────
+async function startManualScrape() {
+  const btn = document.getElementById('manual-scrape-btn');
+  const statusEl = document.getElementById('manual-scrape-status');
+  try {
+    // Save settings first so workers use the latest config
+    await saveAll();
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Starting...';
+    statusEl.textContent = 'Saving settings and starting scrape...';
+    statusEl.style.color = 'var(--accent)';
+
+    const res = await fetch('/api/run-scrape', { method: 'POST' });
+    const data = await res.json();
+
+    if (res.ok) {
+      btn.textContent = '⏳ Scrape Running...';
+      statusEl.textContent = 'Scrape is running in the background. Checking progress...';
+      statusEl.style.color = 'var(--green)';
+      showToast('Scrape started! Running in background...', 'success');
+
+      // Poll for completion
+      const pollInterval = setInterval(async () => {
+        try {
+          const checkRes = await fetch('/api/scrape-running');
+          const checkData = await checkRes.json();
+          if (!checkData.running) {
+            clearInterval(pollInterval);
+            btn.disabled = false;
+            btn.textContent = '▶ Start Scrape Now';
+            statusEl.textContent = 'Scrape completed! Refreshing data...';
+            statusEl.style.color = 'var(--green)';
+            // Reload scrape log and status
+            await loadFromServer();
+            setTimeout(() => { statusEl.textContent = 'Run all enabled workers manually'; statusEl.style.color = 'var(--muted)'; }, 5000);
+          }
+        } catch(e) { /* keep polling */ }
+      }, 3000);
+
+    } else {
+      btn.disabled = false;
+      btn.textContent = '▶ Start Scrape Now';
+      statusEl.textContent = data.error || 'Failed to start scrape';
+      statusEl.style.color = 'var(--red)';
+      showToast(data.error || 'Failed to start scrape', 'error');
+    }
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '▶ Start Scrape Now';
+    statusEl.textContent = 'Server offline';
+    statusEl.style.color = 'var(--red)';
+    showToast('Server offline — cannot start scrape', 'error');
   }
 }
 

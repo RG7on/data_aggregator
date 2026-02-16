@@ -34,13 +34,17 @@ LOG_DIR = get_log_dir()
 os.makedirs(LOG_DIR, exist_ok=True)
 
 log_filename = os.path.join(LOG_DIR, f"driver_{datetime.now().strftime('%Y%m%d')}.log")
+
+# Configure root logger explicitly (force=True ensures it works even if
+# basicConfig was already called by an imported module like base_worker)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         logging.FileHandler(log_filename),
         logging.StreamHandler(sys.stdout)
-    ]
+    ],
+    force=True
 )
 logger = logging.getLogger('driver')
 

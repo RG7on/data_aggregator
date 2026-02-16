@@ -34,6 +34,11 @@ UI_FILE = os.path.join(PROJECT_ROOT, 'ui', 'settings.html')
 _discovery_lock = threading.Lock()
 _discovery_running = False
 
+# Track running scrape tasks
+_scrape_lock = threading.Lock()
+_scrape_running = False
+_scrape_thread = None
+
 
 class SettingsHandler(BaseHTTPRequestHandler):
     """Handle API requests and serve the control panel HTML."""
@@ -51,6 +56,9 @@ class SettingsHandler(BaseHTTPRequestHandler):
             self._serve_scrape_log()
         elif path == '/api/scrape-status':
             self._serve_scrape_status()
+        elif path == '/api/scrape-running':
+            with _scrape_lock:
+                self._send_json({'running': _scrape_running})
         else:
             self.send_error(404)
 
@@ -59,12 +67,25 @@ class SettingsHandler(BaseHTTPRequestHandler):
 
         if path == '/api/settings':
             self._save_json_file(SETTINGS_PATH)
+            # Invalidate cached config so workers pick up the new settings
+            try:
+                from core.config import reload as config_reload
+                config_reload()
+            except Exception:
+                pass
         elif path == '/api/credentials':
             self._save_json_file(CREDENTIALS_PATH)
+            try:
+                from core.config import reload as config_reload
+                config_reload()
+            except Exception:
+                pass
         elif path == '/api/discover-filters':
             self._discover_filters()
         elif path == '/api/discover-smax-properties':
             self._discover_smax_properties()
+        elif path == '/api/run-scrape':
+            self._run_scrape()
         else:
             self.send_error(404)
 
@@ -130,6 +151,36 @@ class SettingsHandler(BaseHTTPRequestHandler):
             with _discovery_lock:
                 _discovery_running = False
             self._send_json({'error': str(e)}, status=500)
+
+    # ── Manual scrape trigger ─────────────────────────────────────────────
+
+    def _run_scrape(self):
+        """Trigger the driver (all workers) in a background thread."""
+        global _scrape_running, _scrape_thread
+        with _scrape_lock:
+            if _scrape_running:
+                self._send_json({'error': 'A scrape is already running. Please wait.'}, status=409)
+                return
+            _scrape_running = True
+
+        def _bg_scrape():
+            global _scrape_running
+            try:
+                # Force-reload config from disk so workers use the latest saved settings
+                from core.config import reload as config_reload
+                config_reload()
+                from core.driver import run_all_workers
+                run_all_workers()
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+            finally:
+                with _scrape_lock:
+                    _scrape_running = False
+
+        _scrape_thread = threading.Thread(target=_bg_scrape, daemon=True)
+        _scrape_thread.start()
+        self._send_json({'status': 'started', 'message': 'Scrape started in background'})
 
     # ── File serving ──────────────────────────────────────────────────────
 

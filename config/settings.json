@@ -2,7 +2,7 @@
   "global": {
     "headless": false,
     "use_system_chrome": true,
-    "screenshot_steps": false,
+    "screenshot_steps": true,
     "screenshot_errors": true,
     "log_level": "INFO",
     "output_dir": "output",
@@ -21,782 +21,652 @@
           "name": "Z Call Type Historical All Fields",
           "enabled": true,
           "data_type": "ongoing",
-          "filters": {}
-        },
-        {
-          "label": "agent_hist",
-          "folder": "Stock/CCE/CCE_AF_Historical",
-          "name": "Agent Historical All Fields",
-          "enabled": true,
-          "data_type": "ongoing",
           "filters": {
             "_meta": {
-              "type": "cuic_spab",
-              "params": [
+              "type": "cuic_multistep",
+              "steps": [
                 {
-                  "dataType": "DATETIME",
-                  "label": "Date and Time",
-                  "paramName": "@start_date",
-                  "paramName2": "@end_date",
-                  "isRequired": true,
-                  "type": "cuic_datetime",
-                  "datePresets": [
+                  "step": 1,
+                  "title": "Date & Time",
+                  "type": "cuic_multistep",
+                  "params": [
                     {
-                      "value": "CUSTOM",
-                      "label": "Custom"
-                    },
-                    {
-                      "value": "THISDAY",
-                      "label": "Today"
-                    },
-                    {
-                      "value": "LASTDAY",
-                      "label": "Yesterday"
-                    },
-                    {
-                      "value": "THISWK",
-                      "label": "This Week"
-                    },
-                    {
-                      "value": "LASTWK",
-                      "label": "Last Week"
-                    },
-                    {
-                      "value": "THISMTH",
-                      "label": "This Month"
-                    },
-                    {
-                      "value": "LASTMTH",
-                      "label": "Last Month"
-                    },
-                    {
-                      "value": "THISYR",
-                      "label": "Year to Date"
-                    },
-                    {
-                      "value": "LASTYR",
-                      "label": "Last Year"
+                      "dataType": "DATETIME",
+                      "type": "cuic_datetime",
+                      "label": "DateTime  (DateTime)",
+                      "paramName": "DateTime  (DateTime)",
+                      "datePresets": [
+                        {
+                          "value": "CUSTOM",
+                          "label": "Custom"
+                        },
+                        {
+                          "value": "THISDAY",
+                          "label": "Today"
+                        },
+                        {
+                          "value": "LASTDAY",
+                          "label": "Yesterday"
+                        },
+                        {
+                          "value": "THISWK",
+                          "label": "This Week"
+                        },
+                        {
+                          "value": "LASTWK",
+                          "label": "Last Week"
+                        },
+                        {
+                          "value": "THISMTH",
+                          "label": "This Month"
+                        },
+                        {
+                          "value": "LASTMTH",
+                          "label": "Last Month"
+                        },
+                        {
+                          "value": "THISYR",
+                          "label": "Year to Date"
+                        },
+                        {
+                          "value": "LASTYR",
+                          "label": "Last Year"
+                        }
+                      ],
+                      "currentPreset": "LASTDAY",
+                      "hasDateRange": true,
+                      "hasTimeRange": true,
+                      "isRequired": true
                     }
-                  ],
-                  "currentPreset": "THISDAY",
-                  "hasDateRange": true,
-                  "allTime": 1,
-                  "hasTimeRange": true
+                  ]
                 },
                 {
-                  "dataType": "VALUELIST",
-                  "label": "Agent Names",
-                  "paramName": "@agent_list",
-                  "paramName2": "",
-                  "isRequired": true,
-                  "type": "cuic_valuelist",
-                  "selectedCount": 0,
-                  "selectedValues": [],
-                  "availableCount": 695,
-                  "availableNames": [
-                    "Aamri_Abdullah",
-                    "Abdusalam_Huria_",
-                    "Al_Abri_Mohammed",
-                    "Al_Adawi_Khalid",
-                    "Al_Amri_Hanin",
-                    "Al_Ghafri_Hajer_",
-                    "Al_Ghassnani__Hasn",
-                    "Al_Handhali_Rawabi",
-                    "Al_Hashmi_Reem_",
-                    "Al_Hudar_Juhaina_",
-                    "Al_Khanbashi_Marwan",
-                    "Al_Maawali_Buthaina",
-                    "Al_Muqrashi_Abeer",
-                    "Al_Rawahi_Jokha_",
-                    "Al_Riyamy_Shahad",
-                    "Al_Saadi_Aisha",
-                    "Al_Sinani_Asia",
-                    "Al_Yahyaee_Shaikah",
-                    "AlAbri_Majda",
-                    "Alawi_Samah",
-                    "Albusaidi_Khalid",
-                    "AlHosni_Maysa",
-                    "Alkindi_Asila",
-                    "Alkindi_Nasser_",
-                    "Alsalmi_Asma",
-                    "Anqudi_Faisal",
-                    "Bakri_Ruwaida",
-                    "Balushi__Qasim",
-                    "Farsi__Manar",
-                    "Habs_Sulaiman",
-                    "Harthy_Sultan",
-                    "Hasani_Nawar",
-                    "Hashami_Khulood",
-                    "Husaini_Almotasem",
-                    "Ismaili_Muna",
-                    "Jabri_Asma",
-                    "Mahfudhi_Suleiman_",
-                    "Mathen_Ashwin",
-                    "Naamani_latifa",
-                    "Nasseri_Hamood",
-                    "Said__Sumri",
-                    "Saqri_Sultan",
-                    "Shaaibi_Mohammed_",
-                    "Shermohammed_Wahee",
-                    "Sinawi_Fahad",
-                    "Sukaiti_Asim",
-                    "Sumry_Abdullah_",
-                    "Suqri__Khalfan",
-                    "Zakwani_Majina",
-                    "2000",
-                    "Aamri_Abdullah",
-                    "Aasmi_Abdullah",
-                    "Abdali_Ibrahim",
-                    "Abdul_Rahman_Rahb",
-                    "Abdullah_Mashrafi",
-                    "abdulrazaq_Hadi",
-                    "Abdusalam_Huria_",
-                    "Abri_Ali",
-                    "Abri_Azhar",
-                    "Abri_Faisal",
-                    "Abri_Faiza_",
-                    "Abri_Khalifa",
-                    "Abri_Khulud",
-                    "Abri_Mohammed_",
-                    "Abri_Said",
-                    "Abri_Yousif",
-                    "Abry_Ahmed",
-                    "Adawi_Ranin",
-                    "Adwani_Haitham",
-                    "Ahlam__Shidhani_",
-                    "Ahmed_Afhaz_",
-                    "Al_Abdusalam_Huria",
-                    "Al_Abrawi__Ruwaida",
-                    "Al_Abri_Faisal",
-                    "AL_Abri_Khalifa",
-                    "Al_Abri_Mohammed",
-                    "Al_Adawi_Khalid",
-                    "Al_Ajmi_Murtadha",
-                    "Al_Amri_Hanin",
-                    "AL_Azki_Khalil",
-                    "Al_Baaz_Adel",
-                    "Al_Badri__Said",
-                    "Al_Bahrani_Hassan",
-                    "Al_Balushi__Abdull",
-                    "Al_Balushi__Ayoob",
-                    "Al_Balushi__Fatma_",
-                    "AL_BALUSHI_FATIMA",
-                    "Al_Balushi_Sara",
-                    "Al_Balushi_Siham",
-                    "Al_Barwani_Adil",
-                    "Al_Basrawi_Abdulba",
-                    "Al_Battashi__Said",
-                    "Al_Battashi_Imad",
-                    "Al_Bimany__Murfida",
-                    "Al_Bulushi_Fatema",
-                    "Al_Bulushi_Zahra_",
-                    "Al_Busaidi_Abdul_R",
-                    "Al_Busaidi_Mohamme",
-                    "Al_Busaidi_Raiya_",
-                    "Al_Busaidi_Yusra",
-                    "Al_busaidy_Salwa",
-                    "Al_Dighaishi_Fatma",
-                    "Al_Farsi__Sultan_",
-                    "Al_Ghafri_Hajer_",
-                    "Al_Ghassnani__Hasn",
-                    "Al_Hady_Aziz",
-                    "Al_Handhali_Rawabi",
-                    "Al_Harthi_Abdullah",
-                    "Al_Harthi_Arwa_",
-                    "Al_Harthy_Aida",
-                    "Al_Harthy_Hilal",
-                    "Al_Harthy_Musab",
-                    "Al_Harthy_Nasser",
-                    "Al_Hasani_Hajer_",
-                    "Al_Hashimi_Aisha",
-                    "Al_Hashmi_Reem_",
-                    "AL_Hasni_Ibrahim",
-                    "Al_Hinaai_Khalid",
-                    "Al_Hudar_Juhaina_",
-                    "Al_Ismaili_AbdulBasit",
-                    "AL_jabri_Ali",
-                    "Al_Jahdhami_Sumaiy",
-                    "Al_Jilani_Shaikha",
-                    "Al_Kalbani_Amani_",
-                    "Al_Khanbashi_Marwan",
-                    "Al_Kharusi_Bader",
-                    "Al_Kyumi_Nasser",
-                    "Al_Lawati__Zainab_",
-                    "Al_Lawati_Jaafar_",
-                    "Al_Lawati_Jaffar",
-                    "Al_Maamari_Al_Khal",
-                    "Al_Maawali__Shari",
-                    "Al_Maawali_Buthaina",
-                    "AL_maawali_Mohamed",
-                    "Al_Maharbi_Safa",
-                    "Al_Maharbi_Safa_",
-                    "Al_Mahrizi__Salim_",
-                    "Al_Mamari_Barah",
-                    "Al_Mandhari_Ahmed",
-                    "Al_Maskari__Alya",
-                    "Al_Masoudi_Anwar_",
-                    "Al_Moqbali_Ahmed",
-                    "Al_Mujaini__Ali_",
-                    "Al_Mukhaini_Fatma_",
-                    "Al_Muqrashi_Abeer",
-                    "Al_Musalhi_Ahmed",
-                    "AL_Musallami_Hussa",
-                    "Al_Naabi_Omar",
-                    "Al_Naamani_Faisal",
-                    "Al_Nabhani_Omar",
-                    "Al_Noamani_AlMunth",
-                    "Al_Nuaimai_Khalifa",
-                    "Al_Rahbi_Mai",
-                    "Al_Ramadhani__Fay_",
-                    "Al_Rasbi_Abdullah",
-                    "Al_Rasbi_Hassan",
-                    "Al_Rawahi_Jokha_",
-                    "Al_Rawahi_Lama.",
-                    "Al_Riyamy_Shahad",
-                    "Al_Rujaibi_Hamed",
-                    "Al_Ruzaiqi_Sara",
-                    "Al_Saadi_Aisha",
-                    "Al_Saaidi_Tahani",
-                    "Al_Salhi__Mustafa",
-                    "Al_Salmani_Said",
-                    "Al_Saqri_Abdulaziz",
-                    "Al_Saqry_Abdulaziz",
-                    "Al_Shaqsi_Hamood_",
-                    "Al_Shibli_Ismail_",
-                    "Al_Shoukri_Khamis",
-                    "Al_Shuhaimi_Umkult",
-                    "Al_Sinani_Asia",
-                    "Al_Suleimani_Mahmo",
-                    "Al_Taii_Wala",
-                    "Al_Tamimi_Alyaqdha",
-                    "Al_Tamimy_Said_",
-                    "Al_Tooqi__Ali",
-                    "Al_Yahmadi_Ahmed_",
-                    "Al_Yahyaee_Ali",
-                    "Al_Yahyaee_Shaikah",
-                    "Al_Yaqoobi_Nasser_",
-                    "Al_Zadjali_Ahmed_",
-                    "Al_Zadjali_Azan",
-                    "Al_Zeidi_Omar",
-                    "Al_Zuwina",
-                    "AlAbdelsalam_Ghani",
-                    "Alabdulsalam_Talal",
-                    "AlAbri_Majda",
-                    "ALAsmi_Salem",
-                    "Alawi_Hamed",
-                    "Alawi_Samah",
-                    "AlBakry_Ruwaida",
-                    "ALBalushi_Ammar",
-                    "Albalushi_Fatma",
-                    "AlBalushi_Haifa",
-                    "AlBalushi_Zamzam_",
-                    "Albusaidi_Khalid",
-                    "ALBusaidi_Lubna",
-                    "ALbusaidi_Mohammed",
-                    "albusaidy_mohammad",
-                    "AlFaraey_Zahir",
-                    "AlHabsi_Sabrin",
-                    "Alhakmani_Fawaz_",
-                    "AlHarrasi_Afnan",
-                    "AlHarrasi_Ahmed",
-                    "AlHarthi_Afrah",
-                    "AlHarthy_Ahmed",
-                    "Alharthy_Asila",
-                    "AlHarthy_Shamsah",
-                    "AlHashami_Khulood",
-                    "Alhashmi_Roqayia",
-                    "Alhathy_Zuwinia",
-                    "Alhinai_Saeed",
-                    "AlHosni_Maysa",
-                    "Aliyar_Asaf",
-                    "Aljabri_Sundus",
-                    "AlJahdhami_Sulaiman",
-                    "AlKaifi_Kauthar",
-                    "Alkharusi_Mohammed",
-                    "Alkindi_Asila",
-                    "Alkindi_mu94996",
-                    "Alkindi_Nasser_",
-                    "ALKindi_Saleh",
-                    "ALKindi_Sami",
-                    "AlKulaiby_Ibtisam",
-                    "AlMaamary_Aisha",
-                    "AlMagheiry_Ibtihal",
-                    "AlMamari_Sultan",
-                    "Almanai_Aisha",
-                    "Almanai_Aisha_",
-                    "ALMandhary_Raitha",
-                    "AlMandri_Waleed",
-                    "Almaqimi_Saoud",
-                    "AlMazrouai_Azzan",
-                    "Almondhari_Mohamme",
-                    "ALMughzwi_Sumaya",
-                    "AlMuntaser_AlSarmi",
-                    "AlMushi_Mohammed",
-                    "AlNaamani_Ahmed",
-                    "Alnasseri_Abdulnas",
-                    "AlQasmi_Majid",
-                    "AlQasmi_Mohammed",
-                    "AlQassabi__Iman",
-                    "Alqutaiti_Sawsan_",
-                    "AlRaisi_Nawaf",
-                    "Alramadhani_Mohamm",
-                    "AlRawahi_Nasra_",
-                    "AlRiyami_Yahya",
-                    "AlSabri_Aiman",
-                    "Alsalmi_Asma",
-                    "AlShahab_Abdullah",
-                    "AlShohumi__Eram",
-                    "Alsukaiti_Omar_",
-                    "AlSulaimani_Nasser",
-                    "AlTamimi_Said",
-                    "alzadjali_mohamed",
-                    "Alzadjali_Rayyan",
-                    "Amri_Majid",
-                    "Amri_Mathla",
-                    "Amri_Montaser",
-                    "Amrut__Ruban",
-                    "Amry_Sarah",
-                    "Anees_Mohammed",
-                    "Anqudi_Faisal",
-                    "Anwar_Al_Jahwari_A",
-                    "Araimi_Rahma",
-                    "Arimi_Sheikha",
-                    "Arimi_Sheikha_",
-                    "Asmaily_Zahor",
-                    "Asmi_Abdulla",
-                    "Awladthani_Amour",
-                    "Awladthani_Intisar",
-                    "Awladthany_Intisar",
-                    "Azri__Nadhira",
-                    "AZRI_MOUSA",
-                    "Azri_Mousa (5352)",
-                    "Azri_Nabil",
-                    "Badai_Nasser",
-                    "Badi_Al_Muatasem",
-                    "Badria_Shuaili",
-                    "Bahry_nada",
-                    "Bahwan__Ahmed_",
-                    "Bait_Ishaq__Zahra",
-                    "Bait_Ishaq_Fatma",
-                    "Bakri_Ruwaida",
-                    "Balasubramanian_Pu",
-                    "BALOUSHI_ISMAI",
-                    "Baluchi_Taha",
-                    "Balushi__Qasim",
-                    "Balushi_Abdullah_",
-                    "Balushi_Ahmed_",
-                    "Balushi_Ammar_",
-                    "Balushi_Kawthar",
-                    "Balushi_Khalid",
-                    "Balushi_Manal",
-                    "Balushi_Nasra",
-                    "Balushi_Said",
-                    "Balushi_saif",
-                    "Balushi_Shamsa",
-                    "Balushi_Zamzam",
-                    "Bani_Oraba_Sami",
-                    "Barwani_Qussay",
-                    "Barwani_Sharifa",
-                    "Barwani_Widad",
-                    "Battashi_Rahma",
-                    "Battashi_Salim",
-                    "Bharat__Vijey",
-                    "Bimal_Manam",
-                    "Bowser_Simon",
-                    "Brumi_Harub",
-                    "Bulushi_Said",
-                    "Busafi_Samya",
-                    "Busafi_Samya_",
-                    "Busaidi__Ghanima",
-                    "Busaidi__Moza_",
-                    "Busaidi_Lubna",
-                    "Busaidi_Nawaf",
-                    "But_Rahma",
-                    "Butcher_Dave",
-                    "Columna_Marlon",
-                    "Cowe_Robert",
-                    "D_Premkumar_",
-                    "Darai_Abdullah",
-                    "Darmaki_Zuwaina (5088)",
-                    "Darmaki_Zuwaina (5317)",
-                    "Das__Mohana_",
-                    "Dhawi_Alsadat",
-                    "Dhoyani__Hamyar",
-                    "Dhughaishi_Humaid",
-                    "Dhuhli_Nahid",
-                    "Dias_Bryan",
-                    "Dohani_Saud",
-                    "dost_mariem",
-                    "Dowling_Jason_",
-                    "Dowling_Jason_Pete",
-                    "Easry_Salma_",
-                    "Eddy_Mohammed_",
-                    "Fadhil_Mansoor",
-                    "Falahi_Marwa",
-                    "Falahi_Nasser",
-                    "Farii_Zahir",
-                    "Farqani_Rashid",
-                    "Farsi__Manar",
-                    "Farsi_Haitham_",
-                    "Farsi_Lina",
-                    "Fasil_Romaila",
-                    "Fazari_Nasser",
-                    "FMDisplay_HD",
-                    "Ghafri_Alla_",
-                    "Ghafri_Hajer",
-                    "Ghafri_Jokha_ (5315)",
-                    "Ghafri_Jokha_ (5724)",
-                    "Ghafri_Qais",
-                    "Ghafri_Said_Ghafry",
-                    "Ghaithi_Zuwaina",
-                    "Ghaithi_zuwaina (5094)",
-                    "Ghannami_Hawra",
-                    "Ghassani_Tasneem",
-                    "Ghethy_Hamad",
-                    "Habs_Sulaiman",
-                    "Habsi_Al_Yaqdhan",
-                    "Habsi_Hajar",
-                    "Habsi_Noora",
-                    "Habsi_Sabrin",
-                    "Habsi_salim",
-                    "Habsi_Wahid",
-                    "Habsy_Hamoud",
-                    "Haddabi_Samir",
-                    "Hadharmi__Salama",
-                    "Hadi_Mousa_",
-                    "Hadidi_Ahmed",
-                    "Hajiri_Salim",
-                    "Hajri_Abdullah",
-                    "Hajri_Huda",
-                    "HAKMANI_Mohammed",
-                    "Hambleton___Daniel",
-                    "Hanai_Abdul_Aziz",
-                    "Hanai_Amal",
-                    "Hanan__Rawahi_",
-                    "Harassi__Juma",
-                    "Harthi_Afrah_",
-                    "Harthi_Haitham",
-                    "Harthi_Musalam",
-                    "Harthi_Samiya_",
-                    "Harthi_Walid",
-                    "Harthy__Aisha",
-                    "Harthy_Ali",
-                    "Harthy_Hilal",
-                    "Harthy_Iman",
-                    "harthy_Khadija",
-                    "Harthy_Mohammed",
-                    "Harthy_Nadya_",
-                    "Harthy_Said",
-                    "Harthy_Saif",
-                    "Harthy_Samiha",
-                    "Harthy_Shamsa_",
-                    "Harthy_Shekha",
-                    "Harthy_Sultan",
-                    "Hasani_Basma",
-                    "Hasani_Hajer",
-                    "Hasani_Nawar",
-                    "Hasani_Nawar_",
-                    "Hashami_Khulood",
-                    "Hashmi__Ruqaiya",
-                    "hashmi_Ruqaiyayy",
-                    "Hashmi_Taimura",
-                    "Hashmi_Zakariya__H",
-                    "Hasni_Mazin",
-                    "Hasni_Mazin_",
-                    "Hassan_Mohamed",
-                    "Hassany_Salim",
-                    "Hattali_Nasser",
-                    "Hiddabi_Ishaq",
-                    "Hilal_Test",
-                    "Hilali_Huda",
-                    "Hinai_Ahmed_",
-                    "Hinai_Hana",
-                    "Hinai_Humaid",
-                    "Hinai_Salama_",
-                    "Housni__Sabah",
-                    "Housni_Aiman_",
-                    "HR_HR_Group",
-                    "Hubaishi_Zomaria",
-                    "Humaidi_Hamood",
-                    "Husaini_Almotasem",
-                    "Husaini_Inas_",
-                    "Husaini_Saif_UIB14",
-                    "IPCCtest_IPCCtest",
-                    "iptest2_iptest2",
-                    "Iskander_Peter",
-                    "Ismaili_Hisham",
-                    "Ismaili_Majid",
-                    "Ismaili_Muna",
-                    "Ismaily_Asila",
-                    "ist_agent",
-                    "J.S_Jayachandran_",
-                    "Jabri_Asma",
-                    "Jabri_Nasaeh",
-                    "Jabry_samra",
-                    "Jadidi_Ali",
-                    "Jahdhami_Firdaus",
-                    "Jahdhami_Naila",
-                    "Jahwari_Fatma_",
-                    "Jahwary_Khulud",
-                    "Jameel__Muhammad",
-                    "Jardani_Badriya",
-                    "Jashmi_Amira",
-                    "Jawad__Mustafa",
-                    "Jokha__AL_Rawahi",
-                    "Junaibi__Fatma_",
-                    "Kadhiya_Mahruqi",
-                    "Kalbani__Abdulla",
-                    "Kalbani__Omar",
-                    "Kalbani_Abdallah_",
-                    "Katti12_Sanjeev1",
-                    "Kevan_John_",
-                    "Khadija__AL_Balush",
-                    "Khadtare_Deepak",
-                    "Khan_Mohammed",
-                    "Kharousi__Ahmed",
-                    "Kharusi__Saud",
-                    "khnbash_hussain",
-                    "khulaifeen_Salim_",
-                    "Kindi_Assad",
-                    "Kindi_Buthaina",
-                    "Kindi_Fuad",
-                    "Kindi_Ibtisam",
-                    "kindi_Mariya",
-                    "Kindi_Rahima",
-                    "Kindi_Sami",
-                    "kiyumi_Almontasar",
-                    "Kiyumi_Haitham",
-                    "Krusic_Ivan",
-                    "Kumar_Shubham_",
-                    "Lakshmanan_Maruthu",
-                    "Lamki_Thabit",
-                    "Lawati_Abbas",
-                    "Lawati_Muhsin",
-                    "Lawti_Zahra",
-                    "Maa_mohammed",
-                    "Maamari_Eqlila",
-                    "Maani_Abdullah",
-                    "Mackay_Angus",
-                    "Maddi_IIham",
-                    "Magrafi_Eman",
-                    "Maharrami_Saleh",
-                    "Mahdi__Abdullah",
-                    "Mahfoodh_Hashim",
-                    "Mahfudhi_Suleiman_",
-                    "Mahrazi__Hashim",
-                    "Mahrazi_Salim",
-                    "Mahrouqi_Fahima",
-                    "Mahrouqi_Hamed",
-                    "Mahrouqi_Saleem",
-                    "Mahrouqi_Warda",
-                    "Mahrouqy__Hamed_",
-                    "Mahrouqy_Fahima",
-                    "Mahruqi_Iman",
-                    "Mahruqy_Moza",
-                    "Maimani__Ahmed",
-                    "Malik_Gaurav",
-                    "Mandhari_Raitha",
-                    "Mandhry_Aisha",
-                    "Marhun_Mohammed",
-                    "Mark_Pimento",
-                    "Mashaikhi__Abdul_R",
-                    "Mashari_Shadiya",
-                    "Mashrafi__Rashid_",
-                    "Maskari_Ali",
-                    "Maskari_Arif",
-                    "Maskari_Khadija",
-                    "Maskari_Nasreen",
-                    "Mathen_Ashwin",
-                    "Mauly_Nasser",
-                    "Mazin_Aasmi_",
-                    "Mazrouai_Azzan",
-                    "Mazroui_Feras",
-                    "Mazroui_Rumaila",
-                    "mezeini_ahmed",
-                    "Minji__Hamed",
-                    "Mitchell_Mark",
-                    "Mohammed__Abri_",
-                    "Mohammed_Sawafi",
-                    "Muhammed_Fazil",
-                    "Muharram_Saleh",
-                    "Muhsain_Khalifa",
-                    "Mujaini_Yousuf",
-                    "Muqaimi__Khalid",
-                    "Murad_Mohameed",
-                    "Murshid_Yaarubi",
-                    "Musalhi_Iman",
-                    "Musalmi_Najat",
-                    "Musheifri_Muna",
-                    "Muthuveeriah_Rajes",
-                    "Naamani_Aflah",
-                    "Naamani_latifa",
-                    "Naamany_Hunaynah",
-                    "Nabhani_Suleiman_",
-                    "nadabi_saif",
-                    "Najiya_Ghaithi",
-                    "Nasseri_Hamood",
-                    "Nasseri_Sultan",
-                    "Naveed_Bhatti",
-                    "Nawal_Handhali",
-                    "Neduvellil_Biju",
-                    "Nelson_Sajin",
-                    "Nirappath_Savad",
-                    "Nisar__Qazi_",
-                    "Obeidani_Abdullah",
-                    "PDO_CUCM_PIM1.Al_Lawati_Anfal",
-                    "PDO_CUCM_PIM1.AlBalushi_Nusiba",
-                    "PDO_CUCM_PIM1.AlHamed_Khadija",
-                    "PDO_CUCM_PIM1.AlRiyami_Sundus_",
-                    "PDO_CUCM_PIM1.AlShukail_Omar_",
-                    "PDO_CUCM_PIM1.Azan_Azan",
-                    "PDO_CUCM_PIM1.Fuad__Kindi_",
-                    "PDO_CUCM_PIM1.ist_ist_joe",
-                    "PDO_CUCM_PIM1.Mohan_chandra",
-                    "PDO_CUCM_PIM1.Sultan_Harthy_",
-                    "PDO_CUCM_PIM1.Sumry_Abdullah",
-                    "PDO_CUCM_PIM1.test_isham",
-                    "PDO_CUCM_PIM1.test_superviisor",
-                    "PDO_CUCM_PIM1.Test_Test",
-                    "PDO_CUCM_PIM1.test_test (5479)",
-                    "Pillai__Bala",
-                    "Prescott_Raymond",
-                    "Pushpan_Sanu",
-                    "Qasmi_Majid",
-                    "Qassabi_Iman_",
-                    "Qassabi_Mahfoodh",
-                    "Qassabi_Sara",
-                    "Qassabi_Sara_",
-                    "Rahbi_Saif",
-                    "Rahbi_Yamen",
-                    "Raid_Ismaili",
-                    "RaithaMandhari",
-                    "Rashdi_Mustafa",
-                    "Rashdi_Sami_",
-                    "Rashid_Abdullah",
-                    "Rasool_Zeeshan",
-                    "Rawahi_Adil_",
-                    "Rawahi_Ahmed",
-                    "Rawahi_Asma",
-                    "Rawahi_Fadiya",
-                    "Rawahi_Omar",
-                    "Rawahi_Salim__",
-                    "Rawahi_Talal_UEOA4",
-                    "Rawahy_Jokha",
-                    "Reisi_Ibrahim",
-                    "Riyami_Samiya",
-                    "Riyami_Sara",
-                    "Robles_Armando",
-                    "Rodrigues__Alan",
-                    "Rujabi_Siham",
-                    "Rujaibi__Siham",
-                    "Rukaya__AL_Darmak",
-                    "Ruzaiki_Majid",
-                    "Saadi_Aisha",
-                    "Saadi_Sana",
-                    "Said__Khanbashi",
-                    "Said__Sumri",
-                    "Said_Ali_Test",
-                    "Saif_Touqi",
-                    "Salim__Habsy_",
-                    "Salim_AlBusaidy",
-                    "Salim_Ibrahim",
-                    "Salima_Minji",
-                    "Salmeen_Ahmed",
-                    "Salmi_Abdullah",
-                    "Salmi_Asmaa",
-                    "Samiya_Harthi_",
-                    "Saqri_Sultan",
-                    "Sarao_Mark",
-                    "Sarihi_Bader",
-                    "Sarmi_Salwa",
-                    "Sathyasheelan_Raje",
-                    "Senapati_Rahul_",
-                    "Shaaibi_Mohammed_",
-                    "shabibi_waleed",
-                    "Shaibani__Dawood",
-                    "Shamsi_Mundhir",
-                    "Shaqsi_Faisal",
-                    "Shaqsi_Faiz",
-                    "Sharji_Salim",
-                    "Sharji_Shani",
-                    "Sharji_Suleiman",
-                    "Sharma__Rajeev",
-                    "Shekaili__Tahani",
-                    "Shekaili_Khadija",
-                    "Shermohammed_Wahee",
-                    "Shezawi__Ali",
-                    "Shidhani_Adnan",
-                    "Shidhani_Hayat",
-                    "Shidhani_Laila",
-                    "Shuaibi_Mohammed",
-                    "Shuaili_Harub",
-                    "Shuhaimy_Umkulthoom",
-                    "Shukaili__Abdullah",
-                    "Shukaili_Ahmed",
-                    "Shuwaina_Maskari",
-                    "Sibani_Yahya_",
-                    "Siddiq_Muhammad_",
-                    "Sinawi_Fahad",
-                    "Siyabi_Huda",
-                    "Skariah__Binu_",
-                    "Skariah_Binu",
-                    "Slemy_Rahma",
-                    "Stalker_Angus",
-                    "Subhi_Hamood",
-                    "Sukaiti_Asim",
-                    "Sulaiman__Samiha",
-                    "Sulaimi_Amal",
-                    "Sumry_Abdullah_",
-                    "sumry_hamoud",
-                    "Suqri__Khalfan",
-                    "Suqri_Issa",
-                    "Taii_Wala_",
-                    "test_agent1",
-                    "Test_Azza",
-                    "Test_For",
-                    "test_ist",
-                    "Thaver_Lukeshan",
-                    "The_Bot_Salamah_",
-                    "Thuhli_Zainab",
-                    "Thuraiya__AlHosni_",
-                    "Toqi_Said",
-                    "Touqi_Sabrina",
-                    "Tuwayyah_Osama",
-                    "Umair_Abdul_Samad_",
-                    "Urbina_Lloyd",
-                    "Usama__Shaidhani_",
-                    "Verghese_Eapen",
-                    "Verma_Rohan",
-                    "Vijayan_KN",
-                    "Wahaibi_Ahlam",
-                    "Wahaibi_Mahmood",
-                    "Wahaibi_Nawal",
-                    "Waili_Ikhlas",
-                    "Waili_ikhlas (5718)",
-                    "Yaarubi_Muhand",
-                    "Yahyaee_Shaikah",
-                    "Yahyi_Aida",
-                    "Yaqdhan__AL_Toubi_",
-                    "Yaqoob__Imran_",
-                    "Yasir_Ismaili",
-                    "Yusra_Al_Busaidi",
-                    "Zaabi_Balqees",
-                    "Zadjali__Mohammed",
-                    "Zadjali_Marwa",
-                    "Zahra_Hajri",
-                    "Zaidjali_yasmeen",
-                    "Zakwani_Faiza_",
-                    "Zakwani_Majina",
-                    "Ziadjali_Faiza",
-                    "Zidjali_Samer"
-                  ],
-                  "availableGroups": [
+                  "step": 2,
+                  "title": "Key Criteria",
+                  "type": "cuic_multistep",
+                  "params": [
                     {
-                      "name": "Helpdesk_Team",
-                      "count": 49
+                      "dataType": "VALUELIST",
+                      "type": "cuic_valuelist",
+                      "label": "Call Types",
+                      "paramName": "CallTypeID",
+                      "isRequired": true,
+                      "totalAvailable": 73,
+                      "availableCount": 73,
+                      "availableNames": [
+                        "AGENT_XFER_CALLTYPE",
+                        "AgentTransfer_CT",
+                        "Anti_Natal_CT",
+                        "ARB_CLINIC_COMMON_CT",
+                        "ARB_GENERAL_CT",
+                        "ARB_LABORATORY_CT",
+                        "ARB_OUTPATIENT_CT",
+                        "ARB_VACCINATION_CT",
+                        "BuiltIn",
+                        "Business_HD_CT",
+                        "CCTV",
+                        "CLINIC_UAT",
+                        "Dialer_Camp",
+                        "EDM_Application_CT",
+                        "EDM_IT_CT",
+                        "EDM_Support_Main_CT",
+                        "EDM_WorkFlow_CT",
+                        "ENG_CLINIC_COMMON_CT",
+                        "ENG_GENERAL_CT",
+                        "ENG_LABORATORY_CT",
+                        "ENG_OUTPATIENT_CT",
+                        "ENG_VACCINATION_CT",
+                        "EOB_CT",
+                        "Flight_Booking_CT",
+                        "General_IT_CT",
+                        "General_OP_CT",
+                        "GenITOB_CT",
+                        "Genral_Apt_CT",
+                        "HelloWorl_CT",
+                        "HR_DEPT_MAIN_CT",
+                        "HR_DEPT_RAMADAN_002",
+                        "HR_Faciility_CT",
+                        "HR_Logistics_App_CT",
+                        "HR_Logistics_CT",
+                        "HR_Logistics_Services_CT",
+                        "HSSE_CT",
+                        "IFMOB_CT",
+                        "IFMS_CT",
+                        "IMMG_CT",
+                        "Interior_Coorprate_CT",
+                        "IT_HelpDesk_CT",
+                        "Laboratory_CT",
+                        "Logistics_CT",
+                        "MAIN_CLINIC_FLOW",
+                        "MED_CT",
+                        "Out_Patient_CT",
+                        "PDO_HR",
+                        "PDO_IFM",
+                        "PDO_TEST",
+                        "PDO_TollFree",
+                        "Pension_Ar_CT",
+                        "Pension_CT",
+                        "Pension_EN_CT",
+                        "Pool_Car_CT",
+                        "RTMOB_CT",
+                        "RTPS_CT",
+                        "SAP_CPL_CT",
+                        "SAP_CT",
+                        "SAP_FIN_CT",
+                        "SAP_SAPHIRE_CT",
+                        "SAP_WM_CT",
+                        "SAPOB_CT",
+                        "Servion_CT",
+                        "SUBOB_CT",
+                        "Subsurface_CT",
+                        "Telcom_CT",
+                        "TelecomOB_CT",
+                        "Test123",
+                        "Test_1145_CT",
+                        "Test_CT",
+                        "Transport_Chauffeur_CT",
+                        "Voice_Mail",
+                        "WIN_CT"
+                      ],
+                      "availableGroups": [],
+                      "selectedCount": 5,
+                      "selectedValues": [
+                        "General_IT_CT",
+                        "RTPS_CT",
+                        "SAP_CT",
+                        "Subsurface_CT",
+                        "Telcom_CT"
+                      ],
+                      "_vlDebug": {
+                        "switcherIsoKeys": [
+                          "leftModel",
+                          "rightModel",
+                          "maxItems",
+                          "leftSearchPlaceholder",
+                          "rightSearchPlaceholder",
+                          "leftCountLabel",
+                          "rightCountLabel",
+                          "maxErrorHandler",
+                          "refreshHandler",
+                          "errorIndicator",
+                          "initialized",
+                          "onChange",
+                          "config",
+                          "i18N",
+                          "rightPaneIDSet",
+                          "showOnlyRightleft",
+                          "callbacks",
+                          "moveRight",
+                          "moveLeft",
+                          "moveAllToRight",
+                          "moveAllToLeft",
+                          "checkInRightIDSet",
+                          "refresh",
+                          "isRightEnabled",
+                          "isLeftEnabled",
+                          "showCardinal",
+                          "styleOnmove",
+                          "removeOnMove"
+                        ],
+                        "source": "switcher.isolateScope.leftModel",
+                        "rawCount": 73,
+                        "selectedSource": "switcher.isolateScope.rightModel"
+                      },
+                      "_needsScroll": false
+                    }
+                  ]
+                },
+                {
+                  "step": 3,
+                  "title": "Field Filters",
+                  "type": "cuic_multistep",
+                  "params": [
+                    {
+                      "dataType": "FIELD_FILTER",
+                      "type": "cuic_field_filter",
+                      "label": "Field Filters",
+                      "paramName": "_field_filters",
+                      "availableFields": [
+                        {
+                          "label": "% Abandon",
+                          "fieldId": "per_aban",
+                          "combined": "% Abandon (per_aban)"
+                        },
+                        {
+                          "label": "% Queued",
+                          "fieldId": "per_queued",
+                          "combined": "% Queued (per_queued)"
+                        },
+                        {
+                          "label": "Abandon Interval 1",
+                          "fieldId": "AbandInterval1",
+                          "combined": "Abandon Interval 1 (AbandInterval1)"
+                        },
+                        {
+                          "label": "Abandon Interval 10",
+                          "fieldId": "AbandInterval10",
+                          "combined": "Abandon Interval 10 (AbandInterval10)"
+                        },
+                        {
+                          "label": "Abandon Interval 2",
+                          "fieldId": "AbandInterval2",
+                          "combined": "Abandon Interval 2 (AbandInterval2)"
+                        },
+                        {
+                          "label": "Abandon Interval 3",
+                          "fieldId": "AbandInterval3",
+                          "combined": "Abandon Interval 3 (AbandInterval3)"
+                        },
+                        {
+                          "label": "Abandon Interval 4",
+                          "fieldId": "AbandInterval4",
+                          "combined": "Abandon Interval 4 (AbandInterval4)"
+                        },
+                        {
+                          "label": "Abandon Interval 5",
+                          "fieldId": "AbandInterval5",
+                          "combined": "Abandon Interval 5 (AbandInterval5)"
+                        },
+                        {
+                          "label": "Abandon Interval 6",
+                          "fieldId": "AbandInterval6",
+                          "combined": "Abandon Interval 6 (AbandInterval6)"
+                        },
+                        {
+                          "label": "Abandon Interval 7",
+                          "fieldId": "AbandInterval7",
+                          "combined": "Abandon Interval 7 (AbandInterval7)"
+                        },
+                        {
+                          "label": "Abandon Interval 8",
+                          "fieldId": "AbandInterval8",
+                          "combined": "Abandon Interval 8 (AbandInterval8)"
+                        },
+                        {
+                          "label": "Abandon Interval 9",
+                          "fieldId": "AbandInterval9",
+                          "combined": "Abandon Interval 9 (AbandInterval9)"
+                        },
+                        {
+                          "label": "Agent Error Count",
+                          "fieldId": "AgentErrorCount",
+                          "combined": "Agent Error Count (AgentErrorCount)"
+                        },
+                        {
+                          "label": "Answer Interval 1",
+                          "fieldId": "AnsInterval1",
+                          "combined": "Answer Interval 1 (AnsInterval1)"
+                        },
+                        {
+                          "label": "Answer Interval 10",
+                          "fieldId": "AnsInterval10",
+                          "combined": "Answer Interval 10 (AnsInterval10)"
+                        },
+                        {
+                          "label": "Answer Interval 2",
+                          "fieldId": "AnsInterval2",
+                          "combined": "Answer Interval 2 (AnsInterval2)"
+                        },
+                        {
+                          "label": "Answer Interval 3",
+                          "fieldId": "AnsInterval3",
+                          "combined": "Answer Interval 3 (AnsInterval3)"
+                        },
+                        {
+                          "label": "Answer Interval 4",
+                          "fieldId": "AnsInterval4",
+                          "combined": "Answer Interval 4 (AnsInterval4)"
+                        },
+                        {
+                          "label": "Answer Interval 5",
+                          "fieldId": "AnsInterval5",
+                          "combined": "Answer Interval 5 (AnsInterval5)"
+                        },
+                        {
+                          "label": "Answer Interval 6",
+                          "fieldId": "AnsInterval6",
+                          "combined": "Answer Interval 6 (AnsInterval6)"
+                        },
+                        {
+                          "label": "Answer Interval 7",
+                          "fieldId": "AnsInterval7",
+                          "combined": "Answer Interval 7 (AnsInterval7)"
+                        },
+                        {
+                          "label": "Answer Interval 8",
+                          "fieldId": "AnsInterval8",
+                          "combined": "Answer Interval 8 (AnsInterval8)"
+                        },
+                        {
+                          "label": "Answer Interval 9",
+                          "fieldId": "AnsInterval9",
+                          "combined": "Answer Interval 9 (AnsInterval9)"
+                        },
+                        {
+                          "label": "Answer Wait Time",
+                          "fieldId": "AnswerWaitTime",
+                          "combined": "Answer Wait Time (AnswerWaitTime)"
+                        },
+                        {
+                          "label": "Avg Abandon Delay",
+                          "fieldId": "avg_aban_delay",
+                          "combined": "Avg Abandon Delay (avg_aban_delay)"
+                        },
+                        {
+                          "label": "Avg Router Delay",
+                          "fieldId": "AvgRouterDelay",
+                          "combined": "Avg Router Delay (AvgRouterDelay)"
+                        },
+                        {
+                          "label": "Avg Speed of Answer",
+                          "fieldId": "asa",
+                          "combined": "Avg Speed of Answer (asa)"
+                        },
+                        {
+                          "label": "Bucket Interval ID",
+                          "fieldId": "BucketIntervalID",
+                          "combined": "Bucket Interval ID (BucketIntervalID)"
+                        },
+                        {
+                          "label": "Call Delay Abandon Time",
+                          "fieldId": "CallDelayAbandTime",
+                          "combined": "Call Delay Abandon Time (CallDelayAbandTime)"
+                        },
+                        {
+                          "label": "Call Type Delay Abandon Time",
+                          "fieldId": "CTDelayAbandTime",
+                          "combined": "Call Type Delay Abandon Time (CTDelayAbandTime)"
+                        },
+                        {
+                          "label": "Call Type VRU Time",
+                          "fieldId": "CTVRUTime",
+                          "combined": "Call Type VRU Time (CTVRUTime)"
+                        },
+                        {
+                          "label": "Calls Answered",
+                          "fieldId": "CallsAnswered",
+                          "combined": "Calls Answered (CallsAnswered)"
+                        },
+                        {
+                          "label": "Calls Handled",
+                          "fieldId": "CallsHandled",
+                          "combined": "Calls Handled (CallsHandled)"
+                        },
+                        {
+                          "label": "Calls Offered",
+                          "fieldId": "CallsOffered",
+                          "combined": "Calls Offered (CallsOffered)"
+                        },
+                        {
+                          "label": "Calls Q Handled",
+                          "fieldId": "CallsQHandled",
+                          "combined": "Calls Q Handled (CallsQHandled)"
+                        },
+                        {
+                          "label": "Calls RONA",
+                          "fieldId": "CallsRONA",
+                          "combined": "Calls RONA (CallsRONA)"
+                        },
+                        {
+                          "label": "Calls Routed",
+                          "fieldId": "CallsRouted",
+                          "combined": "Calls Routed (CallsRouted)"
+                        },
+                        {
+                          "label": "Calls Routed Non Agent",
+                          "fieldId": "CallsRoutedNonAgent",
+                          "combined": "Calls Routed Non Agent (CallsRoutedNonAgent)"
+                        },
+                        {
+                          "label": "Completed Tasks",
+                          "fieldId": "CompletedTasks",
+                          "combined": "Completed Tasks (CompletedTasks)"
+                        },
+                        {
+                          "label": "Database DateTime",
+                          "fieldId": "DbDateTime",
+                          "combined": "Database DateTime (DbDateTime)"
+                        },
+                        {
+                          "label": "Date",
+                          "fieldId": "Date",
+                          "combined": "Date (Date)"
+                        },
+                        {
+                          "label": "Delay Agent Abandon Time",
+                          "fieldId": "DelayAgentAbandTime",
+                          "combined": "Delay Agent Abandon Time (DelayAgentAbandTime)"
+                        },
+                        {
+                          "label": "Delay Q Abandon Time",
+                          "fieldId": "DelayQAbandTime",
+                          "combined": "Delay Q Abandon Time (DelayQAbandTime)"
+                        },
+                        {
+                          "label": "Enterprise Name",
+                          "fieldId": "EnterpriseName",
+                          "combined": "Enterprise Name (EnterpriseName)"
+                        },
+                        {
+                          "label": "Error Count",
+                          "fieldId": "ErrorCount",
+                          "combined": "Error Count (ErrorCount)"
+                        },
+                        {
+                          "label": "Handle Time",
+                          "fieldId": "HandleTime",
+                          "combined": "Handle Time (HandleTime)"
+                        },
+                        {
+                          "label": "Hold Time",
+                          "fieldId": "HoldTime",
+                          "combined": "Hold Time (HoldTime)"
+                        },
+                        {
+                          "label": "ICR Default Routed",
+                          "fieldId": "ICRDefaultRouted",
+                          "combined": "ICR Default Routed (ICRDefaultRouted)"
+                        },
+                        {
+                          "label": "Incomplete Calls",
+                          "fieldId": "IncompleteCalls",
+                          "combined": "Incomplete Calls (IncompleteCalls)"
+                        },
+                        {
+                          "label": "Max Call Wait Time",
+                          "fieldId": "MaxCallWaitTime",
+                          "combined": "Max Call Wait Time (MaxCallWaitTime)"
+                        },
+                        {
+                          "label": "Max Queued",
+                          "fieldId": "MaxCallsQueued",
+                          "combined": "Max Queued (MaxCallsQueued)"
+                        },
+                        {
+                          "label": "Network Announcement",
+                          "fieldId": "NetworkAnnouncement",
+                          "combined": "Network Announcement (NetworkAnnouncement)"
+                        },
+                        {
+                          "label": "Network Default Routed",
+                          "fieldId": "NetworkDefaultRouted",
+                          "combined": "Network Default Routed (NetworkDefaultRouted)"
+                        },
+                        {
+                          "label": "Other",
+                          "fieldId": "Other",
+                          "combined": "Other (Other)"
+                        },
+                        {
+                          "label": "Overflow Out",
+                          "fieldId": "OverflowOut",
+                          "combined": "Overflow Out (OverflowOut)"
+                        },
+                        {
+                          "label": "Reporting Interval",
+                          "fieldId": "ReportingInterval",
+                          "combined": "Reporting Interval (ReportingInterval)"
+                        },
+                        {
+                          "label": "Return Busy",
+                          "fieldId": "ReturnBusy",
+                          "combined": "Return Busy (ReturnBusy)"
+                        },
+                        {
+                          "label": "Return Release",
+                          "fieldId": "ReturnRelease",
+                          "combined": "Return Release (ReturnRelease)"
+                        },
+                        {
+                          "label": "Return Ring",
+                          "fieldId": "ReturnRing",
+                          "combined": "Return Ring (ReturnRing)"
+                        },
+                        {
+                          "label": "ReturnBR",
+                          "fieldId": "ReturnBR",
+                          "combined": "ReturnBR (ReturnBR)"
+                        },
+                        {
+                          "label": "Router Calls Abandon Queue",
+                          "fieldId": "RouterCallsAbandQ",
+                          "combined": "Router Calls Abandon Queue (RouterCallsAbandQ)"
+                        },
+                        {
+                          "label": "Router Calls Abandon To Agent",
+                          "fieldId": "RouterCallsAbandToAgent",
+                          "combined": "Router Calls Abandon To Agent (RouterCallsAbandToAgent)"
+                        },
+                        {
+                          "label": "Router Queue Call Type Limit",
+                          "fieldId": "RouterQueueCallTypeLimit",
+                          "combined": "Router Queue Call Type Limit (RouterQueueCallTypeLimit)"
+                        },
+                        {
+                          "label": "Router Queue Calls",
+                          "fieldId": "RouterQueueCalls",
+                          "combined": "Router Queue Calls (RouterQueueCalls)"
+                        },
+                        {
+                          "label": "Router Queue Global Limit",
+                          "fieldId": "RouterQueueGlobalLimit",
+                          "combined": "Router Queue Global Limit (RouterQueueGlobalLimit)"
+                        },
+                        {
+                          "label": "Router Queue Wait Time",
+                          "fieldId": "RouterQueueWaitTime",
+                          "combined": "Router Queue Wait Time (RouterQueueWaitTime)"
+                        },
+                        {
+                          "label": "Service Level",
+                          "fieldId": "servicelLevel",
+                          "combined": "Service Level (servicelLevel)"
+                        },
+                        {
+                          "label": "Service Level Abandon",
+                          "fieldId": "ServiceLevelAband",
+                          "combined": "Service Level Abandon (ServiceLevelAband)"
+                        },
+                        {
+                          "label": "Service Level Calls",
+                          "fieldId": "ServiceLevelCalls",
+                          "combined": "Service Level Calls (ServiceLevelCalls)"
+                        },
+                        {
+                          "label": "Service Level Calls Offered",
+                          "fieldId": "ServiceLevelCallsOffered",
+                          "combined": "Service Level Calls Offered (ServiceLevelCallsOffered)"
+                        },
+                        {
+                          "label": "Service Level Error",
+                          "fieldId": "ServiceLevelError",
+                          "combined": "Service Level Error (ServiceLevelError)"
+                        },
+                        {
+                          "label": "Service Level RONA",
+                          "fieldId": "ServiceLevelRONA",
+                          "combined": "Service Level RONA (ServiceLevelRONA)"
+                        },
+                        {
+                          "label": "Service Level Type",
+                          "fieldId": "ServiceLevelType",
+                          "combined": "Service Level Type (ServiceLevelType)"
+                        },
+                        {
+                          "label": "Short Calls",
+                          "fieldId": "ShortCalls",
+                          "combined": "Short Calls (ShortCalls)"
+                        },
+                        {
+                          "label": "Talk Time",
+                          "fieldId": "TalkTime",
+                          "combined": "Talk Time (TalkTime)"
+                        },
+                        {
+                          "label": "Time Zone",
+                          "fieldId": "TimeZone",
+                          "combined": "Time Zone (TimeZone)"
+                        },
+                        {
+                          "label": "Total Calls Abandon",
+                          "fieldId": "TotalCallsAband",
+                          "combined": "Total Calls Abandon (TotalCallsAband)"
+                        },
+                        {
+                          "label": "Total Error Count",
+                          "fieldId": "totalerrorcount",
+                          "combined": "Total Error Count (totalerrorcount)"
+                        },
+                        {
+                          "label": "Vru Assisted Calls",
+                          "fieldId": "VruAssistedCalls",
+                          "combined": "Vru Assisted Calls (VruAssistedCalls)"
+                        },
+                        {
+                          "label": "Vru Forced Xferred Calls",
+                          "fieldId": "VruForcedXferredCalls",
+                          "combined": "Vru Forced Xferred Calls (VruForcedXferredCalls)"
+                        },
+                        {
+                          "label": "Vru Handled Calls",
+                          "fieldId": "VruHandledCalls",
+                          "combined": "Vru Handled Calls (VruHandledCalls)"
+                        },
+                        {
+                          "label": "Vru Opt Out Unhandled Calls",
+                          "fieldId": "VruOptOutUnhandledCalls",
+                          "combined": "Vru Opt Out Unhandled Calls (VruOptOutUnhandledCalls)"
+                        },
+                        {
+                          "label": "Vru Other Calls",
+                          "fieldId": "VruOtherCalls",
+                          "combined": "Vru Other Calls (VruOtherCalls)"
+                        },
+                        {
+                          "label": "Vru Scripted Xferred Calls",
+                          "fieldId": "VruScriptedXferredCalls",
+                          "combined": "Vru Scripted Xferred Calls (VruScriptedXferredCalls)"
+                        },
+                        {
+                          "label": "VRU Time",
+                          "fieldId": "VRUTime",
+                          "combined": "VRU Time (VRUTime)"
+                        },
+                        {
+                          "label": "Vru Unhandled Calls",
+                          "fieldId": "VruUnhandledCalls",
+                          "combined": "Vru Unhandled Calls (VruUnhandledCalls)"
+                        }
+                      ],
+                      "selectedFieldIds": []
                     }
                   ]
                 }
+              ],
+              "stepTitles": [
+                "Date & Time",
+                "Key Criteria",
+                "Field Filters"
               ],
               "datePresets": [
                 {
@@ -837,13 +707,28 @@
                 }
               ]
             },
-            "@start_date": "THISDAY",
-            "@agent_list": [
-              "Aamri_Abdullah",
-              "Abdusalam_Huria_",
-              "Al_Abri_Mohammed"
-            ]
+            "step_1": {
+              "DateTime  (DateTime)": "THISMTH"
+            },
+            "step_2": {
+              "CallTypeID": [
+                "ARB_GENERAL_CT"
+              ]
+            },
+            "step_3": {
+              "_field_filters": [
+                "AbandInterval4"
+              ]
+            }
           }
+        },
+        {
+          "label": "agent_hist",
+          "folder": "Stock/CCE/CCE_AF_Historical",
+          "name": "Agent Historical All Fields",
+          "enabled": false,
+          "data_type": "ongoing",
+          "filters": {}
         }
       ],
       "timeout_nav_ms": 30000,
@@ -854,121 +739,7 @@
     "smax": {
       "enabled": false,
       "base_url": "https://smax.corp.pdo.om",
-      "reports": [
-        {
-          "label": "aging_requests",
-          "url": "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640",
-          "enabled": true,
-          "data_type": "ongoing",
-          "properties": {
-            "error": "",
-            "report_name": "Aging Requests",
-            "display_label": "Aging Requests",
-            "record_type": "Request",
-            "filters": [
-              {
-                "field_id": "ServiceDeskGroup",
-                "field_label": "Service desk group",
-                "negated": false,
-                "operator": "Is",
-                "type": "text",
-                "display_value": "SMX-HELPDESK-CALLOFF, SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-HELPDESK, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access"
-              },
-              {
-                "field_id": "PhaseId",
-                "field_label": "Phase Id",
-                "negated": false,
-                "operator": "Is",
-                "type": "dropdown",
-                "display_value": "First line support, Fulfill, Review, Escalate",
-                "selected_values": [
-                  "First line support",
-                  "Fulfill",
-                  "Review",
-                  "Escalate"
-                ],
-                "value_ids": "FirstLineSupport,Fulfill,Review,Escalate"
-              },
-              {
-                "field_id": "CurrentAssignment",
-                "field_label": "Current assignment",
-                "negated": false,
-                "operator": "Is",
-                "type": "enum",
-                "display_value": "Service Desk, Expert Group, Incident",
-                "enum_options": [
-                  {
-                    "id": "Unassigned",
-                    "label": "Unassigned",
-                    "checked": false
-                  },
-                  {
-                    "id": "ServiceDesk",
-                    "label": "Service Desk",
-                    "checked": true
-                  },
-                  {
-                    "id": "ExpertGroup",
-                    "label": "Expert Group",
-                    "checked": true
-                  },
-                  {
-                    "id": "Incident",
-                    "label": "Incident",
-                    "checked": true
-                  },
-                  {
-                    "id": "<No Value>",
-                    "label": "<No Value>",
-                    "checked": false
-                  }
-                ],
-                "selected_values": [
-                  "Service Desk",
-                  "Expert Group",
-                  "Incident"
-                ]
-              },
-              {
-                "field_id": "CreateTime",
-                "field_label": "Created time",
-                "negated": false,
-                "operator": "Is",
-                "type": "date",
-                "display_value": "Past year",
-                "date_presets": []
-              }
-            ],
-            "group_by": [
-              "Created time",
-              "Phase Id"
-            ],
-            "func": {
-              "main": "Count",
-              "secondary": ""
-            },
-            "chart_function": "Count",
-            "chart_legend": [
-              {
-                "label": "First line support",
-                "value": null
-              },
-              {
-                "label": "Escalate",
-                "value": null
-              },
-              {
-                "label": "Fulfill",
-                "value": null
-              },
-              {
-                "label": "Review",
-                "value": null
-              }
-            ]
-          }
-        }
-      ],
+      "reports": [],
       "page_load_timeout_ms": 120000,
       "element_wait_timeout_ms": 30000,
       "tab_stagger_delay_ms": 2000,

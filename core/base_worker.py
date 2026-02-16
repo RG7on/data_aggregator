@@ -19,11 +19,8 @@ except ImportError:
     def get_global_settings(): return {}
     def get_log_dir(): return 'logs'
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Note: logging is configured by driver.py which adds FileHandler.
+# Do NOT call basicConfig here — it would prevent the driver's FileHandler from being added.
 
 
 class BaseWorker(ABC):
