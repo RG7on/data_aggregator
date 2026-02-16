@@ -243,71 +243,50 @@ class Worker(BaseWorker):
             # ── XPath/CSS multi-strategy clicks ──────────────────────────
             try:
                 # IMPORTANT: User menu button is inside remote_iframe_0 iframe!
-                # Get the identity gadget iframe
                 self.logger.info("STEP 1: Locating identity_gadget iframe...")
                 
-                identity_frame = None
-                try:
-                    # Try to get frame by name
-                    identity_frame = main_page.frame(name='remote_iframe_0')
-                    if identity_frame:
-                        self.logger.info("  ✓ Found iframe by name: remote_iframe_0")
-                except Exception:
-                    pass
-                
+                identity_frame = main_page.frame(name='remote_iframe_0')
                 if not identity_frame:
-                    try:
-                        # Try by selector
-                        identity_frame = main_page.frame_locator('#remote_iframe_0').first
-                        self.logger.info("  ✓ Found iframe by selector: #remote_iframe_0")
-                    except Exception:
-                        pass
-                
-                if not identity_frame:
-                    self.logger.error("  ✗ Could not find identity_gadget iframe")
+                    self.logger.error("  ✗ Could not find remote_iframe_0")
                     try:
                         main_page.screenshot(path=f"{self.log_dir}/logout_iframe_not_found.png")
                         self.logger.info("📸 Screenshot: logout_iframe_not_found.png")
                     except Exception:
                         pass
                     return False
+                
+                self.logger.info("  ✓ Found iframe: remote_iframe_0")
 
-                # Try multiple selectors for the user menu button INSIDE the iframe
+                # Try specific selectors for the user menu button INSIDE the iframe
+                # Start with most specific, fall back to generic
                 user_menu_selectors = [
-                    'button',                                  # Try any button
-                    '.user-info-btn',                          # Class-based
-                    '#user-info-btn',                          # ID-based
-                    'button[aria-label="User"]',               # Aria label
-                    'a',                                       # Try any link
-                    'div',                                     # Try any div (clickable)
+                    'div[id*="user"]',                         # Div with 'user' in ID
+                    'button[id*="user"]',                      # Button with 'user' in ID
+                    'a[id*="user"]',                           # Link with 'user' in ID
+                    'div.user-info',                           # Class-based
+                    'button:visible',                          # Any visible button (fallback)
+                    'a:visible',                               # Any visible link (fallback)
+                    'div:visible',                             # Any visible div (last resort)
                 ]
                 
-                self.logger.info("STEP 2: Finding and clicking user menu button (inside iframe)...")
+                self.logger.info("STEP 2: Clicking user menu button (inside iframe)...")
                 menu_clicked = False
                 
                 for selector in user_menu_selectors:
                     try:
-                        self.logger.info(f"  Trying selector in iframe: {selector}")
-                        
-                        # For frame (not frame_locator), use locator() method
-                        if hasattr(identity_frame, 'locator'):
-                            user_menu = identity_frame.locator(selector)
-                        else:
-                            # frame_locator style
-                            user_menu = identity_frame.locator(selector)
-                        
+                        self.logger.info(f"  Trying: {selector}")
+                        user_menu = identity_frame.locator(selector)
                         menu_count = user_menu.count()
-                        self.logger.info(f"    Found {menu_count} element(s)")
                         
                         if menu_count > 0:
-                            # Wait for element to be visible
+                            self.logger.info(f"    Found {menu_count} element(s)")
                             user_menu.first.wait_for(state='visible', timeout=5000)
                             user_menu.first.click(force=True)
-                            self.logger.info(f"  ✓ Clicked user menu with: {selector}")
+                            self.logger.info(f"  ✓ Clicked user menu")
                             menu_clicked = True
                             break
                     except Exception as e:
-                        self.logger.debug(f"    Failed with {selector}: {e}")
+                        self.logger.debug(f"    Failed: {e}")
                         continue
                 
                 if not menu_clicked:
@@ -319,8 +298,14 @@ class Worker(BaseWorker):
                         pass
                     return False
                 
-                # Menu clicked successfully, now wait for dropdown to appear
-                main_page.wait_for_timeout(1500)
+                # Wait for dropdown menu to appear (more reliable than fixed timeout)
+                self.logger.info("STEP 3: Waiting for dropdown menu...")
+                try:
+                    main_page.locator('ul#id-gt-ul').wait_for(state='visible', timeout=3000)
+                    self.logger.info("  ✓ Dropdown menu visible")
+                except Exception:
+                    self.logger.warning("  ⚠ Dropdown didn't appear, trying anyway...")
+                    main_page.wait_for_timeout(1500)
                 
                 # Screenshot after menu click
                 try:
@@ -329,37 +314,42 @@ class Worker(BaseWorker):
                 except Exception:
                     pass
 
-                # STEP 3: Click sign-out link (in MAIN page, not iframe)
+                # STEP 4: Click sign-out link (in MAIN page, not iframe)
                 # The dropdown menu appears in the main page after clicking the iframe button
                 signout_selectors = [
-                    '#signout-btn1',                       # Most reliable - ID of the <li>
-                    '#so_anchor',                          # ID of the <a> tag
+                    '#so_anchor',                          # Most reliable - direct ID of <a>
+                    '#signout-btn1 a',                     # ID of <li> + descendant <a>
                     'a:has-text("Sign Out")',             # Text match
-                    'li#signout-btn1 > a',                # Combined selector
                     'ul#id-gt-ul a:has-text("Sign Out")', # Full path with text
-                    'xpath=//li[@id="signout-btn1"]/a',   # XPath with ID
                     'xpath=//a[@id="so_anchor"]',         # XPath for anchor
+                    'xpath=//li[@id="signout-btn1"]/a',   # XPath with ID
                 ]
                 
-                self.logger.info("STEP 3: Finding and clicking sign-out link (in main page)...")
+                self.logger.info("STEP 4: Clicking sign-out link (in main page)...")
                 
                 for selector in signout_selectors:
                     try:
-                        self.logger.info(f"  Trying selector: {selector}")
+                        self.logger.info(f"  Trying: {selector}")
                         signout_link = main_page.locator(selector)
                         signout_count = signout_link.count()
-                        self.logger.info(f"    Found {signout_count} element(s)")
                         
                         if signout_count > 0:
-                            # Wait for element to be visible
+                            self.logger.info(f"    Found {signout_count} element(s)")
                             signout_link.first.wait_for(state='visible', timeout=5000)
                             signout_link.first.click(force=True)
-                            self.logger.info(f"  ✓ Clicked sign-out with: {selector}")
-                            main_page.wait_for_timeout(3000)
+                            self.logger.info(f"  ✓ Clicked sign-out")
+                            
+                            # Wait for navigation to Logout.jsp
+                            try:
+                                main_page.wait_for_url('**/Logout.jsp**', timeout=5000)
+                                self.logger.info("  ✓ Navigated to Logout.jsp")
+                            except Exception:
+                                main_page.wait_for_timeout(3000)  # Fallback to fixed wait
+                            
                             logged_out = True
                             break
                     except Exception as e:
-                        self.logger.debug(f"    Failed with {selector}: {e}")
+                        self.logger.debug(f"    Failed: {e}")
                         continue
                 
                 if not logged_out:
