@@ -707,12 +707,60 @@ class Worker(BaseWorker):
         }
         if (!wizScope) return {_debug: 'no_scope_on_wizard'};
 
-        /* Walk up to find wizardConfig */
-        let wc = wizScope.wizardConfig || wizScope.$parent?.wizardConfig
-              || wizScope.$parent?.$parent?.wizardConfig;
-        if (!wc) return {_debug: 'no_wizardConfig', 
-            scopeKeys: Object.keys(wizScope).filter(k => !k.startsWith('$')).slice(0,20),
-            parentKeys: wizScope.$parent ? Object.keys(wizScope.$parent).filter(k => !k.startsWith('$')).slice(0,20) : []};
+        /* Enhanced debug info collection */
+        const debugInfo = {
+            scopeKeys: Object.keys(wizScope).filter(k => !k.startsWith('$')).slice(0,30),
+            allScopeKeys: Object.keys(wizScope).slice(0,30),
+            parentKeys: wizScope.$parent ? Object.keys(wizScope.$parent).filter(k => !k.startsWith('$')).slice(0,30) : [],
+            grandparentKeys: wizScope.$parent?.$parent ? Object.keys(wizScope.$parent.$parent).filter(k => !k.startsWith('$')).slice(0,30) : [],
+        };
+        
+        /* Try isolateScope instead of regular scope */
+        let isoScope = null;
+        try {
+            isoScope = angular.element(wizEl).isolateScope();
+            if (isoScope) {
+                debugInfo.hasIsolateScope = true;
+                debugInfo.isoScopeKeys = Object.keys(isoScope).filter(k => !k.startsWith('$')).slice(0,30);
+            }
+        } catch(e) {}
+        
+        /* Walk up to find wizardConfig - check nested objects and parent chain */
+        let wc = wizScope.wizardConfig 
+              || isoScope?.wizardConfig
+              || wizScope.runReportFilterForm?.wizardConfig
+              || wizScope.ctrl?.wizardConfig
+              || wizScope.vm?.wizardConfig
+              || wizScope.$parent?.wizardConfig
+              || wizScope.$parent?.$parent?.wizardConfig
+              || wizScope.$parent?.$parent?.$parent?.wizardConfig;
+        
+        /* If still not found, try the controller directly with various names */
+        if (!wc) {
+            const ctrlNames = ['filterWizard', 'FilterWizardCtrl', 'wizardCtrl', 'runReportFilter'];
+            for (const name of ctrlNames) {
+                try {
+                    const ctrl = angular.element(wizEl).controller(name);
+                    if (ctrl) {
+                        debugInfo.foundController = name;
+                        debugInfo.ctrlKeys = Object.keys(ctrl).slice(0,30);
+                        wc = ctrl.wizardConfig || ctrl.config || ctrl.steps;
+                        if (wc) break;
+                    }
+                } catch(e) {}
+            }
+        }
+        
+        /* Try to find steps directly on various scopes */
+        if (!wc && !wc?.steps) {
+            const stepsCheck = wizScope.steps || isoScope?.steps || wizScope.$parent?.steps;
+            if (stepsCheck && Array.isArray(stepsCheck) && stepsCheck.length >= 2) {
+                wc = {steps: stepsCheck};
+                debugInfo.foundStepsDirectly = true;
+            }
+        }
+        
+        if (!wc) return {_debug: 'no_wizardConfig', ...debugInfo};
         if (!wc.steps || wc.steps.length < 2) return {_debug: 'not_multistep', stepsCount: wc.steps?.length || 0};
 
         /* Read step tabs (titles) */
@@ -805,57 +853,145 @@ class Worker(BaseWorker):
             const label = labelMatch ? labelMatch[1].trim() : rawLabel;
             const paramName = labelMatch ? labelMatch[2].trim() : rawLabel;
 
-            /* Read available values from left pane scope */
             const leftPane = vlFilter.querySelector('[cuic-pane="left"]');
             const rightPane = vlFilter.querySelector('[cuic-pane="right"]');
+            const switcherEl = vlFilter.querySelector('[cuic-switcher]');
             const allNames = [];
             const groups = [];
             const selectedNames = [];
+            let _vlDebug = {};
 
-            if (leftPane) {
-                try {
-                    const lpScope = angular.element(leftPane).scope();
-                    const model = lpScope?.model || lpScope?.$parent?.leftModel || [];
-                    function collectFromModel(list) {
-                        (list || []).forEach(v => {
-                            if (v.children && v.children.length > 0) {
-                                const memberNames = [];
-                                function flatMembers(items) {
-                                    (items || []).forEach(c => {
-                                        if (c.children && c.children.length > 0) flatMembers(c.children);
-                                        else memberNames.push(c.name || '');
-                                    });
-                                }
-                                flatMembers(v.children);
-                                groups.push({name: v.name || '',
+            /* Helper: flatten a model array into allNames / groups */
+            function collectFromModel(list, targetNames, targetGroups) {
+                (list || []).forEach(v => {
+                    if (v.children && v.children.length > 0) {
+                        const memberNames = [];
+                        function flatMembers(items) {
+                            (items || []).forEach(c => {
+                                if (c.children && c.children.length > 0) flatMembers(c.children);
+                                else memberNames.push(c.name || '');
+                            });
+                        }
+                        flatMembers(v.children);
+                        if (targetGroups) {
+                            targetGroups.push({name: v.name || '',
                                              count: v.totalElements || v.children.length,
                                              members: memberNames});
-                                memberNames.forEach(n => allNames.push(n));
-                            } else {
-                                allNames.push(v.name || '');
-                            }
-                        });
+                        }
+                        memberNames.forEach(n => { if (!targetNames.includes(n)) targetNames.push(n); });
+                    } else {
+                        const n = v.name || '';
+                        if (n && !targetNames.includes(n)) targetNames.push(n);
                     }
-                    collectFromModel(model);
-                } catch(e) {}
-                /* Fallback: read from DOM titles */
-                if (allNames.length === 0) {
-                    leftPane.querySelectorAll('.cuic-switcher-name').forEach(el => {
-                        allNames.push((el.title || el.textContent || '').trim());
-                    });
-                }
+                });
             }
-            if (rightPane) {
+
+            /*
+             * PRIMARY: Use isolateScope() on cuic-switcher or cuic-pane.
+             * cuic-switcher directive binds: left-model → leftModel, right-model → rightModel
+             * cuic-pane directive binds: model → model
+             * isolateScope() returns the directive's OWN scope (not the vs-repeat child scope).
+             * This bypasses virtual scrolling entirely.
+             */
+
+            /* Try cuic-switcher isolateScope first (has BOTH left and right models) */
+            if (switcherEl) {
                 try {
-                    const rpScope = angular.element(rightPane).scope();
-                    const model = rpScope?.model || rpScope?.$parent?.rightModel || [];
-                    (model || []).forEach(v => selectedNames.push(v.name || ''));
+                    const swIso = angular.element(switcherEl).isolateScope();
+                    if (swIso) {
+                        _vlDebug.switcherIsoKeys = Object.keys(swIso).filter(k => !k.startsWith('$')).slice(0,30);
+                        /* leftModel = full available list */
+                        if (Array.isArray(swIso.leftModel) && swIso.leftModel.length > 0) {
+                            collectFromModel(swIso.leftModel, allNames, groups);
+                            _vlDebug.source = 'switcher.isolateScope.leftModel';
+                            _vlDebug.rawCount = swIso.leftModel.length;
+                        }
+                        /* rightModel = full selected list */
+                        if (Array.isArray(swIso.rightModel) && swIso.rightModel.length > 0) {
+                            collectFromModel(swIso.rightModel, selectedNames, null);
+                            _vlDebug.selectedSource = 'switcher.isolateScope.rightModel';
+                        }
+                    }
+                } catch(e) { _vlDebug.switcherIsoErr = e.message; }
+            }
+
+            /* Fallback: cuic-pane isolateScope for available values */
+            if (leftPane && allNames.length === 0) {
+                try {
+                    const lpIso = angular.element(leftPane).isolateScope();
+                    if (lpIso) {
+                        _vlDebug.paneIsoKeys = Object.keys(lpIso).filter(k => !k.startsWith('$')).slice(0,30);
+                        if (Array.isArray(lpIso.model) && lpIso.model.length > 0) {
+                            collectFromModel(lpIso.model, allNames, groups);
+                            _vlDebug.source = 'pane.isolateScope.model';
+                            _vlDebug.rawCount = lpIso.model.length;
+                        }
+                    }
+                } catch(e) { _vlDebug.paneIsoErr = e.message; }
+            }
+
+            /* Fallback: walk scope chain to find item.lvaluelist */
+            if (allNames.length === 0 && (switcherEl || leftPane)) {
+                try {
+                    let s = angular.element(switcherEl || leftPane).scope();
+                    for (let depth = 0; s && depth < 10; depth++, s = s.$parent) {
+                        if (s.item && Array.isArray(s.item.lvaluelist) && s.item.lvaluelist.length > 0) {
+                            collectFromModel(s.item.lvaluelist, allNames, groups);
+                            _vlDebug.source = 'scope.item.lvaluelist@depth' + depth;
+                            _vlDebug.rawCount = s.item.lvaluelist.length;
+                            break;
+                        }
+                    }
+                } catch(e) { _vlDebug.scopeWalkErr = e.message; }
+            }
+
+            /* Fallback: cuic-pane isolateScope for selected values */
+            if (rightPane && selectedNames.length === 0) {
+                try {
+                    const rpIso = angular.element(rightPane).isolateScope();
+                    if (rpIso && Array.isArray(rpIso.model) && rpIso.model.length > 0) {
+                        collectFromModel(rpIso.model, selectedNames, null);
+                        _vlDebug.selectedSource = 'pane.right.isolateScope.model';
+                    }
                 } catch(e) {}
-                if (selectedNames.length === 0) {
-                    rightPane.querySelectorAll('.cuic-switcher-name').forEach(el => {
-                        selectedNames.push((el.title || el.textContent || '').trim());
-                    });
-                }
+            }
+
+            /* Fallback: scope chain for item.rvaluelist (selected values) */
+            if (selectedNames.length === 0 && (switcherEl || rightPane)) {
+                try {
+                    let s = angular.element(switcherEl || rightPane).scope();
+                    for (let depth = 0; s && depth < 10; depth++, s = s.$parent) {
+                        if (s.item && Array.isArray(s.item.rvaluelist) && s.item.rvaluelist.length > 0) {
+                            collectFromModel(s.item.rvaluelist, selectedNames, null);
+                            _vlDebug.selectedSource = 'scope.item.rvaluelist@depth' + depth;
+                            break;
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            /* Last resort: read what's visible in DOM (partial, only rendered items) */
+            if (leftPane && allNames.length === 0) {
+                leftPane.querySelectorAll('.cuic-switcher-name').forEach(el => {
+                    const name = (el.title || el.textContent || '').trim();
+                    if (name && !allNames.includes(name)) allNames.push(name);
+                });
+                _vlDebug.source = 'dom_fallback';
+                _vlDebug.partial = true;
+            }
+            if (rightPane && selectedNames.length === 0) {
+                rightPane.querySelectorAll('.cuic-switcher-name').forEach(el => {
+                    const name = (el.title || el.textContent || '').trim();
+                    if (name && !selectedNames.includes(name)) selectedNames.push(name);
+                });
+            }
+
+            /* Read the "Available: N Values" text to get total expected count */
+            let totalAvailable = allNames.length;
+            const totalLabel = (leftPane || vlFilter).querySelector('.cuic-switcher-total-label .ng-binding');
+            if (totalLabel) {
+                const m = totalLabel.textContent.match(/(\d+)\s*Values?/i);
+                if (m) totalAvailable = parseInt(m[1], 10);
             }
 
             result.params.push({
@@ -864,11 +1000,14 @@ class Worker(BaseWorker):
                 label: label,
                 paramName: paramName,
                 isRequired: true,
+                totalAvailable: totalAvailable,
                 availableCount: allNames.length,
                 availableNames: allNames,
                 availableGroups: groups,
                 selectedCount: selectedNames.length,
-                selectedValues: selectedNames
+                selectedValues: selectedNames,
+                _vlDebug: _vlDebug,
+                _needsScroll: allNames.length < totalAvailable
             });
         }
 
@@ -1237,6 +1376,17 @@ class Worker(BaseWorker):
                 if result and result.get('type') == 'cuic_multistep':
                     self.logger.info(f"  ✓ CUIC multi-step wizard step {result.get('stepIndex',0)+1}: "
                                      f"{len(result.get('params',[]))} param(s)")
+
+                    # ── Async scroll fallback for valuelist ──
+                    # If isolateScope didn't return full data, scroll the
+                    # virtual list in the browser to collect all items.
+                    for p in result.get('params', []):
+                        if p.get('type') == 'cuic_valuelist' and p.get('_needsScroll'):
+                            self.logger.info(
+                                f"  Valuelist '{p['label']}' needs scroll: "
+                                f"{p['availableCount']}/{p['totalAvailable']}")
+                            self._scroll_collect_valuelist(f, p)
+
                     return result
             except Exception as e:
                 self.logger.warning(f"  Multi-step reader exception ({f.url[:60]}): {e}")
@@ -1262,6 +1412,78 @@ class Worker(BaseWorker):
             except Exception:
                 pass
         return {'type': 'generic', 'fields': all_fields} if all_fields else None
+
+    # ── Async scroll-based valuelist collection ──────────────────────────
+    def _scroll_collect_valuelist(self, frame, param: dict):
+        """Scroll the virtual-scrolled valuelist in the browser to collect
+        all items when isolateScope() didn't return the full dataset.
+
+        Mutates *param* in-place: updates availableNames, availableCount,
+        and clears _needsScroll.
+        """
+        total_expected = param.get('totalAvailable', 0)
+        collected = set(param.get('availableNames', []))
+
+        # JS to read currently visible items + scroll info
+        SCROLL_READ_JS = r'''(pane) => {
+            const container = document.querySelector(
+                '[ng-switch-when="VALUELIST"] [cuic-pane="' + pane + '"] .cuic-switcher-list'
+            );
+            if (!container) return null;
+            const names = [];
+            container.querySelectorAll('.cuic-switcher-name').forEach(el => {
+                const n = (el.title || el.textContent || '').trim();
+                if (n) names.push(n);
+            });
+            return {
+                names: names,
+                scrollTop: container.scrollTop,
+                scrollHeight: container.scrollHeight,
+                clientHeight: container.clientHeight
+            };
+        }'''
+
+        SCROLL_SET_JS = r'''(pos) => {
+            const container = document.querySelector(
+                '[ng-switch-when="VALUELIST"] [cuic-pane="left"] .cuic-switcher-list'
+            );
+            if (container) container.scrollTop = pos;
+        }'''
+
+        try:
+            max_iterations = 50
+            for i in range(max_iterations):
+                info = frame.evaluate(SCROLL_READ_JS, 'left')
+                if not info:
+                    break
+
+                for n in info.get('names', []):
+                    collected.add(n)
+
+                self.logger.debug(
+                    f"    Scroll iter {i}: collected={len(collected)}/{total_expected} "
+                    f"scrollTop={info['scrollTop']}/{info['scrollHeight']}")
+
+                if len(collected) >= total_expected:
+                    break
+
+                # Scroll down by one viewport
+                new_pos = info['scrollTop'] + info['clientHeight']
+                if new_pos >= info['scrollHeight']:
+                    break
+
+                frame.evaluate(SCROLL_SET_JS, new_pos)
+                self.page.wait_for_timeout(150)  # let Angular digest
+
+            # Update param in-place
+            param['availableNames'] = sorted(collected)
+            param['availableCount'] = len(collected)
+            param['_needsScroll'] = False
+            self.logger.info(
+                f"  After scrolling: {len(collected)}/{total_expected} valuelist items collected")
+
+        except Exception as e:
+            self.logger.warning(f"  Scroll collection failed: {e}")
 
     def _find_wizard_frame(self):
         """Find the frame containing the wizard Next/Run buttons."""

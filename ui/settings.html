@@ -773,7 +773,9 @@ function renderFilterPanel(report, idx) {
         } else if (p.type === 'cuic_valuelist') {
           const isAll = savedVal === 'all';
           const isSpecific = Array.isArray(savedVal);
-          const selectedNames = isSpecific ? savedVal : [];
+          // Fall back to pre-selected values from CUIC when no saved config
+          const selectedNames = isSpecific ? savedVal
+            : (savedVal === undefined && p.selectedValues && p.selectedValues.length > 0 ? p.selectedValues : []);
           const allNames = p.availableNames || [];
           const badge = `<span class="vl-badge">${allNames.length} available</span>`;
           const vlId = 'vl-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
@@ -920,7 +922,9 @@ function renderFilterPanel(report, idx) {
         // Value list with checkbox grid
         const isAll = savedVal === 'all';
         const isSpecific = Array.isArray(savedVal);
-        const selectedNames = isSpecific ? savedVal : [];
+        // Fall back to pre-selected values from CUIC when no saved config
+        const selectedNames = isSpecific ? savedVal
+          : (savedVal === undefined && p.selectedValues && p.selectedValues.length > 0 ? p.selectedValues : []);
         const allNames = p.availableNames || [];
         const badge = `<span class="vl-badge">${allNames.length} available</span>`;
         const vlId = 'vl-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
@@ -1424,6 +1428,10 @@ async function discoverFilters(reportIdx) {
           if (p.type === 'cuic_datetime' && p.currentPreset) {
             report.filters[stepKey][pn] = p.currentPreset;
           }
+          // Pre-select values that were already selected in CUIC
+          if (p.type === 'cuic_valuelist' && p.selectedValues && p.selectedValues.length > 0) {
+            report.filters[stepKey][pn] = p.selectedValues;
+          }
         });
       });
       showToast(`Discovered ${steps.length} wizard step(s) with ${totalParams} parameter(s)!`, 'success');
@@ -1448,7 +1456,10 @@ async function discoverFilters(reportIdx) {
         if (p.type === 'cuic_datetime' && p.currentPreset) {
           report.filters[pn] = p.currentPreset;
         }
-        // Leave valuelist empty — user must choose
+        // Pre-select values that were already selected in CUIC
+        if (p.type === 'cuic_valuelist' && p.selectedValues && p.selectedValues.length > 0) {
+          report.filters[pn] = p.selectedValues;
+        }
       });
       showToast(`Discovered ${params.length} CUIC parameter(s)!`, 'success');
 
