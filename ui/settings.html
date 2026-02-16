@@ -184,6 +184,26 @@
   .vl-selected-summary .vl-sel-tag .vl-sel-x:hover { color: var(--red); }
   .vl-selected-summary .vl-sel-more { font-size: 10px; color: var(--muted); align-self: center; }
 
+  /* Field-filter selected list (with criteria) */
+  .ff-selected-list { margin-top: 8px; margin-bottom: 8px; max-height: 400px; overflow-y: auto; }
+  .ff-empty-msg { font-size: 12px; color: var(--muted); font-style: italic; margin: 8px 0; }
+  .ff-selected-item { border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin-bottom: 8px;
+    background: var(--surface); }
+  .ff-si-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .ff-si-label { font-weight: 600; font-size: 13px; color: var(--text); }
+  .ff-si-fid { font-size: 10px; color: var(--muted); }
+  .ff-si-remove { margin-left: auto; background: none; border: none; color: var(--danger); font-size: 18px;
+    cursor: pointer; padding: 0 4px; line-height: 1; }
+  .ff-si-remove:hover { color: var(--red); }
+  .ff-si-criteria { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; }
+  .ff-si-criteria > div { display: flex; flex-direction: column; gap: 2px; }
+  .ff-si-criteria label { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .ff-si-criteria select, .ff-si-criteria input[type="text"] {
+    padding: 5px 8px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px;
+    background: var(--bg); color: var(--text); }
+  .ff-si-criteria select:focus, .ff-si-criteria input[type="text"]:focus {
+    outline: none; border-color: var(--accent); }
+
   /* Field-filter checklist (reuses vl-section styles) */
   .ff-section { margin-top: 6px; }
   .ff-section .ff-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
@@ -810,65 +830,105 @@ function renderFilterPanel(report, idx) {
           }
 
         } else if (p.type === 'cuic_field_filter') {
-          // Field Filters — searchable multi-select checklist
+          // Field Filters — multi-select with operator & value per field
           const fields = p.availableFields || [];
           const isAll = savedVal === 'all';
-          const isSpecific = Array.isArray(savedVal);
-          // Fall back to pre-selected fields from CUIC when no saved config
-          const selectedIds = isSpecific ? savedVal
-            : (savedVal === undefined && p.selectedFieldIds && p.selectedFieldIds.length > 0 ? p.selectedFieldIds : []);
+          // savedVal can be: 'all', ['field1','field2'], or [{id:'field1',operator:'EQ',value1:'10'}]
+          let selectedConfigs = [];
+          if (isAll) {
+            selectedConfigs = fields.map(f => ({id: f.fieldId || f.label}));
+          } else if (Array.isArray(savedVal)) {
+            selectedConfigs = savedVal.map(v => {
+              if (typeof v === 'string') return {id: v};
+              if (typeof v === 'object' && v.id) return v;
+              return null;
+            }).filter(Boolean);
+          } else if (savedVal === undefined && p.selectedFieldIds && p.selectedFieldIds.length > 0) {
+            // Fall back to pre-selected fields from CUIC
+            selectedConfigs = p.selectedFieldIds.map(id => ({id}));
+          }
+
           const ffId = 'ff-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
-          const selCount = isAll ? fields.length : selectedIds.length;
           const badge = `<span class="vl-badge">${fields.length} fields</span>`;
-          // Build label map: fieldId → label for summary tag display
-          const ffLabelMap = {};
-          fields.forEach(f => { ffLabelMap[f.fieldId || f.label] = f.label; });
 
           html += `<div class="filter-field">
             <label title="${attr(pn)}">${esc(label)} ${badge}</label>
-            <span id="${ffId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span>
+            <span id="${ffId}-selcount" style="font-size:12px;color:${selectedConfigs.length>0?'var(--green)':'var(--muted)'}">${selectedConfigs.length} selected</span>
           </div>`;
 
-          /* ── Selected fields summary (green tags — always rendered, updated in-place) ── */
-          html += `<div class="vl-selected-summary" id="${ffId}-summary"
-            data-type="ff-ms" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(pn)}" data-baseid="${ffId}"
-            data-labelmap='${JSON.stringify(ffLabelMap).replace(/'/g,"&#39;")}'>`;
-          const showFields = isAll ? fields : fields.filter(f => selectedIds.includes(f.fieldId || f.label));
-          if (showFields.length > 0) {
-            const MAX_TAGS = 20;
-            html += `<span class="vl-sel-label">✅ Selected:</span>`;
-            showFields.slice(0, MAX_TAGS).forEach(f => {
-              const fid = f.fieldId || f.label;
-              html += `<span class="vl-sel-tag">${esc(f.label)}<span class="vl-sel-x" onclick="deselectAndRefresh('${ffId}','${attr(fid)}')">&times;</span></span>`;
+          /* ── Selected fields with criteria (always rendered, updated in-place) ── */
+          html += `<div class="ff-selected-list" id="${ffId}-selected" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(pn)}">`;
+          if (selectedConfigs.length > 0) {
+            selectedConfigs.forEach((cfg, cfgIdx) => {
+              const field = fields.find(f => (f.fieldId || f.label) === cfg.id);
+              if (!field) return;
+              const fLabel = field.label || cfg.id;
+              const op = cfg.operator || '';
+              const v1 = cfg.value1 || '';
+              const v2 = cfg.value2 || '';
+              
+              html += `<div class="ff-selected-item" data-fid="${attr(cfg.id)}">
+                <div class="ff-si-header">
+                  <span class="ff-si-label">${esc(fLabel)}</span>
+                  <span class="ff-si-fid">(${esc(cfg.id)})</span>
+                  <button class="ff-si-remove" onclick="ffRemoveField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}')">×</button>
+                </div>
+                <div class="ff-si-criteria">
+                  <div>
+                    <label>Operator:</label>
+                    <select onchange="ffUpdateField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}','operator',this.value)">
+                      <option value="">— select —</option>
+                      <option value="EQ"${op==='EQ'?' selected':''}>Equal to</option>
+                      <option value="NE"${op==='NE'?' selected':''}>Not equal to</option>
+                      <option value="GT"${op==='GT'?' selected':''}>Greater than</option>
+                      <option value="GE"${op==='GE'?' selected':''}>Greater or equal</option>
+                      <option value="LT"${op==='LT'?' selected':''}>Less than</option>
+                      <option value="LE"${op==='LE'?' selected':''}>Less or equal</option>
+                      <option value="BW"${op==='BW'?' selected':''}>Between</option>
+                      <option value="CT"${op==='CT'?' selected':''}>Contains</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label>Value:</label>
+                    <input type="text" value="${attr(v1)}" placeholder="Value"
+                      onchange="ffUpdateField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}','value1',this.value)">
+                  </div>
+                  ${op==='BW'?`<div>
+                    <label>To:</label>
+                    <input type="text" value="${attr(v2)}" placeholder="Upper bound"
+                      onchange="ffUpdateField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}','value2',this.value)">
+                  </div>`:''}
+                </div>
+              </div>`;
             });
-            if (showFields.length > MAX_TAGS) {
-              html += `<span class="vl-sel-more">+${showFields.length - MAX_TAGS} more</span>`;
-            }
+          } else {
+            html += `<p class="ff-empty-msg">No fields selected. Choose fields below to add criteria.</p>`;
           }
           html += `</div>`;
 
+          /* ── Available fields checklist ── */
           html += `<div class="ff-section" id="${ffId}-section">
             <div class="ff-toolbar">
-              <input type="text" id="${ffId}-search" placeholder="\uD83D\uDD0D Filter fields..."
+              <input type="text" id="${ffId}-search" placeholder="🔍 Filter fields..."
                 oninput="filterFfChecklist('${ffId}',this.value)">
               <button onclick="ffMsCheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">☑ All</button>
               <button onclick="ffMsUncheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">☐ None</button>
-              <span class="ff-count" id="${ffId}-count">${selCount} / ${fields.length}</span>
             </div>
-            <div class="ff-checklist" id="${ffId}-list">`;
+            <div class="ff-checklist" id="${ffId}-list"
+              onchange="ffToggleItem(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}',event)">`;
 
           fields.forEach(f => {
             const fid = f.fieldId || f.label;
-            const checked = isAll || selectedIds.includes(fid) ? 'checked' : '';
+            const checked = selectedConfigs.some(c => c.id === fid) ? 'checked' : '';
             html += `<label data-name="${attr((f.combined || f.label || '').toLowerCase())}" data-label="${attr(f.label)}">
-              <input type="checkbox" value="${attr(fid)}" ${checked}
-                onchange="ffMsToggleItem(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">
+              <input type="checkbox" value="${attr(fid)}" ${checked}>
               <span>${esc(f.label)}</span>
               <span class="ff-field-id">${esc(f.fieldId)}</span>
             </label>`;
           });
 
           html += `</div></div>`;
+
 
         } else if (p.type === 'cuic_valuelist') {
           const isAll = savedVal === 'all';
@@ -1589,49 +1649,288 @@ function _refreshSummaryTags(baseId) {
   }
 }
 
-/* ── Multi-step field-filter: toggle single item ── */
-function ffMsToggleItem(reportIdx, stepKey, paramName, ffId) {
+/* ── Field-filter: toggle checkbox (multi-step) ── */
+function ffToggleItem(reportIdx, stepKey, paramName, ffId, event) {
+  if (!event || !event.target) return;
+  const cb = event.target;
+  if (cb.tagName !== 'INPUT' || cb.type !== 'checkbox') return;
+  
   const report = cuicReports[reportIdx];
   if (!report.filters) report.filters = {};
   if (!report.filters[stepKey]) report.filters[stepKey] = {};
-  const listEl = document.getElementById(ffId + '-list');
-  if (!listEl) return;
-  const checked = Array.from(listEl.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
-  const total = listEl.querySelectorAll('input[type=checkbox]').length;
-  report.filters[stepKey][paramName] = checked.length === total ? 'all' : checked;
-  const countEl = document.getElementById(ffId + '-count');
-  if (countEl) countEl.textContent = checked.length + ' / ' + total;
-  // Refresh summary tags in-place
-  _refreshSummaryTags(ffId);
+  
+  const fid = cb.value;
+  let configs = report.filters[stepKey][paramName] || [];
+  // Normalize to array of objects
+  if (!Array.isArray(configs)) configs = [];
+  configs = configs.map(c => typeof c === 'string' ? {id: c} : c);
+  
+  if (cb.checked) {
+    // Add field if not already present
+    if (!configs.find(c => c.id === fid)) {
+      configs.push({id: fid, operator: '', value1: ''});
+    }
+  } else {
+    // Remove field
+    configs = configs.filter(c => c.id !== fid);
+  }
+  
+  report.filters[stepKey][paramName] = configs;
+  _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
 }
 
-/* ── Multi-step field-filter: check all visible ── */
+/* ── Field-filter: check all visible ── */
 function ffMsCheckAll(reportIdx, stepKey, paramName, ffId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+  
   const listEl = document.getElementById(ffId + '-list');
   if (!listEl) return;
+  
+  let configs = report.filters[stepKey][paramName] || [];
+  if (!Array.isArray(configs)) configs = [];
+  configs = configs.map(c => typeof c === 'string' ? {id: c} : c);
+  
   listEl.querySelectorAll('label').forEach(lbl => {
     if (lbl.style.display !== 'none') {
       const cb = lbl.querySelector('input[type=checkbox]');
-      if (cb) cb.checked = true;
+      if (cb && !cb.checked) {
+        cb.checked = true;
+        const fid = cb.value;
+        if (!configs.find(c => c.id === fid)) {
+          configs.push({id: fid, operator: '', value1: ''});
+        }
+      }
     }
   });
-  ffMsToggleItem(reportIdx, stepKey, paramName, ffId);
+  
+  report.filters[stepKey][paramName] = configs;
+  _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
 }
 
-/* ── Multi-step field-filter: uncheck all visible ── */
+/* ── Field-filter: uncheck all visible ── */
 function ffMsUncheckAll(reportIdx, stepKey, paramName, ffId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+  
   const listEl = document.getElementById(ffId + '-list');
   if (!listEl) return;
+  
+  let configs = report.filters[stepKey][paramName] || [];
+  if (!Array.isArray(configs)) configs = [];
+  configs = configs.map(c => typeof c === 'string' ? {id: c} : c);
+  
+  const visibleIds = [];
   listEl.querySelectorAll('label').forEach(lbl => {
     if (lbl.style.display !== 'none') {
       const cb = lbl.querySelector('input[type=checkbox]');
-      if (cb) cb.checked = false;
+      if (cb) {
+        cb.checked = false;
+        visibleIds.push(cb.value);
+      }
     }
   });
-  ffMsToggleItem(reportIdx, stepKey, paramName, ffId);
+  
+  configs = configs.filter(c => !visibleIds.includes(c.id));
+  report.filters[stepKey][paramName] = configs;
+  _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
 }
 
-/* ── SPAB field-filter: toggle single item ── */
+/* ── Field-filter: remove a field from selected list ── */
+function ffRemoveField(reportIdx, stepKey, paramName, fieldId) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters || !report.filters[stepKey]) return;
+  
+  let configs = report.filters[stepKey][paramName] || [];
+  if (!Array.isArray(configs)) return;
+  configs = configs.map(c => typeof c === 'string' ? {id: c} : c);
+  configs = configs.filter(c => c.id !== fieldId);
+  
+  report.filters[stepKey][paramName] = configs;
+  
+  // Also uncheck the checkbox
+  const ffId = `ff-${reportIdx}-s${stepKey.replace('step_','')}-${paramName.replace(/[^a-zA-Z0-9]/g,'_')}`;
+  const listEl = document.getElementById(ffId + '-list');
+  if (listEl) {
+    const cb = listEl.querySelector(`input[value="${fieldId}"]`);
+    if (cb) cb.checked = false;
+  }
+  
+  _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
+}
+
+/* ── Field-filter: update operator or value for a field ── */
+function ffUpdateField(reportIdx, stepKey, paramName, fieldId, prop, val) {
+  const report = cuicReports[reportIdx];
+  if (!report.filters || !report.filters[stepKey]) return;
+  
+  let configs = report.filters[stepKey][paramName] || [];
+  if (!Array.isArray(configs)) return;
+  configs = configs.map(c => typeof c === 'string' ? {id: c} : c);
+  
+  const cfg = configs.find(c => c.id === fieldId);
+  if (cfg) {
+    cfg[prop] = val;
+    report.filters[stepKey][paramName] = configs;
+    
+    // Refresh UI when operator changes (to show/hide second value field for "Between")
+    if (prop === 'operator') {
+      const ffId = `ff-${reportIdx}-s${stepKey.replace('step_','')}-${paramName.replace(/[^a-zA-Z0-9]/g,'_')}`;
+      _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
+    }
+  }
+}
+
+/* ── Refresh field filter selected list (summary) ── */
+function _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId) {
+  const report = cuicReports[reportIdx];
+  const configs = report.filters[stepKey]?.[paramName] || [];
+  const normalConfigs = Array.isArray(configs) 
+    ? configs.map(c => typeof c === 'string' ? {id: c} : c)
+    : [];
+  
+  const countEl = document.getElementById(ffId + '-selcount');
+  if (countEl) {
+    countEl.textContent = `${normalConfigs.length} selected`;
+    countEl.style.color = normalConfigs.length > 0 ? 'var(--green)' : 'var(--muted)';
+  }
+  
+  // Re-render the selected list
+  const selectedDiv = document.getElementById(ffId + '-selected');
+  if (!selectedDiv) {
+    console.warn('[FF] Selected div not found:', ffId + '-selected');
+    return;
+  }
+  
+  const ridx = selectedDiv.dataset.ridx;
+  const skey = selectedDiv.dataset.stepkey;
+  const pn = selectedDiv.dataset.pn;
+  
+  // Get field metadata from wizard meta
+  const meta = report._wizard_meta || {};
+  const steps = meta.steps || [];
+  const stepNum = parseInt(skey.replace('step_', ''));
+  const step = steps.find(s => s.step === stepNum);
+  if (!step) {
+    console.warn('[FF] Step not found in metadata. reportIdx:', reportIdx, 'stepNum:', stepNum, 'meta.steps:', steps);
+    // Fallback: render with field IDs only
+    _renderFieldFilterCardsSimple(normalConfigs, selectedDiv, ridx, skey, pn);
+    return;
+  }
+  
+  const param = step.params.find(p => p.paramName === pn);
+  if (!param) {
+    console.warn('[FF] Param not found in step. paramName:', pn, 'step.params:', step.params?.map(p => p.paramName));
+    // Fallback: render with field IDs only
+    _renderFieldFilterCardsSimple(normalConfigs, selectedDiv, ridx, skey, pn);
+    return;
+  }
+  const fields = param.availableFields || [];
+  
+  let html = '';
+  if (normalConfigs.length > 0) {
+    normalConfigs.forEach(cfg => {
+      const field = fields.find(f => (f.fieldId || f.label) === cfg.id);
+      if (!field) return;
+      const fLabel = field.label || cfg.id;
+      const op = cfg.operator || '';
+      const v1 = cfg.value1 || '';
+      const v2 = cfg.value2 || '';
+      
+      html += `<div class="ff-selected-item" data-fid="${cfg.id.replace(/"/g,'&quot;')}">
+        <div class="ff-si-header">
+          <span class="ff-si-label">${fLabel.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+          <span class="ff-si-fid">(${cfg.id.replace(/</g,'&lt;').replace(/>/g,'&gt;')})</span>
+          <button class="ff-si-remove" onclick="ffRemoveField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">×</button>
+        </div>
+        <div class="ff-si-criteria">
+          <div>
+            <label>Operator:</label>
+            <select onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','operator',this.value)">
+              <option value="">— select —</option>
+              <option value="EQ"${op==='EQ'?' selected':''}>Equal to</option>
+              <option value="NE"${op==='NE'?' selected':''}>Not equal to</option>
+              <option value="GT"${op==='GT'?' selected':''}>Greater than</option>
+              <option value="GE"${op==='GE'?' selected':''}>Greater or equal</option>
+              <option value="LT"${op==='LT'?' selected':''}>Less than</option>
+              <option value="LE"${op==='LE'?' selected':''}>Less or equal</option>
+              <option value="BW"${op==='BW'?' selected':''}>Between</option>
+              <option value="CT"${op==='CT'?' selected':''}>Contains</option>
+            </select>
+          </div>
+          <div>
+            <label>Value:</label>
+            <input type="text" value="${String(v1).replace(/"/g,'&quot;')}" placeholder="Value"
+              onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value1',this.value)">
+          </div>
+          ${op==='BW'?`<div>
+            <label>To:</label>
+            <input type="text" value="${String(v2).replace(/"/g,'&quot;')}" placeholder="Upper bound"
+              onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value2',this.value)">
+          </div>`:''}
+        </div>
+      </div>`;
+    });
+  } else {
+    html = '<p class="ff-empty-msg">No fields selected. Choose fields below to add criteria.</p>';
+  }
+  
+  selectedDiv.innerHTML = html;
+}
+
+/* ── Fallback renderer when metadata is not available ── */
+function _renderFieldFilterCardsSimple(normalConfigs, selectedDiv, ridx, skey, pn) {
+  let html = '';
+  if (normalConfigs.length > 0) {
+    normalConfigs.forEach(cfg => {
+      const fLabel = cfg.id; // Use ID as label when metadata unavailable
+      const op = cfg.operator || '';
+      const v1 = cfg.value1 || '';
+      const v2 = cfg.value2 || '';
+      
+      html += `<div class="ff-selected-item" data-fid="${cfg.id.replace(/"/g,'&quot;')}">
+        <div class="ff-si-header">
+          <span class="ff-si-label">${fLabel.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>
+          <span class="ff-si-fid" style="color: orange;">(metadata unavailable - run discovery)</span>
+          <button class="ff-si-remove" onclick="ffRemoveField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">×</button>
+        </div>
+        <div class="ff-si-criteria">
+          <div>
+            <label>Operator:</label>
+            <select onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','operator',this.value)">
+              <option value="">— select —</option>
+              <option value="EQ"${op==='EQ'?' selected':''}>Equal to</option>
+              <option value="NE"${op==='NE'?' selected':''}>Not equal to</option>
+              <option value="GT"${op==='GT'?' selected':''}>Greater than</option>
+              <option value="GE"${op==='GE'?' selected':''}>Greater or equal</option>
+              <option value="LT"${op==='LT'?' selected':''}>Less than</option>
+              <option value="LE"${op==='LE'?' selected':''}>Less or equal</option>
+              <option value="BW"${op==='BW'?' selected':''}>Between</option>
+              <option value="CT"${op==='CT'?' selected':''}>Contains</option>
+            </select>
+          </div>
+          <div>
+            <label>Value:</label>
+            <input type="text" value="${String(v1).replace(/"/g,'&quot;')}" placeholder="Value"
+              onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value1',this.value)">
+          </div>
+          ${op==='BW'?`<div>
+            <label>To:</label>
+            <input type="text" value="${String(v2).replace(/"/g,'&quot;')}" placeholder="Upper bound"
+              onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value2',this.value)">
+          </div>`:''}
+        </div>
+      </div>`;
+    });
+  } else {
+    html = '<p class="ff-empty-msg">No fields selected. Choose fields below to add criteria.</p>';
+  }
+  selectedDiv.innerHTML = html;
+}
+
+/* ── SPAB field-filter (old flat format): toggle single item ── */
 function ffToggleItem(reportIdx, paramName, ffId) {
   const report = cuicReports[reportIdx];
   if (!report.filters) report.filters = {};

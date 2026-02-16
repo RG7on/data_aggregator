@@ -1722,17 +1722,26 @@ class Worker(BaseWorker):
                         self.logger.warning(f"    {pn}: valuelist could NOT be applied (val={val})")
 
                 elif p.get('type') == 'cuic_field_filter':
-                    # Apply field filters — select fields from the csSelect dropdown
-                    # Field filters are optional; val is a list of fieldId strings or 'all'
+                    # Apply field filters — select fields from dropdown and configure criteria
+                    # val is a list of: ["field_id"] OR [{"id": "field_id", "operator": "EQ", "value1": "10"}]
                     if val == 'all' or not val:
                         self.logger.info(f"    {pn}: field_filter = {'all (no filtering)' if val == 'all' else 'none'}")
                         continue
                     if not isinstance(val, list):
                         continue
+                    
+                    # Normalize to object format
+                    normalized = []
+                    for item in val:
+                        if isinstance(item, str):
+                            normalized.append({"id": item})
+                        elif isinstance(item, dict):
+                            normalized.append(item)
+                    
                     try:
                         for f in self.page.frames:
                             try:
-                                result = f.evaluate(r'''(fieldIds) => {
+                                result = f.evaluate(r'''(fieldConfigs) => {
                                     if (typeof angular === 'undefined') return null;
                                     const section = document.querySelector(
                                         'filter-wizard .steps > section[style*="display: flex"]'
@@ -1743,35 +1752,65 @@ class Worker(BaseWorker):
                                     const selEl = iffDiv.querySelector('.iff-available-fields, .csSelect-container');
                                     if (!selEl) return null;
                                     const scope = angular.element(selEl).scope();
-                                    if (!scope || !scope.csSelect) return null;
+                                    if (!scope || !scope.csSelect || !scope.vm) return null;
 
                                     const added = [];
-                                    const nameSet = new Set(fieldIds);
-
-                                    // The csSelect options have combinedName like "Label (fieldId)"
-                                    // and an id property matching the field
                                     const opts = scope.csSelect.options || [];
-                                    for (const fid of fieldIds) {
+                                    
+                                    for (const config of fieldConfigs) {
+                                        const fid = config.id;
+                                        // Find field in dropdown options
                                         const opt = opts.find(o =>
                                             o.id === fid || o.name === fid || o.fieldName === fid ||
                                             (o.combinedName && o.combinedName.includes('(' + fid + ')'))
                                         );
-                                        if (opt) {
-                                            // Select and add the field
-                                            scope.csSelect.selected = opt;
-                                            if (scope.vm && scope.vm.addField) {
-                                                scope.vm.addField();
-                                            } else if (scope.csSelect.selectOption) {
-                                                scope.csSelect.selectOption(opt);
-                                            }
-                                            try { scope.$apply(); } catch(e) {}
-                                            added.push(fid);
+                                        if (!opt) continue;
+
+                                        // Add field to selected list
+                                        scope.csSelect.selected = opt;
+                                        if (scope.vm.addField) {
+                                            scope.vm.addField();
                                         }
+                                        try { scope.$apply(); } catch(e) {}
+                                        
+                                        // Configure operator and values if provided
+                                        if (config.operator || config.value1) {
+                                            setTimeout(() => {
+                                                const accordions = iffDiv.querySelectorAll('cs-accordion .accordion--navigation');
+                                                for (const acc of accordions) {
+                                                    const filterDiv = acc.querySelector('cuic-filter');
+                                                    if (!filterDiv) continue;
+                                                    const filterScope = angular.element(filterDiv).scope();
+                                                    if (!filterScope || !filterScope.filterCtrl) continue;
+                                                    const field = filterScope.filterCtrl.filterField;
+                                                    if (!field || field.id !== opt.id) continue;
+                                                    
+                                                    // Set operator
+                                                    if (config.operator) {
+                                                        const opOpts = filterScope.filterCtrl.options[field.filterType] || [];
+                                                        const opMatch = opOpts.find(o => o.operator === config.operator);
+                                                        if (opMatch) {
+                                                            field.selected = opMatch;
+                                                        }
+                                                    }
+                                                    
+                                                    // Set values
+                                                    if (config.value1 !== undefined) field.value1 = config.value1;
+                                                    if (config.value2 !== undefined) field.value2 = config.value2;
+                                                    
+                                                    try { filterScope.$apply(); } catch(e) {}
+                                                    break;
+                                                }
+                                            }, 200);
+                                        }
+                                        
+                                        added.push(fid);
                                     }
-                                    return {ok: added.length > 0, added: added, total: fieldIds.length};
-                                }''', val)
+                                    return {ok: added.length > 0, added: added, total: fieldConfigs.length};
+                                }''', normalized)
                                 if result and result.get('ok'):
-                                    self.logger.info(f"    {pn}: OK → {result.get('added',[])} field filter(s)")
+                                    self.logger.info(f"    {pn}: OK → {result.get('added',[])} field filter(s) with criteria")
+                                    self.page.wait_for_timeout(300)  # Wait for operator/value application
                                     break
                             except Exception:
                                 pass
