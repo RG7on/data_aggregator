@@ -92,10 +92,25 @@ class Worker(BaseWorker):
             self.screenshot("error", is_step=False)
             return []
         finally:
-            self._logout()
-            # Small delay so logout screen is visible when headless=false
-            if self.page and not self.page.is_closed():
-                self.page.wait_for_timeout(1500)
+            logout_ok = self._logout()
+            
+            if logout_ok:
+                # Small delay so logout screen is visible when headless=false
+                if self.page and not self.page.is_closed():
+                    self.page.wait_for_timeout(1500)
+            else:
+                # Logout failed — keep browser open for manual intervention
+                self.logger.error("")
+                self.logger.error("="*60)
+                self.logger.error("⚠⚠⚠ KEEPING BROWSER OPEN FOR 60 SECONDS ⚠⚠⚠")
+                self.logger.error("Please manually logout:")
+                self.logger.error("1. Click the user menu (top right)")
+                self.logger.error("2. Click 'Sign Out'")
+                self.logger.error("Or visit: https://148.151.32.77:8444/cuicui/Logout.jsp")
+                self.logger.error("="*60)
+                if self.page and not self.page.is_closed():
+                    self.page.wait_for_timeout(60000)  # 60 seconds
+            
             self.teardown_browser()
 
     def scrape(self) -> List[Dict[str, Any]]:
@@ -165,141 +180,246 @@ class Worker(BaseWorker):
     # ──────────────────────────────────────────────────────────────────────
     #  Logout – always called before closing the browser
     # ──────────────────────────────────────────────────────────────────────
-    def _logout(self):
+    def _logout(self) -> bool:
         """Sign out of CUIC so the session is released.
-        This must run even after scraping errors to prevent
-        'Session Limit Reached' on subsequent runs.
+        Logout UI lives in the MAIN page (outside any iframe).
 
-        Strategies (in order of reliability):
-          1. Logout URL – navigate to Logout.jsp (proven to work)
-          2. JavaScript – call Angular signout() directly
-          3. Force-click – click through overlays with force=True
+        Strategy: Multiple selectors (ID, class, XPath)
+          1. Click user menu button (tries multiple selectors)
+          2. Click sign-out link (tries multiple selectors)
+          → Navigates to Logout.jsp
+        
+        Returns: True if logout succeeded, False if manual logout required
         """
         try:
             if not self.context:
-                self.logger.warning("No browser context – skipping logout")
-                return
+                self.logger.warning("⚠ No browser context – skipping logout")
+                return False
 
             # Always use the FIRST page (main CUIC tab) for logout
             pages = self.context.pages
             if not pages:
-                self.logger.warning("No pages open – skipping logout")
-                return
+                self.logger.warning("⚠ No pages open – skipping logout")
+                return False
 
             # Close all extra tabs/popups first
+            self.logger.info("Closing extra browser tabs...")
             while len(pages) > 1:
                 try:
                     pages[-1].close()
+                    self.logger.info(f"  Closed tab — {len(pages)-1} remaining")
                 except Exception:
                     pass
                 pages = self.context.pages
 
             main_page = pages[0]
             if main_page.is_closed():
-                self.logger.warning("Main page already closed – skipping logout")
-                return
+                self.logger.warning("⚠ Main page already closed – skipping logout")
+                return False
 
-            self.logger.info("Starting logout sequence...")
+            self.logger.info("="*60)
+            self.logger.info("LOGOUT SEQUENCE STARTING")
+            self.logger.info("="*60)
 
             # Dismiss any open dialogs/modals by pressing Escape
+            self.logger.info("Pressing Escape to dismiss any modals...")
             try:
                 main_page.keyboard.press('Escape')
                 main_page.wait_for_timeout(500)
                 main_page.keyboard.press('Escape')
                 main_page.wait_for_timeout(500)
+            except Exception:
+                pass
+
+            # Screenshot before logout
+            try:
+                main_page.screenshot(path=f"{self.log_dir}/logout_01_before.png")
+                self.logger.info("📸 Screenshot: logout_01_before.png")
             except Exception:
                 pass
 
             logged_out = False
 
-            # ── Strategy 1: navigate to Logout.jsp (most reliable) ───────
-            base = self.url.rstrip('/').rsplit('/cuicui', 1)[0]
-            logout_urls = [
-                f"{base}/cuicui/Logout.jsp",
-                f"{base}/cuicui/j_spring_security_logout",
-                f"{base}/cuicui/logout",
-            ]
-            for url in logout_urls:
+            # ── XPath/CSS multi-strategy clicks ──────────────────────────
+            try:
+                # IMPORTANT: User menu button is inside remote_iframe_0 iframe!
+                # Get the identity gadget iframe
+                self.logger.info("STEP 1: Locating identity_gadget iframe...")
+                
+                identity_frame = None
                 try:
-                    resp = main_page.goto(url, wait_until='domcontentloaded',
-                                          timeout=15000)
-                    if resp and resp.status < 400:
-                        self.logger.info(f"Logged out via URL: {url} (status {resp.status})")
-                        logged_out = True
-                        break
-                except Exception as e:
-                    self.logger.debug(f"Logout URL {url} failed: {e}")
-                    continue
+                    # Try to get frame by name
+                    identity_frame = main_page.frame(name='remote_iframe_0')
+                    if identity_frame:
+                        self.logger.info("  ✓ Found iframe by name: remote_iframe_0")
+                except Exception:
+                    pass
+                
+                if not identity_frame:
+                    try:
+                        # Try by selector
+                        identity_frame = main_page.frame_locator('#remote_iframe_0').first
+                        self.logger.info("  ✓ Found iframe by selector: #remote_iframe_0")
+                    except Exception:
+                        pass
+                
+                if not identity_frame:
+                    self.logger.error("  ✗ Could not find identity_gadget iframe")
+                    try:
+                        main_page.screenshot(path=f"{self.log_dir}/logout_iframe_not_found.png")
+                        self.logger.info("📸 Screenshot: logout_iframe_not_found.png")
+                    except Exception:
+                        pass
+                    return False
 
-            # ── Strategy 2: JavaScript – call Angular's signout() ────────
-            if not logged_out:
+                # Try multiple selectors for the user menu button INSIDE the iframe
+                user_menu_selectors = [
+                    'button',                                  # Try any button
+                    '.user-info-btn',                          # Class-based
+                    '#user-info-btn',                          # ID-based
+                    'button[aria-label="User"]',               # Aria label
+                    'a',                                       # Try any link
+                    'div',                                     # Try any div (clickable)
+                ]
+                
+                self.logger.info("STEP 2: Finding and clicking user menu button (inside iframe)...")
+                menu_clicked = False
+                
+                for selector in user_menu_selectors:
+                    try:
+                        self.logger.info(f"  Trying selector in iframe: {selector}")
+                        
+                        # For frame (not frame_locator), use locator() method
+                        if hasattr(identity_frame, 'locator'):
+                            user_menu = identity_frame.locator(selector)
+                        else:
+                            # frame_locator style
+                            user_menu = identity_frame.locator(selector)
+                        
+                        menu_count = user_menu.count()
+                        self.logger.info(f"    Found {menu_count} element(s)")
+                        
+                        if menu_count > 0:
+                            # Wait for element to be visible
+                            user_menu.first.wait_for(state='visible', timeout=5000)
+                            user_menu.first.click(force=True)
+                            self.logger.info(f"  ✓ Clicked user menu with: {selector}")
+                            menu_clicked = True
+                            break
+                    except Exception as e:
+                        self.logger.debug(f"    Failed with {selector}: {e}")
+                        continue
+                
+                if not menu_clicked:
+                    self.logger.error("  ✗ All user menu selectors failed (tried inside iframe)")
+                    try:
+                        main_page.screenshot(path=f"{self.log_dir}/logout_menu_not_found.png")
+                        self.logger.info("📸 Screenshot: logout_menu_not_found.png")
+                    except Exception:
+                        pass
+                    return False
+                
+                # Menu clicked successfully, now wait for dropdown to appear
+                main_page.wait_for_timeout(1500)
+                
+                # Screenshot after menu click
                 try:
-                    result = main_page.evaluate('''() => {
-                        const btn = document.querySelector('#signout-btn1')
-                                  || document.querySelector('#so_anchor')
-                                  || document.querySelector('[ng-click*="signout"]');
-                        if (btn) {
-                            const scope = (typeof angular !== 'undefined')
-                                ? angular.element(btn).scope() : null;
-                            if (scope && typeof scope.signout === 'function') {
-                                scope.signout();
-                                return 'angular_signout';
-                            }
-                            if (scope && scope.$parent && typeof scope.$parent.signout === 'function') {
-                                scope.$parent.signout();
-                                return 'angular_parent_signout';
-                            }
-                        }
-                        if (typeof angular !== 'undefined') {
-                            const body = document.querySelector('[ng-app]') || document.body;
-                            const s = angular.element(body).scope();
-                            if (s && typeof s.signout === 'function') {
-                                s.signout();
-                                return 'angular_root_signout';
-                            }
-                        }
-                        return null;
-                    }''')
-                    if result:
-                        self.logger.info(f"Logged out via JS: {result}")
-                        logged_out = True
-                except Exception as js_err:
-                    self.logger.debug(f"JS signout not available: {js_err}")
+                    main_page.screenshot(path=f"{self.log_dir}/logout_02_menu_opened.png")
+                    self.logger.info("📸 Screenshot: logout_02_menu_opened.png")
+                except Exception:
+                    pass
 
-            # ── Strategy 3: force-click through any overlay ──────────────
-            if not logged_out:
-                try:
-                    user_btn = main_page.locator('#user-info-btn')
-                    if user_btn.count() > 0:
-                        user_btn.first.click(force=True)
-                        main_page.wait_for_timeout(1500)
-                        for sel in ['#signout-btn1', '#so_anchor']:
-                            signout = main_page.locator(sel)
-                            if signout.count() > 0:
-                                signout.first.click(force=True)
-                                self.logger.info(f"Logged out via force-click ({sel})")
-                                logged_out = True
-                                break
-                except Exception as fc_err:
-                    self.logger.debug(f"Force-click approach failed: {fc_err}")
+                # STEP 3: Click sign-out link (in MAIN page, not iframe)
+                # The dropdown menu appears in the main page after clicking the iframe button
+                signout_selectors = [
+                    '#signout-btn1',                       # Most reliable - ID of the <li>
+                    '#so_anchor',                          # ID of the <a> tag
+                    'a:has-text("Sign Out")',             # Text match
+                    'li#signout-btn1 > a',                # Combined selector
+                    'ul#id-gt-ul a:has-text("Sign Out")', # Full path with text
+                    'xpath=//li[@id="signout-btn1"]/a',   # XPath with ID
+                    'xpath=//a[@id="so_anchor"]',         # XPath for anchor
+                ]
+                
+                self.logger.info("STEP 3: Finding and clicking sign-out link (in main page)...")
+                
+                for selector in signout_selectors:
+                    try:
+                        self.logger.info(f"  Trying selector: {selector}")
+                        signout_link = main_page.locator(selector)
+                        signout_count = signout_link.count()
+                        self.logger.info(f"    Found {signout_count} element(s)")
+                        
+                        if signout_count > 0:
+                            # Wait for element to be visible
+                            signout_link.first.wait_for(state='visible', timeout=5000)
+                            signout_link.first.click(force=True)
+                            self.logger.info(f"  ✓ Clicked sign-out with: {selector}")
+                            main_page.wait_for_timeout(3000)
+                            logged_out = True
+                            break
+                    except Exception as e:
+                        self.logger.debug(f"    Failed with {selector}: {e}")
+                        continue
+                
+                if not logged_out:
+                    self.logger.error("  ✗ All sign-out selectors failed")
+                    # Try to take a screenshot to see what's on screen
+                    try:
+                        main_page.screenshot(path=f"{self.log_dir}/logout_signout_not_found.png")
+                        self.logger.info("📸 Screenshot: logout_signout_not_found.png")
+                    except Exception:
+                        pass
+                    
+            except Exception as e:
+                self.logger.error(f"✗ Logout click sequence failed: {e}")
+
+            # Screenshot final state
+            try:
+                main_page.screenshot(path=f"{self.log_dir}/logout_03_complete.png")
+                self.logger.info("📸 Screenshot: logout_03_complete.png")
+            except Exception:
+                pass
 
             # ── Verification ─────────────────────────────────────────────
             main_page.wait_for_timeout(2000)
             try:
                 final_url = main_page.url
-                if logged_out:
-                    self.logger.info(f"✓ Logout confirmed — landed on: {final_url}")
+                is_logout_page = 'logout' in final_url.lower()
+                
+                if logged_out and is_logout_page:
+                    self.logger.info("="*60)
+                    self.logger.info(f"✓✓✓ LOGOUT SUCCESSFUL ✓✓✓")
+                    self.logger.info(f"Final URL: {final_url}")
+                    self.logger.info("="*60)
+                elif logged_out:
+                    self.logger.warning("="*60)
+                    self.logger.warning(f"⚠ Logout clicks completed but NOT on logout page")
+                    self.logger.warning(f"Final URL: {final_url}")
+                    self.logger.warning("="*60)
                 else:
-                    self.logger.warning(f"All logout strategies exhausted — final URL: {final_url}")
+                    self.logger.error("="*60)
+                    self.logger.error("✗✗✗ LOGOUT FAILED — MANUAL LOGOUT REQUIRED ✗✗✗")
+                    self.logger.error(f"Final URL: {final_url}")
+                    self.logger.error("To prevent session limit, manually visit:")
+                    self.logger.error("https://148.151.32.77:8444/cuicui/Logout.jsp")
+                    self.logger.error("="*60)
             except Exception:
                 pass
+            
+            return logged_out
 
         except Exception as e:
-            self.logger.error(f"Logout failed (session may persist): {e}")
+            self.logger.error("="*60)
+            self.logger.error(f"✗✗✗ LOGOUT EXCEPTION: {e}")
+            self.logger.error("MANUAL LOGOUT REQUIRED to prevent session limit!")
+            self.logger.error("="*60)
             try:
-                self.screenshot("logout_error", is_step=False)
+                if self.context and self.context.pages:
+                    self.context.pages[0].screenshot(path=f"{self.log_dir}/logout_error.png")
             except Exception:
                 pass
+            return False
 
     # ──────────────────────────────────────────────────────────────────────
     #  Navigation helpers for multi-report
@@ -1601,10 +1721,25 @@ class Worker(BaseWorker):
             result['error'] = str(e)
             return result
         finally:
-            worker._logout()
-            # Small delay so logout screen is visible when headless=false
-            if worker.page and not worker.page.is_closed():
-                worker.page.wait_for_timeout(1500)
+            logout_ok = worker._logout()
+            
+            if logout_ok:
+                # Small delay so logout screen is visible when headless=false
+                if worker.page and not worker.page.is_closed():
+                    worker.page.wait_for_timeout(1500)
+            else:
+                # Logout failed — keep browser open for manual intervention
+                worker.logger.error("")
+                worker.logger.error("="*60)
+                worker.logger.error("⚠⚠⚠ KEEPING BROWSER OPEN FOR 60 SECONDS ⚠⚠⚠")
+                worker.logger.error("Please manually logout:")
+                worker.logger.error("1. Click the user menu (top right)")
+                worker.logger.error("2. Click 'Sign Out'")
+                worker.logger.error("Or visit: https://148.151.32.77:8444/cuicui/Logout.jsp")
+                worker.logger.error("="*60)
+                if worker.page and not worker.page.is_closed():
+                    worker.page.wait_for_timeout(60000)  # 60 seconds
+            
             worker.teardown_browser()
 
     # ══════════════════════════════════════════════════════════════════════
