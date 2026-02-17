@@ -879,13 +879,12 @@ function renderFilterPanel(report, idx) {
                     <select onchange="ffUpdateField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}','operator',this.value)">
                       <option value="">— select —</option>
                       <option value="EQ"${op==='EQ'?' selected':''}>Equal to</option>
-                      <option value="NE"${op==='NE'?' selected':''}>Not equal to</option>
-                      <option value="GT"${op==='GT'?' selected':''}>Greater than</option>
-                      <option value="GE"${op==='GE'?' selected':''}>Greater or equal</option>
-                      <option value="LT"${op==='LT'?' selected':''}>Less than</option>
-                      <option value="LE"${op==='LE'?' selected':''}>Less or equal</option>
-                      <option value="BW"${op==='BW'?' selected':''}>Between</option>
-                      <option value="CT"${op==='CT'?' selected':''}>Contains</option>
+                      <option value="NEQ"${op==='NEQ'||op==='NE'?' selected':''}>Not equal to</option>
+                      <option value="G"${op==='G'||op==='GT'?' selected':''}>Greater than</option>
+                      <option value="GEQ"${op==='GEQ'||op==='GE'?' selected':''}>Greater or equal</option>
+                      <option value="L"${op==='L'||op==='LT'?' selected':''}>Less than</option>
+                      <option value="LEQ"${op==='LEQ'||op==='LE'?' selected':''}>Less or equal</option>
+                      <option value="BTWN"${op==='BTWN'||op==='BW'?' selected':''}>Between</option>
                     </select>
                   </div>
                   <div>
@@ -893,7 +892,7 @@ function renderFilterPanel(report, idx) {
                     <input type="text" value="${attr(v1)}" placeholder="Value"
                       onchange="ffUpdateField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}','value1',this.value)">
                   </div>
-                  ${op==='BW'?`<div>
+                  ${op==='BTWN'||op==='BW'?`<div>
                     <label>To:</label>
                     <input type="text" value="${attr(v2)}" placeholder="Upper bound"
                       onchange="ffUpdateField(${idx},'${attr(stepKey)}','${attr(pn)}','${attr(cfg.id)}','value2',this.value)">
@@ -1146,7 +1145,7 @@ function renderFilterPanel(report, idx) {
           const checked = isAll || selectedIds.includes(fid) ? 'checked' : '';
           html += `<label data-name="${attr((f.combined || f.label || '').toLowerCase())}" data-label="${attr(f.label)}">
             <input type="checkbox" value="${attr(fid)}" ${checked}
-              onchange="ffToggleItem(${idx},'${attr(pn)}','${ffId}')">
+              onchange="ffSpabToggleItem(${idx},'${attr(pn)}','${ffId}')">
             <span>${esc(f.label)}</span>
             <span class="ff-field-id">${esc(f.fieldId)}</span>
           </label>`;
@@ -1808,8 +1807,8 @@ function _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId) {
   const skey = selectedDiv.dataset.stepkey;
   const pn = selectedDiv.dataset.pn;
   
-  // Get field metadata from wizard meta
-  const meta = report._wizard_meta || {};
+  // Get field metadata from wizard meta (with fallback to filters._meta)
+  const meta = report._wizard_meta || (report.filters && report.filters._meta) || {};
   const steps = meta.steps || [];
   const stepNum = parseInt(skey.replace('step_', ''));
   const step = steps.find(s => s.step === stepNum);
@@ -1851,13 +1850,12 @@ function _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId) {
             <select onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','operator',this.value)">
               <option value="">— select —</option>
               <option value="EQ"${op==='EQ'?' selected':''}>Equal to</option>
-              <option value="NE"${op==='NE'?' selected':''}>Not equal to</option>
-              <option value="GT"${op==='GT'?' selected':''}>Greater than</option>
-              <option value="GE"${op==='GE'?' selected':''}>Greater or equal</option>
-              <option value="LT"${op==='LT'?' selected':''}>Less than</option>
-              <option value="LE"${op==='LE'?' selected':''}>Less or equal</option>
-              <option value="BW"${op==='BW'?' selected':''}>Between</option>
-              <option value="CT"${op==='CT'?' selected':''}>Contains</option>
+              <option value="NEQ"${op==='NEQ'||op==='NE'?' selected':''}>Not equal to</option>
+              <option value="G"${op==='G'||op==='GT'?' selected':''}>Greater than</option>
+              <option value="GEQ"${op==='GEQ'||op==='GE'?' selected':''}>Greater or equal</option>
+              <option value="L"${op==='L'||op==='LT'?' selected':''}>Less than</option>
+              <option value="LEQ"${op==='LEQ'||op==='LE'?' selected':''}>Less or equal</option>
+              <option value="BTWN"${op==='BTWN'||op==='BW'?' selected':''}>Between</option>
             </select>
           </div>
           <div>
@@ -1902,13 +1900,12 @@ function _renderFieldFilterCardsSimple(normalConfigs, selectedDiv, ridx, skey, p
             <select onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','operator',this.value)">
               <option value="">— select —</option>
               <option value="EQ"${op==='EQ'?' selected':''}>Equal to</option>
-              <option value="NE"${op==='NE'?' selected':''}>Not equal to</option>
-              <option value="GT"${op==='GT'?' selected':''}>Greater than</option>
-              <option value="GE"${op==='GE'?' selected':''}>Greater or equal</option>
-              <option value="LT"${op==='LT'?' selected':''}>Less than</option>
-              <option value="LE"${op==='LE'?' selected':''}>Less or equal</option>
-              <option value="BW"${op==='BW'?' selected':''}>Between</option>
-              <option value="CT"${op==='CT'?' selected':''}>Contains</option>
+              <option value="NEQ"${op==='NEQ'||op==='NE'?' selected':''}>Not equal to</option>
+              <option value="G"${op==='G'||op==='GT'?' selected':''}>Greater than</option>
+              <option value="GEQ"${op==='GEQ'||op==='GE'?' selected':''}>Greater or equal</option>
+              <option value="L"${op==='L'||op==='LT'?' selected':''}>Less than</option>
+              <option value="LEQ"${op==='LEQ'||op==='LE'?' selected':''}>Less or equal</option>
+              <option value="BTWN"${op==='BTWN'||op==='BW'?' selected':''}>Between</option>
             </select>
           </div>
           <div>
@@ -1916,7 +1913,7 @@ function _renderFieldFilterCardsSimple(normalConfigs, selectedDiv, ridx, skey, p
             <input type="text" value="${String(v1).replace(/"/g,'&quot;')}" placeholder="Value"
               onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value1',this.value)">
           </div>
-          ${op==='BW'?`<div>
+          ${op==='BTWN'||op==='BW'?`<div>
             <label>To:</label>
             <input type="text" value="${String(v2).replace(/"/g,'&quot;')}" placeholder="Upper bound"
               onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value2',this.value)">
@@ -1931,7 +1928,7 @@ function _renderFieldFilterCardsSimple(normalConfigs, selectedDiv, ridx, skey, p
 }
 
 /* ── SPAB field-filter (old flat format): toggle single item ── */
-function ffToggleItem(reportIdx, paramName, ffId) {
+function ffSpabToggleItem(reportIdx, paramName, ffId) {
   const report = cuicReports[reportIdx];
   if (!report.filters) report.filters = {};
   const listEl = document.getElementById(ffId + '-list');
@@ -1955,7 +1952,7 @@ function ffCheckAll(reportIdx, paramName, ffId) {
       if (cb) cb.checked = true;
     }
   });
-  ffToggleItem(reportIdx, paramName, ffId);
+  ffSpabToggleItem(reportIdx, paramName, ffId);
 }
 
 /* ── SPAB field-filter: uncheck all visible ── */
@@ -1968,7 +1965,7 @@ function ffUncheckAll(reportIdx, paramName, ffId) {
       if (cb) cb.checked = false;
     }
   });
-  ffToggleItem(reportIdx, paramName, ffId);
+  ffSpabToggleItem(reportIdx, paramName, ffId);
 }
 
 /* ── Field-filter: filter checklist by search text ── */
@@ -2052,18 +2049,19 @@ async function discoverFilters(reportIdx) {
         datePresets: data.datePresets || []
       };
       report._wizard_meta = metaObj;
-      if (!report.filters) report.filters = {};
-      report.filters._meta = metaObj;
+      // Reset filters to fresh discovery state (keep only _meta)
+      const oldFilters = report.filters || {};
+      report.filters = { _meta: metaObj };
 
-      // Pre-populate per-step defaults
+      // Pre-populate per-step defaults from discovery
       let totalParams = 0;
       steps.forEach(step => {
         const stepKey = 'step_' + step.step;
-        if (!report.filters[stepKey]) report.filters[stepKey] = {};
+        report.filters[stepKey] = {};
         (step.params || []).forEach(p => {
           totalParams++;
           const pn = p.paramName;
-          if (!pn || report.filters[stepKey][pn] !== undefined) return;
+          if (!pn) return;
           if (p.type === 'cuic_datetime' && p.currentPreset) {
             report.filters[stepKey][pn] = p.currentPreset;
           }
@@ -2088,13 +2086,13 @@ async function discoverFilters(reportIdx) {
         datePresets: data.datePresets || []
       };
       report._wizard_meta = metaObj;
-      if (!report.filters) report.filters = {};
-      report.filters._meta = metaObj;
+      // Reset filters to fresh discovery state (keep only _meta)
+      report.filters = { _meta: metaObj };
 
-      // Pre-populate with safe defaults (don't overwrite existing)
+      // Pre-populate with defaults from discovery
       params.forEach(p => {
         const pn = p.paramName;
-        if (!pn || report.filters[pn] !== undefined) return;
+        if (!pn) return;
         // Set sensible defaults
         if (p.type === 'cuic_datetime' && p.currentPreset) {
           report.filters[pn] = p.currentPreset;
@@ -2109,18 +2107,16 @@ async function discoverFilters(reportIdx) {
     } else {
       // ── Generic step-based format ──
       report._wizard_meta = { steps: data.steps };
-      if (!report.filters) report.filters = {};
-      report.filters._meta = { steps: data.steps };
+      // Reset filters to fresh discovery state (keep only _meta)
+      report.filters = { _meta: { steps: data.steps } };
 
       data.steps.forEach(step => {
         const stepKey = 'step_' + step.step;
-        if (!report.filters[stepKey]) report.filters[stepKey] = {};
+        report.filters[stepKey] = {};
         (step.fields || []).forEach(field => {
           const key = field.id || field.name || field.label;
           if (!key) return;
-          if (report.filters[stepKey][key] === undefined) {
-            report.filters[stepKey][key] = field.value;
-          }
+          report.filters[stepKey][key] = field.value;
         });
       });
       showToast(`Discovered ${data.steps.length} wizard step(s)!`, 'success');
