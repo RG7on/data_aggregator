@@ -107,7 +107,7 @@ class SettingsHandler(BaseHTTPRequestHandler):
 
             # Run discovery in the current thread (request blocks until done)
             try:
-                from workers.cuic_worker import Worker as CuicWorker
+                from workers.cuic import Worker as CuicWorker
                 result = CuicWorker.discover_wizard(report_config)
                 self._send_json(result)
             finally:

@@ -18,7 +18,15 @@ data_aggregator/
 │
 ├── workers/
 │   ├── __init__.py
-│   ├── cuic_worker.py          # CUIC (Cisco) report scraper
+│   ├── cuic/                   # CUIC (Cisco) report scraper package
+│   │   ├── __init__.py         # Main Worker class
+│   │   ├── auth.py             # Login/logout
+│   │   ├── navigation.py       # Report navigation
+│   │   ├── wizard.py           # Filter wizard handling
+│   │   ├── scraper.py          # Data extraction
+│   │   ├── javascript.py       # Browser JS snippets
+│   │   ├── selectors.py        # DOM selectors
+│   │   └── README.md           # Package documentation
 │   ├── smax_worker.py          # SMAX dashboard scraper
 │   ├── _example_worker.py      # Template for new workers
 │   └── README.md               # How to add a new worker

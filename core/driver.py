@@ -54,10 +54,10 @@ WORKERS_DIR = os.path.join(CFG_ROOT, 'workers')
 
 def discover_workers() -> List[str]:
     """
-    Scan the /workers folder for Python modules.
+    Scan the /workers folder for Python modules and packages.
     
     Returns:
-        List of worker module file paths
+        List of worker module file paths or package directory paths
     """
     workers = []
     
@@ -68,30 +68,47 @@ def discover_workers() -> List[str]:
         return workers
     
     for filename in os.listdir(WORKERS_DIR):
+        # Check for .py files (not starting with _)
         if filename.endswith('.py') and not filename.startswith('_'):
             worker_path = os.path.join(WORKERS_DIR, filename)
             workers.append(worker_path)
-            logger.info(f"Discovered worker: {filename}")
+            logger.info(f"Discovered worker module: {filename}")
+        # Check for packages (directories with __init__.py)
+        elif os.path.isdir(os.path.join(WORKERS_DIR, filename)) and not filename.startswith('_'):
+            package_path = os.path.join(WORKERS_DIR, filename)
+            init_file = os.path.join(package_path, '__init__.py')
+            if os.path.exists(init_file):
+                workers.append(package_path)
+                logger.info(f"Discovered worker package: {filename}")
     
     return workers
 
 
 def load_worker_module(worker_path: str):
     """
-    Dynamically import a worker module.
+    Dynamically import a worker module or package.
     
     Args:
-        worker_path: Full path to the worker .py file
+        worker_path: Full path to the worker .py file or package directory
         
     Returns:
         Loaded module object, or None if failed
     """
     try:
         module_name = os.path.splitext(os.path.basename(worker_path))[0]
-        spec = importlib.util.spec_from_file_location(module_name, worker_path)
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+        
+        # Check if it's a package (directory) or a module (.py file)
+        if os.path.isdir(worker_path):
+            # It's a package - import from workers.package_name
+            package_name = os.path.basename(worker_path)
+            module = importlib.import_module(f'workers.{package_name}')
+        else:
+            # It's a .py file - use spec_from_file_location
+            spec = importlib.util.spec_from_file_location(module_name, worker_path)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+        
         return module
     except Exception as e:
         logger.error(f"Failed to load worker {worker_path}: {e}")
