@@ -273,6 +273,41 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
         return False
 
 
+def _apply_multistep(worker, step_type: str, values: dict, label: str):
+    """Call CUIC_MULTISTEP_APPLY_JS in every frame until one reports success.
+
+    Parameters
+    ----------
+    step_type : 'datetime' | 'valuelist' | 'field_filter'
+    values    : the `values` dict passed to the JS as cfg.values
+    label     : human-readable name for log messages
+    """
+    cfg = {'stepType': step_type, 'values': values}
+    for f in worker.page.frames:
+        try:
+            result = f.evaluate(javascript.CUIC_MULTISTEP_APPLY_JS, cfg)
+            if not result:
+                continue
+            if result.get('error') in ('no_angular', 'no_visible_section'):
+                continue                      # wrong frame – try next
+            # This is the right frame (filter-wizard lives here)
+            ok = result.get('ok', False)
+            actions = result.get('actions', [])
+            for a in actions:
+                status = 'OK' if a.get('ok') else 'FAIL'
+                worker.logger.info(
+                    f"    {label} [{a.get('field','')}]: "
+                    f"{status} = {a.get('value', a.get('count', ''))}"
+                    + (f"  ({a['error']})" if not a.get('ok') and 'error' in a else '')
+                )
+            if not ok:
+                worker.logger.warning(
+                    f"    {label} apply returned ok=False: {result.get('error','')}")
+            return
+        except Exception as e:
+            worker.logger.debug(f"  _apply_multistep ({f.url[:50]}): {e}")
+
+
 def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
     """Apply filter values. Routes to CUIC Angular path or generic DOM path.
     
@@ -305,22 +340,42 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                 pass
 
     elif stype == 'cuic_multistep':
-        # ── CUIC multi-step: complex Angular scope manipulation ──
-        # This is a simplified version. For full implementation with
-        # datetime, valuelist, and field filter support, see original file.
+        # ── CUIC multi-step: apply via CUIC_MULTISTEP_APPLY_JS ──
+        # Each param in the current step is applied separately.  The JS snippet
+        # targets the currently-visible <section> so the step navigation in
+        # run_filter_wizard() must have already advanced to the right step.
         params = step_info.get('params', [])
         for p in params:
-            pn = p.get('paramName', '')
-            val = saved_values.get(pn)
-            if val is None:
-                continue
-            
-            # Log what we're attempting to apply
-            worker.logger.info(f"    {pn} ({p.get('type','')}): attempting to apply {val}")
-            
-            # NOTE: Full implementation of datetime, valuelist, and field filter
-            # application is ~300 lines of Angular scope manipulation.
-            # See original cuic_worker.py lines 1542-1950 for complete code.
+            ptype = p.get('type', '')
+            pn    = p.get('paramName', '')
+
+            # ── datetime ──
+            if ptype == 'cuic_datetime':
+                raw = saved_values.get(pn)
+                if raw is None:
+                    worker.logger.info(f"    {pn}: no saved value, keeping CUIC default")
+                    continue
+                # Normalise: a plain string is treated as {preset: <string>}
+                values = raw if isinstance(raw, dict) else {'preset': raw}
+                _apply_multistep(worker, 'datetime', values, pn)
+
+            # ── valuelist ──
+            elif ptype == 'cuic_valuelist':
+                raw = saved_values.get(pn)
+                if raw is None:
+                    worker.logger.info(f"    {pn}: no saved value, keeping CUIC default")
+                    continue
+                _apply_multistep(worker, 'valuelist', {'selectedValues': raw}, pn)
+
+            # ── field filters ──
+            elif ptype == 'cuic_field_filter':
+                raw = saved_values.get('_field_filters')
+                if raw is None:
+                    worker.logger.info("    _field_filters: no saved value, keeping CUIC default")
+                    continue
+                # Accept both a list [{fieldId,operator,value1,...}] and a plain dict
+                fields = raw if isinstance(raw, list) else [raw]
+                _apply_multistep(worker, 'field_filter', {'fields': fields}, '_field_filters')
 
     else:
         # ── Generic: DOM-based ──

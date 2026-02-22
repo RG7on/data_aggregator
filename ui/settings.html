@@ -145,6 +145,12 @@
   .filter-sub .sub-row select { padding: 4px 6px; background: var(--bg); border: 1px solid var(--border);
     border-radius: 4px; color: var(--text); font-size: 12px; }
   .filter-sub .sub-row span.to { font-size: 11px; color: var(--muted); }
+  /* ── Day-of-week button picker ── */
+  .day-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+  .day-btn { padding: 3px 9px; font-size: 12px; border: 1px solid var(--border); border-radius: 4px;
+    background: var(--surface); color: var(--muted); cursor: pointer; transition: .15s; }
+  .day-btn.active { background: #1d6196; border-color: var(--accent); color: #fff; }
+  .day-btn:hover { border-color: var(--accent); color: var(--text); }
   .vl-section { margin-top: 6px; }
   .vl-section .vl-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
   .vl-section .vl-toolbar input[type="text"] { flex: 1; min-width: 140px; padding: 4px 8px; background: var(--bg);
@@ -829,6 +835,38 @@ function renderFilterPanel(report, idx) {
             </div>`;
           }
 
+          /* ── Days of week — hidden when preset is Today or Yesterday ── */
+          {
+            const preset   = curPreset;
+            const showDays = (preset !== 'THISDAY' && preset !== 'LASTDAY' && preset !== '')
+                             || (p.hasDays === true);   /* use scraped default if no preset saved yet */
+            const hideDays  = !showDays ? 'style="display:none"' : '';
+            const savedAllDay = cfg.allDayChecked || (p.allDayChecked || 'true');
+            const savedDays   = cfg.days          || (p.days           || {});
+            const showDayPick = savedAllDay === 'false' ? '' : 'style="display:none"';
+            const dayDefs = [['mon','Mon'],['tue','Tue'],['wed','Wed'],['thu','Thu'],
+                             ['fri','Fri'],['sat','Sat'],['sun','Sun']];
+            const btnHtml = dayDefs.map(([d,lbl]) => {
+              const act = (savedDays[d] === 'checked' || savedDays[d] === undefined) ? ' active' : '';
+              return `<button type="button" class="day-btn${act}" data-day="${d}"
+                onclick="toggleDayBtn(${idx},'${attr(stepKey)}','${attr(pn)}','${dtId}','${d}',this)">${lbl}</button>`;
+            }).join('');
+            html += `<div class="filter-sub" id="${dtId}-days" ${hideDays}>
+              <div class="sub-row">
+                <label>Days</label>
+                <select onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','allDayChecked',this.value);
+                  document.getElementById('${dtId}-daypick').style.display=this.value==='false'?'':'none'">
+                  <option value="true"  ${savedAllDay!=='false'?'selected':''}>All Days</option>
+                  <option value="false" ${savedAllDay==='false'?'selected':''}>Custom</option>
+                </select>
+              </div>
+              <div class="sub-row" id="${dtId}-daypick" ${showDayPick}>
+                <label>Select</label>
+                <div class="day-btns">${btnHtml}</div>
+              </div>
+            </div>`;
+          }
+
         } else if (p.type === 'cuic_field_filter') {
           // Field Filters — multi-select with operator & value per field
           const fields = p.availableFields || [];
@@ -1503,6 +1541,9 @@ function updateMsDatetime(reportIdx, stepKey, paramName, field, value) {
     const dtId = 'dt-' + reportIdx + '-s' + sn + '-' + paramName.replace(/[^a-zA-Z0-9]/g,'_');
     const datesEl = document.getElementById(dtId + '-dates');
     if (datesEl) datesEl.style.display = value === 'CUSTOM' ? '' : 'none';
+    // Days section: hidden only for Today (THISDAY) and Yesterday (LASTDAY)
+    const daysEl  = document.getElementById(dtId + '-days');
+    if (daysEl) daysEl.style.display = (value === 'THISDAY' || value === 'LASTDAY' || value === '') ? 'none' : '';
   }
 
   const keys = Object.keys(cur).filter(k => cur[k] !== undefined && cur[k] !== '');
@@ -1512,6 +1553,21 @@ function updateMsDatetime(reportIdx, stepKey, paramName, field, value) {
   } else {
     report.filters[stepKey][paramName] = cur;
   }
+}
+
+/* ── Multi-step datetime: toggle a single day-of-week button ── */
+function toggleDayBtn(reportIdx, stepKey, paramName, dtId, day, btn) {
+  btn.classList.toggle('active');
+  const isActive = btn.classList.contains('active');
+  const report = cuicReports[reportIdx];
+  if (!report.filters) report.filters = {};
+  if (!report.filters[stepKey]) report.filters[stepKey] = {};
+  let cur = report.filters[stepKey][paramName];
+  if (typeof cur === 'string') cur = {preset: cur};
+  if (!cur || typeof cur !== 'object') cur = {};
+  if (!cur.days) cur.days = {};
+  cur.days[day] = isActive ? 'checked' : '';
+  report.filters[stepKey][paramName] = cur;
 }
 
 /* ── Multi-step valuelist: toggle single item ── */
