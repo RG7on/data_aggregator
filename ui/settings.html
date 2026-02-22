@@ -1863,7 +1863,7 @@ function _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId) {
             <input type="text" value="${String(v1).replace(/"/g,'&quot;')}" placeholder="Value"
               onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value1',this.value)">
           </div>
-          ${op==='BW'?`<div>
+          ${op==='BTWN'||op==='BW'?`<div>
             <label>To:</label>
             <input type="text" value="${String(v2).replace(/"/g,'&quot;')}" placeholder="Upper bound"
               onchange="ffUpdateField(${ridx},'${skey}','${pn}','${cfg.id.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','value2',this.value)">
