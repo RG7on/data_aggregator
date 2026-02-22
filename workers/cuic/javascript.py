@@ -921,30 +921,31 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
             if (!iffScope || !iffScope.vm || !iffScope.vm.selectedList)
                 return {ok: false, error: 'no_vm_selectedList'};
 
-            /* vals.fields = [{fieldId, operator, value1, value2}, ...] */
+            /* vals.fields = [{fieldId|id, operator, value1, value2}, ...] */
             (vals.fields || []).forEach(fv => {
+                const fvId = (fv.fieldId || fv.id || '').trim();
                 const item = iffScope.vm.selectedList.find(f => {
                     const cn  = (f.combinedName || '').trim();
                     const pm  = cn.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
                     const fid = pm ? pm[2].trim() : cn;
-                    return fid === fv.fieldId || cn === fv.fieldId;
+                    return fid === fvId || cn === fvId;
                 });
                 if (!item) {
-                    actions.push({field: 'operator_' + fv.fieldId, ok: false,
+                    actions.push({field: 'operator_' + fvId, ok: false,
                                   error: 'field_not_in_selectedList'});
                     return;
                 }
                 if (fv.operator !== undefined) {
                     item.operator = fv.operator;
-                    actions.push({field: 'operator_' + fv.fieldId, value: fv.operator, ok: true});
+                    actions.push({field: 'operator_' + fvId, value: fv.operator, ok: true});
                 }
                 if (fv.value1 !== undefined) {
                     item.value1 = fv.value1;
-                    actions.push({field: 'value1_' + fv.fieldId, value: fv.value1, ok: true});
+                    actions.push({field: 'value1_' + fvId, value: fv.value1, ok: true});
                 }
                 if (fv.value2 !== undefined) {
                     item.value2 = fv.value2;
-                    actions.push({field: 'value2_' + fv.fieldId, value: fv.value2, ok: true});
+                    actions.push({field: 'value2_' + fvId, value: fv.value2, ok: true});
                 }
             });
             try { iffScope.$apply(); } catch(e) {}

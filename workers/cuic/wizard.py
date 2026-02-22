@@ -373,8 +373,17 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                 if raw is None:
                     worker.logger.info("    _field_filters: no saved value, keeping CUIC default")
                     continue
-                # Accept both a list [{fieldId,operator,value1,...}] and a plain dict
-                fields = raw if isinstance(raw, list) else [raw]
+                # Normalize entries: bare string → {fieldId:s}; dict with 'id' but no 'fieldId' → copy
+                raw_list = raw if isinstance(raw, list) else [raw]
+                fields = []
+                for entry in raw_list:
+                    if isinstance(entry, str):
+                        fields.append({'fieldId': entry})
+                    elif isinstance(entry, dict):
+                        if 'fieldId' not in entry and 'id' in entry:
+                            fields.append({**entry, 'fieldId': entry['id']})
+                        else:
+                            fields.append(entry)
                 _apply_multistep(worker, 'field_filter', {'fields': fields}, '_field_filters')
 
     else:
