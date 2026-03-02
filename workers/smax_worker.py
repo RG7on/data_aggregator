@@ -398,7 +398,7 @@ class Worker(BaseWorker):
             # Skip historical reports that already have data
             if report.get('data_type') == 'historical':
                 if has_historical_data('smax', label):
-                    self.logger.info(f"  Report {i+1} '{label}': HISTORICAL — already scraped, skipping")
+                    self.logger.info(f"  Report {i+1} '{label}': HISTORICAL - already scraped, skipping")
                     log_scrape('smax', label, 'skipped', 0, 0, 'Historical data already exists')
                     continue
 

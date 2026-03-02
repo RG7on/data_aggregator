@@ -166,16 +166,53 @@ def find_wizard_frame(worker):
 
 
 def click_wizard_button(worker, btn_text: str) -> bool:
-    """Click a wizard button (Next / Run / Back) in any frame."""
+    """Click a wizard button (Next / Run / Back) in any frame.
+
+    Uses JavaScript element.click() instead of Playwright's click() so that
+    buttons at the bottom of a tall modal dialog (outside the viewport) are
+    still triggered reliably.
+
+    Special handling for 'Run': the Run/Finish button in CUIC multi-step
+    wizards lives OUTSIDE the <filter-wizard> element, in a separate
+    .runreport-display-flex container.  We also try calling $ctrl.finish()
+    directly to ensure Angular click handlers fire.
+    """
     for f in worker.page.frames:
         try:
+            # Standard button search (Next, Back, and sometimes Run)
             for sel in [f'button:has-text("{btn_text}")',
                         f'input[type="button"][value="{btn_text}"]']:
                 btn = f.query_selector(sel)
                 if btn and btn.is_visible():
-                    btn.click()
+                    f.evaluate('el => el.click()', btn)
                     worker.page.wait_for_timeout(worker.timeout_short)
                     return True
+
+            # Extra selectors for the Run/Finish button (lives outside filter-wizard)
+            if btn_text.lower() == 'run':
+                for sel in ['.finishButton', 'button.finishButton',
+                            '[ng-click*="finish"]', '[ng-click*="Finish"]']:
+                    btn = f.query_selector(sel)
+                    if btn and btn.is_visible():
+                        # Try $ctrl.finish() via Angular scope for reliable triggering
+                        try:
+                            f.evaluate('''(el) => {
+                                if (typeof angular !== 'undefined') {
+                                    const scope = angular.element(el).scope();
+                                    let s = scope;
+                                    for (let d = 0; s && d < 10; d++, s = s.$parent) {
+                                        if (s.$ctrl && typeof s.$ctrl.finish === 'function') {
+                                            s.$ctrl.finish();
+                                            return;
+                                        }
+                                    }
+                                }
+                                el.click();
+                            }''', btn)
+                        except Exception:
+                            f.evaluate('el => el.click()', btn)
+                        worker.page.wait_for_timeout(worker.timeout_short)
+                        return True
         except Exception:
             pass
     return False
@@ -273,41 +310,6 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
         return False
 
 
-def _apply_multistep(worker, step_type: str, values: dict, label: str):
-    """Call CUIC_MULTISTEP_APPLY_JS in every frame until one reports success.
-
-    Parameters
-    ----------
-    step_type : 'datetime' | 'valuelist' | 'field_filter'
-    values    : the `values` dict passed to the JS as cfg.values
-    label     : human-readable name for log messages
-    """
-    cfg = {'stepType': step_type, 'values': values}
-    for f in worker.page.frames:
-        try:
-            result = f.evaluate(javascript.CUIC_MULTISTEP_APPLY_JS, cfg)
-            if not result:
-                continue
-            if result.get('error') in ('no_angular', 'no_visible_section'):
-                continue                      # wrong frame – try next
-            # This is the right frame (filter-wizard lives here)
-            ok = result.get('ok', False)
-            actions = result.get('actions', [])
-            for a in actions:
-                status = 'OK' if a.get('ok') else 'FAIL'
-                worker.logger.info(
-                    f"    {label} [{a.get('field','')}]: "
-                    f"{status} = {a.get('value', a.get('count', ''))}"
-                    + (f"  ({a['error']})" if not a.get('ok') and 'error' in a else '')
-                )
-            if not ok:
-                worker.logger.warning(
-                    f"    {label} apply returned ok=False: {result.get('error','')}")
-            return
-        except Exception as e:
-            worker.logger.debug(f"  _apply_multistep ({f.url[:50]}): {e}")
-
-
 def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
     """Apply filter values. Routes to CUIC Angular path or generic DOM path.
     
@@ -341,50 +343,61 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
 
     elif stype == 'cuic_multistep':
         # ── CUIC multi-step: apply via CUIC_MULTISTEP_APPLY_JS ──
-        # Each param in the current step is applied separately.  The JS snippet
-        # targets the currently-visible <section> so the step navigation in
-        # run_filter_wizard() must have already advanced to the right step.
+        # Routes each param type (datetime / valuelist / field_filter) through
+        # the centralised Angular-scope JS snippet in javascript.py.
         params = step_info.get('params', [])
         for p in params:
-            ptype = p.get('type', '')
             pn    = p.get('paramName', '')
+            ptype = p.get('type', '')
+            val   = saved_values.get(pn)
+            if val is None:
+                continue
 
-            # ── datetime ──
+            worker.logger.info(f"    {pn} ({ptype}): applying {val!r}")
+
+            # Build the cfg dict that CUIC_MULTISTEP_APPLY_JS expects
             if ptype == 'cuic_datetime':
-                raw = saved_values.get(pn)
-                if raw is None:
-                    worker.logger.info(f"    {pn}: no saved value, keeping CUIC default")
-                    continue
-                # Normalise: a plain string is treated as {preset: <string>}
-                values = raw if isinstance(raw, dict) else {'preset': raw}
-                _apply_multistep(worker, 'datetime', values, pn)
-
-            # ── valuelist ──
+                cfg = {
+                    'stepType': 'datetime',
+                    'values': {'preset': val} if isinstance(val, str) else (val or {})
+                }
             elif ptype == 'cuic_valuelist':
-                raw = saved_values.get(pn)
-                if raw is None:
-                    worker.logger.info(f"    {pn}: no saved value, keeping CUIC default")
-                    continue
-                _apply_multistep(worker, 'valuelist', {'selectedValues': raw}, pn)
-
-            # ── field filters ──
+                cfg = {
+                    'stepType': 'valuelist',
+                    'values': {'selectedValues': val}
+                }
             elif ptype == 'cuic_field_filter':
-                raw = saved_values.get('_field_filters')
-                if raw is None:
-                    worker.logger.info("    _field_filters: no saved value, keeping CUIC default")
+                if not isinstance(val, list) or not val:
+                    worker.logger.info(f"    {pn}: no field filters to apply")
                     continue
-                # Normalize entries: bare string → {fieldId:s}; dict with 'id' but no 'fieldId' → copy
-                raw_list = raw if isinstance(raw, list) else [raw]
-                fields = []
-                for entry in raw_list:
-                    if isinstance(entry, str):
-                        fields.append({'fieldId': entry})
-                    elif isinstance(entry, dict):
-                        if 'fieldId' not in entry and 'id' in entry:
-                            fields.append({**entry, 'fieldId': entry['id']})
-                        else:
-                            fields.append(entry)
-                _apply_multistep(worker, 'field_filter', {'fields': fields}, '_field_filters')
+                cfg = {
+                    'stepType': 'field_filter',
+                    'values': {'fields': val}
+                }
+            else:
+                worker.logger.warning(f"    {pn}: unknown type '{ptype}', skipping")
+                continue
+
+            # Try every frame until the JS applies successfully
+            applied = False
+            for f in worker.page.frames:
+                try:
+                    result = f.evaluate(javascript.CUIC_MULTISTEP_APPLY_JS, cfg)
+                    if result and result.get('ok'):
+                        for a in result.get('actions', []):
+                            status = '✓' if a.get('ok') else '✗'
+                            worker.logger.info(
+                                f"      {status} {a.get('field','')}: "
+                                f"{a.get('matchedNames', a.get('value', a.get('error', '')))}")
+                        applied = True
+                        worker.page.wait_for_timeout(300)
+                        break
+                    elif result and result.get('error'):
+                        worker.logger.debug(f"    {pn}: frame skip: {result.get('error','')}")
+                except Exception as e:
+                    worker.logger.debug(f"    {pn}: frame error: {e}")
+            if not applied:
+                worker.logger.warning(f"    {pn}: could NOT be applied")
 
     else:
         # ── Generic: DOM-based ──

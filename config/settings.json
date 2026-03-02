@@ -16,7 +16,7 @@
       "url": "https://148.151.32.77:8444/cuicui/Main.jsp",
       "reports": [
         {
-          "label": "test/Z Call Type Historical All Fields",
+          "label": "z_call_type_historical_all_fields",
           "folder": "Test",
           "name": "Z Call Type Historical All Fields",
           "enabled": true,
@@ -81,9 +81,9 @@
                       "hasDateRange": true,
                       "hasTimeRange": true,
                       "allTimeChecked": "true",
-                      "currentTime1": "",
-                      "currentTime2": "",
-                      "hasDays": false,
+                      "currentTime1": "12:00 AM",
+                      "currentTime2": "11:59 PM",
+                      "hasDays": true,
                       "allDayChecked": "true",
                       "days": {
                         "mon": "checked",
@@ -678,7 +678,352 @@
                           "combined": "Vru Unhandled Calls (VruUnhandledCalls)"
                         }
                       ],
-                      "availableOperators": [],
+                      "availableOperators": [
+                        {
+                          "value": "6A8A7718100001256BE2A5865ED3AEAC",
+                          "label": "per_aban"
+                        },
+                        {
+                          "value": "6A8A771810000125555041D95ED3AEAC",
+                          "label": "per_queued"
+                        },
+                        {
+                          "value": "6A8A7718100001255FB32F095ED3AEAC",
+                          "label": "AbandInterval1"
+                        },
+                        {
+                          "value": "6A8A771810000125785430745ED3AEAC",
+                          "label": "AbandInterval10"
+                        },
+                        {
+                          "value": "6A8A771810000125007FEE085ED3AEAC",
+                          "label": "AbandInterval2"
+                        },
+                        {
+                          "value": "6A8A771810000125300C1D9A5ED3AEAC",
+                          "label": "AbandInterval3"
+                        },
+                        {
+                          "value": "6A8A7718100001252EDBBE805ED3AEAC",
+                          "label": "AbandInterval4"
+                        },
+                        {
+                          "value": "6EEB816C100001305B8E37234067E996",
+                          "label": "AbandInterval5"
+                        },
+                        {
+                          "value": "6A8A7718100001254F167E315ED3AEAC",
+                          "label": "AbandInterval6"
+                        },
+                        {
+                          "value": "6A8A7718100001250BB7B3345ED3AEAC",
+                          "label": "AbandInterval7"
+                        },
+                        {
+                          "value": "6A8A7718100001254EFED37A5ED3AEAC",
+                          "label": "AbandInterval8"
+                        },
+                        {
+                          "value": "6A8A7718100001255D3421EF5ED3AEAC",
+                          "label": "AbandInterval9"
+                        },
+                        {
+                          "value": "6A8A7718100001253161D4365ED3AEAC",
+                          "label": "AgentErrorCount"
+                        },
+                        {
+                          "value": "6A8A7718100001256C848E145ED3AEAC",
+                          "label": "AnsInterval1"
+                        },
+                        {
+                          "value": "6A8A77181000012512FDB9D15ED3AEAC",
+                          "label": "AnsInterval10"
+                        },
+                        {
+                          "value": "6A8A77181000012571A0C55D5ED3AEAC",
+                          "label": "AnsInterval2"
+                        },
+                        {
+                          "value": "6A8A771810000125573CFDBB5ED3AEAC",
+                          "label": "AnsInterval3"
+                        },
+                        {
+                          "value": "6A8A77181000012534B6EB005ED3AEAC",
+                          "label": "AnsInterval4"
+                        },
+                        {
+                          "value": "6A8A7718100001250ACC35D75ED3AEAC",
+                          "label": "AnsInterval5"
+                        },
+                        {
+                          "value": "6A8A7718100001253BA557B75ED3AEAC",
+                          "label": "AnsInterval6"
+                        },
+                        {
+                          "value": "6A8A7718100001251EFDB8915ED3AEAC",
+                          "label": "AnsInterval7"
+                        },
+                        {
+                          "value": "6A8A77181000012560741CAF5ED3AEAC",
+                          "label": "AnsInterval8"
+                        },
+                        {
+                          "value": "6A8A7718100001252363E4E55ED3AEAC",
+                          "label": "AnsInterval9"
+                        },
+                        {
+                          "value": "6A8A7718100001252A9C16935ED3AEAC",
+                          "label": "AnswerWaitTime"
+                        },
+                        {
+                          "value": "6A8A7718100001257FA867DA5ED3AEAC",
+                          "label": "avg_aban_delay"
+                        },
+                        {
+                          "value": "6A8A7718100001255ADBA37B5ED3AEAC",
+                          "label": "AvgRouterDelay"
+                        },
+                        {
+                          "value": "6A8A771810000125421B0E9A5ED3AEAC",
+                          "label": "asa"
+                        },
+                        {
+                          "value": "6A8A7718100001251EB3E2115ED3AEAC",
+                          "label": "BucketIntervalID"
+                        },
+                        {
+                          "value": "6A8A77181000012573510E415ED3AEAC",
+                          "label": "CallDelayAbandTime"
+                        },
+                        {
+                          "value": "6A8A7718100001257E4900B15ED3AEAC",
+                          "label": "CTDelayAbandTime"
+                        },
+                        {
+                          "value": "6A8A771810000125780215685ED3AEAC",
+                          "label": "CTVRUTime"
+                        },
+                        {
+                          "value": "6A8A7718100001256BE55DEF5ED3AEAC",
+                          "label": "CallsAnswered"
+                        },
+                        {
+                          "value": "6A8A771810000125563261015ED3AEAC",
+                          "label": "CallsHandled"
+                        },
+                        {
+                          "value": "6A8A771810000125233FEB815ED3AEAC",
+                          "label": "CallsOffered"
+                        },
+                        {
+                          "value": "6A8A7718100001257B45A9905ED3AEAC",
+                          "label": "CallsQHandled"
+                        },
+                        {
+                          "value": "6A8A7718100001257CEFE1E15ED3AEAC",
+                          "label": "CallsRONA"
+                        },
+                        {
+                          "value": "6A8A7718100001250883575A5ED3AEAC",
+                          "label": "CallsRouted"
+                        },
+                        {
+                          "value": "6A8A7718100001253AC8492F5ED3AEAC",
+                          "label": "CallsRoutedNonAgent"
+                        },
+                        {
+                          "value": "6A8A771810000125180AFCAE5ED3AEAC",
+                          "label": "CompletedTasks"
+                        },
+                        {
+                          "value": "6A8A771810000125669DABBF5ED3AEAC",
+                          "label": "DbDateTime"
+                        },
+                        {
+                          "value": "6A8A77181000012556FB83285ED3AEAC",
+                          "label": "Date"
+                        },
+                        {
+                          "value": "6A8A77181000012555E3FDDE5ED3AEAC",
+                          "label": "DelayAgentAbandTime"
+                        },
+                        {
+                          "value": "6A8A7718100001253756E4195ED3AEAC",
+                          "label": "DelayQAbandTime"
+                        },
+                        {
+                          "value": "6A8A7718100001252636136A5ED3AEAC",
+                          "label": "EnterpriseName"
+                        },
+                        {
+                          "value": "6A8A7718100001251839030B5ED3AEAC",
+                          "label": "ErrorCount"
+                        },
+                        {
+                          "value": "6A8A771810000125506B9BF05ED3AEAC",
+                          "label": "HandleTime"
+                        },
+                        {
+                          "value": "6A8A7718100001250CD145F35ED3AEAC",
+                          "label": "HoldTime"
+                        },
+                        {
+                          "value": "6A8A771810000125007DD6815ED3AEAC",
+                          "label": "ICRDefaultRouted"
+                        },
+                        {
+                          "value": "6A8A77181000012516B9BDD65ED3AEAC",
+                          "label": "IncompleteCalls"
+                        },
+                        {
+                          "value": "6F74CBEF100001307A21565B4067E9AA",
+                          "label": "MaxCallWaitTime"
+                        },
+                        {
+                          "value": "6F74CBEF100001303E06A7464067E9AA",
+                          "label": "MaxCallsQueued"
+                        },
+                        {
+                          "value": "6A8A771810000125071D1A615ED3AEAC",
+                          "label": "NetworkAnnouncement"
+                        },
+                        {
+                          "value": "6A8A7718100001251031D37F5ED3AEAC",
+                          "label": "NetworkDefaultRouted"
+                        },
+                        {
+                          "value": "6A8A7718100001252853AF375ED3AEAC",
+                          "label": "Other"
+                        },
+                        {
+                          "value": "6A8A7718100001256FD246B35ED3AEAC",
+                          "label": "OverflowOut"
+                        },
+                        {
+                          "value": "6A8A77181000012573C250215ED3AEAC",
+                          "label": "ReportingInterval"
+                        },
+                        {
+                          "value": "6A8A7718100001253D2D2F6F5ED3AEAC",
+                          "label": "ReturnBusy"
+                        },
+                        {
+                          "value": "6A8A77181000012572271D4D5ED3AEAC",
+                          "label": "ReturnRelease"
+                        },
+                        {
+                          "value": "6A8A7718100001252C6F3C975ED3AEAC",
+                          "label": "ReturnRing"
+                        },
+                        {
+                          "value": "6A8A7718100001254835B40F5ED3AEAC",
+                          "label": "ReturnBR"
+                        },
+                        {
+                          "value": "6A8A7718100001256519EC275ED3AEAC",
+                          "label": "RouterCallsAbandQ"
+                        },
+                        {
+                          "value": "6A8A77181000012529CFD4565ED3AEAC",
+                          "label": "RouterCallsAbandToAgent"
+                        },
+                        {
+                          "value": "6A8A7718100001257B8BC7B05ED3AEAC",
+                          "label": "RouterQueueCallTypeLimit"
+                        },
+                        {
+                          "value": "6A8A77181000012565DA0D1D5ED3AEAC",
+                          "label": "RouterQueueCalls"
+                        },
+                        {
+                          "value": "6A8A77181000012567F0F5DC5ED3AEAC",
+                          "label": "RouterQueueGlobalLimit"
+                        },
+                        {
+                          "value": "6A8A77181000012568D299105ED3AEAC",
+                          "label": "RouterQueueWaitTime"
+                        },
+                        {
+                          "value": "DC9AFEEE1000014121533D780A00060D",
+                          "label": "servicelLevel"
+                        },
+                        {
+                          "value": "6A8A77181000012546DFCE705ED3AEAC",
+                          "label": "ServiceLevelAband"
+                        },
+                        {
+                          "value": "6A8A77181000012523CD11CF5ED3AEAC",
+                          "label": "ServiceLevelCalls"
+                        },
+                        {
+                          "value": "6A8A7718100001253C970E5E5ED3AEAC",
+                          "label": "ServiceLevelCallsOffered"
+                        },
+                        {
+                          "value": "6A8A7718100001250DD93DF75ED3AEAC",
+                          "label": "ServiceLevelError"
+                        },
+                        {
+                          "value": "6A8A7718100001257C552DBD5ED3AEAC",
+                          "label": "ServiceLevelRONA"
+                        },
+                        {
+                          "value": "6A8A7718100001252850FFFE5ED3AEAC",
+                          "label": "ServiceLevelType"
+                        },
+                        {
+                          "value": "6A8A77181000012552A458155ED3AEAC",
+                          "label": "ShortCalls"
+                        },
+                        {
+                          "value": "6A8A77181000012568DC42015ED3AEAC",
+                          "label": "TalkTime"
+                        },
+                        {
+                          "value": "6A8A771810000125337A13785ED3AEAC",
+                          "label": "TimeZone"
+                        },
+                        {
+                          "value": "6A8A771810000125799A0CDA5ED3AEAC",
+                          "label": "TotalCallsAband"
+                        },
+                        {
+                          "value": "6A8A7718100001252B413A835ED3AEAC",
+                          "label": "totalerrorcount"
+                        },
+                        {
+                          "value": "6A8A7718100001251B05D0315ED3AEAC",
+                          "label": "VruAssistedCalls"
+                        },
+                        {
+                          "value": "6A8A7718100001250B65CFC35ED3AEAC",
+                          "label": "VruForcedXferredCalls"
+                        },
+                        {
+                          "value": "6A8A77181000012528095E605ED3AEAC",
+                          "label": "VruHandledCalls"
+                        },
+                        {
+                          "value": "6A8A771810000125657E4DEF5ED3AEAC",
+                          "label": "VruOptOutUnhandledCalls"
+                        },
+                        {
+                          "value": "6A8A7718100001254541A17E5ED3AEAC",
+                          "label": "VruOtherCalls"
+                        },
+                        {
+                          "value": "6A8A77181000012506B22D8E5ED3AEAC",
+                          "label": "VruScriptedXferredCalls"
+                        },
+                        {
+                          "value": "6A8A7718100001255EBE1AD65ED3AEAC",
+                          "label": "VRUTime"
+                        },
+                        {
+                          "value": "6A8A771810000125336C94AB5ED3AEAC",
+                          "label": "VruUnhandledCalls"
+                        }
+                      ],
                       "selectedFieldIds": [],
                       "selectedFields": []
                     }
@@ -730,25 +1075,11 @@
               ]
             },
             "step_1": {
-              "DateTime  (DateTime)": {
-                "preset": "LASTWK",
-                "allDayChecked": "true",
-                "days": {
-                  "mon": "checked",
-                  "tue": "checked",
-                  "wed": "checked",
-                  "sat": "checked",
-                  "sun": "checked"
-                },
-                "allTime": 1
-              }
+              "DateTime  (DateTime)": "LASTWK"
             },
             "step_2": {
               "Call Types(CallTypeID)": [
-                "AgentTransfer_CT",
-                "RTPS_CT",
-                "SAP_CT",
-                "Subsurface_CT",
+                "AGENT_XFER_CALLTYPE",
                 "Telcom_CT"
               ]
             },

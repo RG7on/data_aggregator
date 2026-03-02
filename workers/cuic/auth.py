@@ -49,13 +49,13 @@ def logout(worker) -> bool:
     """
     try:
         if not worker.context:
-            worker.logger.warning("⚠ No browser context – skipping logout")
+            worker.logger.warning("[WARN] No browser context - skipping logout")
             return False
 
         # Always use the FIRST page (main CUIC tab) for logout
         pages = worker.context.pages
         if not pages:
-            worker.logger.warning("⚠ No pages open – skipping logout")
+            worker.logger.warning("[WARN] No pages open - skipping logout")
             return False
 
         # Close all extra tabs/popups first
@@ -63,14 +63,14 @@ def logout(worker) -> bool:
         while len(pages) > 1:
             try:
                 pages[-1].close()
-                worker.logger.info(f"  Closed tab — {len(pages)-1} remaining")
+                worker.logger.info(f"  Closed tab - {len(pages)-1} remaining")
             except Exception:
                 pass
             pages = worker.context.pages
 
         main_page = pages[0]
         if main_page.is_closed():
-            worker.logger.warning("⚠ Main page already closed – skipping logout")
+            worker.logger.warning("[WARN] Main page already closed - skipping logout")
             return False
 
         worker.logger.info("="*60)
@@ -90,7 +90,7 @@ def logout(worker) -> bool:
         # Screenshot before logout
         try:
             main_page.screenshot(path=f"{worker.log_dir}/logout_01_before.png")
-            worker.logger.info("📸 Screenshot: logout_01_before.png")
+            worker.logger.info("Screenshot: logout_01_before.png")
         except Exception:
             pass
 
@@ -103,15 +103,15 @@ def logout(worker) -> bool:
             
             identity_frame = main_page.frame(name='remote_iframe_0')
             if not identity_frame:
-                worker.logger.error("  ✗ Could not find remote_iframe_0")
+                worker.logger.error("  [FAIL] Could not find remote_iframe_0")
                 try:
                     main_page.screenshot(path=f"{worker.log_dir}/logout_iframe_not_found.png")
-                    worker.logger.info("📸 Screenshot: logout_iframe_not_found.png")
+                    worker.logger.info("Screenshot: logout_iframe_not_found.png")
                 except Exception:
                     pass
                 return False
             
-            worker.logger.info("  ✓ Found iframe: remote_iframe_0")
+            worker.logger.info("  [OK] Found iframe: remote_iframe_0")
 
             # Try specific selectors for the user menu button INSIDE the iframe
             # Start with most specific, fall back to generic
@@ -138,7 +138,7 @@ def logout(worker) -> bool:
                         worker.logger.info(f"    Found {menu_count} element(s)")
                         user_menu.first.wait_for(state='visible', timeout=5000)
                         user_menu.first.click(force=True)
-                        worker.logger.info(f"  ✓ Clicked user menu")
+                        worker.logger.info(f"  [OK] Clicked user menu")
                         menu_clicked = True
                         break
                 except Exception as e:
@@ -146,10 +146,10 @@ def logout(worker) -> bool:
                     continue
             
             if not menu_clicked:
-                worker.logger.error("  ✗ All user menu selectors failed (tried inside iframe)")
+                worker.logger.error("  [FAIL] All user menu selectors failed (tried inside iframe)")
                 try:
                     main_page.screenshot(path=f"{worker.log_dir}/logout_menu_not_found.png")
-                    worker.logger.info("📸 Screenshot: logout_menu_not_found.png")
+                    worker.logger.info("Screenshot: logout_menu_not_found.png")
                 except Exception:
                     pass
                 return False
@@ -158,15 +158,15 @@ def logout(worker) -> bool:
             worker.logger.info("STEP 3: Waiting for dropdown menu...")
             try:
                 main_page.locator('ul#id-gt-ul').wait_for(state='visible', timeout=3000)
-                worker.logger.info("  ✓ Dropdown menu visible")
+                worker.logger.info("  [OK] Dropdown menu visible")
             except Exception:
-                worker.logger.warning("  ⚠ Dropdown didn't appear, trying anyway...")
+                worker.logger.warning("  [WARN] Dropdown didn't appear, trying anyway...")
                 main_page.wait_for_timeout(1500)
             
             # Screenshot after menu click
             try:
                 main_page.screenshot(path=f"{worker.log_dir}/logout_02_menu_opened.png")
-                worker.logger.info("📸 Screenshot: logout_02_menu_opened.png")
+                worker.logger.info("Screenshot: logout_02_menu_opened.png")
             except Exception:
                 pass
 
@@ -193,12 +193,12 @@ def logout(worker) -> bool:
                         worker.logger.info(f"    Found {signout_count} element(s)")
                         signout_link.first.wait_for(state='visible', timeout=5000)
                         signout_link.first.click(force=True)
-                        worker.logger.info(f"  ✓ Clicked sign-out")
+                        worker.logger.info(f"  [OK] Clicked sign-out")
                         
                         # Wait for navigation to Logout.jsp
                         try:
                             main_page.wait_for_url('**/Logout.jsp**', timeout=5000)
-                            worker.logger.info("  ✓ Navigated to Logout.jsp")
+                            worker.logger.info("  [OK] Navigated to Logout.jsp")
                         except Exception:
                             main_page.wait_for_timeout(3000)  # Fallback to fixed wait
                         
@@ -209,21 +209,21 @@ def logout(worker) -> bool:
                     continue
             
             if not logged_out:
-                worker.logger.error("  ✗ All sign-out selectors failed")
+                worker.logger.error("  [FAIL] All sign-out selectors failed")
                 # Try to take a screenshot to see what's on screen
                 try:
                     main_page.screenshot(path=f"{worker.log_dir}/logout_signout_not_found.png")
-                    worker.logger.info("📸 Screenshot: logout_signout_not_found.png")
+                    worker.logger.info("Screenshot: logout_signout_not_found.png")
                 except Exception:
                     pass
                 
         except Exception as e:
-            worker.logger.error(f"✗ Logout click sequence failed: {e}")
+            worker.logger.error(f"[FAIL] Logout click sequence failed: {e}")
 
         # Screenshot final state
         try:
             main_page.screenshot(path=f"{worker.log_dir}/logout_03_complete.png")
-            worker.logger.info("📸 Screenshot: logout_03_complete.png")
+            worker.logger.info("Screenshot: logout_03_complete.png")
         except Exception:
             pass
 
@@ -235,17 +235,17 @@ def logout(worker) -> bool:
             
             if logged_out and is_logout_page:
                 worker.logger.info("="*60)
-                worker.logger.info(f"✓✓✓ LOGOUT SUCCESSFUL ✓✓✓")
+                worker.logger.info(f"LOGOUT SUCCESSFUL")
                 worker.logger.info(f"Final URL: {final_url}")
                 worker.logger.info("="*60)
             elif logged_out:
                 worker.logger.warning("="*60)
-                worker.logger.warning(f"⚠ Logout clicks completed but NOT on logout page")
+                worker.logger.warning(f"[WARN] Logout clicks completed but NOT on logout page")
                 worker.logger.warning(f"Final URL: {final_url}")
                 worker.logger.warning("="*60)
             else:
                 worker.logger.error("="*60)
-                worker.logger.error("✗✗✗ LOGOUT FAILED — MANUAL LOGOUT REQUIRED ✗✗✗")
+                worker.logger.error("LOGOUT FAILED -- MANUAL LOGOUT REQUIRED")
                 worker.logger.error(f"Final URL: {final_url}")
                 worker.logger.error("To prevent session limit, manually visit:")
                 worker.logger.error("https://148.151.32.77:8444/cuicui/Logout.jsp")
@@ -257,7 +257,7 @@ def logout(worker) -> bool:
 
     except Exception as e:
         worker.logger.error("="*60)
-        worker.logger.error(f"✗✗✗ LOGOUT EXCEPTION: {e}")
+        worker.logger.error(f"LOGOUT EXCEPTION: {e}")
         worker.logger.error("MANUAL LOGOUT REQUIRED to prevent session limit!")
         worker.logger.error("="*60)
         try:

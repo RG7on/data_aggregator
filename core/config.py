@@ -98,9 +98,9 @@ def _load_json(path: str, defaults: dict) -> dict:
             logger.debug(f"Loaded config from {path}")
             return loaded
         except Exception as e:
-            logger.warning(f"Failed to load {path}: {e} — using defaults")
+            logger.warning(f"Failed to load {path}: {e} - using defaults")
     else:
-        logger.info(f"Config file not found: {path} — using defaults")
+        logger.info(f"Config file not found: {path} - using defaults")
         # Write defaults so the user has a template
         os.makedirs(os.path.dirname(path), exist_ok=True)
         try:

@@ -45,7 +45,7 @@ def navigate_to_reports_root(worker):
 
         # Attempt 2: full page reload to reset CUIC UI state
         # (session cookie persists — no re-login needed)
-        worker.logger.info("ngGrid hidden after tab click — reloading page")
+        worker.logger.info("ngGrid hidden after tab click - reloading page")
         worker.page.goto(worker.url, wait_until='domcontentloaded',
                        timeout=worker.timeout_nav)
         worker.page.wait_for_timeout(worker.timeout_medium)
@@ -94,7 +94,7 @@ def open_report(worker, frame, folder_path: str, report_name: str) -> bool:
 
         # Defensive: remove report name from folder segments if it slipped in
         if folders and report_name and folders[-1] == report_name:
-            worker.logger.warning(f"Report name '{report_name}' found in folder path — removing duplicate")
+            worker.logger.warning(f"Report name '{report_name}' found in folder path - removing duplicate")
             folders = folders[:-1]
 
         for depth, folder in enumerate(folders):

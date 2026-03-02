@@ -125,3 +125,14 @@ Credentials are in `config/credentials.json`:
   }
 }
 ```
+
+## Verification (smoke test)
+
+After changing saved settings or wizard apply logic:
+
+1. In the settings UI, configure a report with a date preset, valuelist selections, and (if applicable) field filters. Save settings.
+2. Run a scrape (e.g. "Start Scrape Now").
+3. In the driver/wizard logs, confirm:
+   - `Apply step: saved_keys=[...]` shows the expected keys for each step.
+   - Apply lines show "OK" for each filter (datetime, valuelist, field filters), not "no saved value, keeping CUIC default".
+4. In CUIC (or the scraped output), confirm the report ran with the same filters you selected.

@@ -277,7 +277,7 @@ def main():
     url = f'http://localhost:{port}'
 
     print(f'Data Aggregator Control Panel')
-    print(f'  → {url}')
+    print(f'  -> {url}')
     print(f'  Press Ctrl+C to stop\n')
 
     # Open browser after a short delay (let server start first)

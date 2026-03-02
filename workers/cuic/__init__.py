@@ -17,6 +17,7 @@ Flow:
 import os
 import sys
 import time
+import traceback
 from typing import Dict, Any, List
 
 # Add parent directory to path for imports
@@ -70,12 +71,14 @@ class Worker(BaseWorker):
             self.logger.info("No enabled CUIC reports configured")
             return []
 
-        self.logger.info(f"Starting CUIC scraper → {self.url} ({len(enabled)} report(s))")
+        self.logger.info(f"Starting CUIC scraper -> {self.url} ({len(enabled)} report(s))")
         try:
             self.setup_browser(ignore_https_errors=True)
+            self.logger.info("Browser ready, starting scrape...")
             return self.scrape()
         except Exception as e:
             self.logger.error(f"CUIC worker error: {e}")
+            self.logger.error(f"  {traceback.format_exc()}")
             self.screenshot("error", is_step=False)
             return []
         finally:
@@ -89,7 +92,7 @@ class Worker(BaseWorker):
                 # Logout failed — keep browser open for manual intervention
                 self.logger.error("")
                 self.logger.error("="*60)
-                self.logger.error("⚠⚠⚠ KEEPING BROWSER OPEN FOR 60 SECONDS ⚠⚠⚠")
+                self.logger.error("!!! KEEPING BROWSER OPEN FOR 60 SECONDS !!!")
                 self.logger.error("Please manually logout:")
                 self.logger.error("1. Click the user menu (top right)")
                 self.logger.error("2. Click 'Sign Out'")
@@ -112,39 +115,54 @@ class Worker(BaseWorker):
             folder = report.get('folder', '')
             name   = report.get('name', '')
 
-            self.logger.info(f"━━━ Report {i+1}/{len(enabled)}: {label} ({folder}/{name}) ━━━")
+            self.logger.info("=" * 60)
+            self.logger.info(f"Report {i+1}/{len(enabled)}: {label}")
+            self.logger.info(f"  Folder: {folder}")
+            self.logger.info(f"  Name:   {name}")
+            self.logger.info(f"  Type:   {report.get('data_type', 'ongoing')}")
+            filter_keys = list((report.get('filters') or {}).keys())
+            self.logger.info(f"  Filter keys: {filter_keys}")
+            self.logger.info("=" * 60)
             t0 = time.time()
 
-            # Skip historical reports that already have data
             if report.get('data_type') == 'historical':
                 if has_historical_data('cuic', label):
-                    self.logger.info(f"Report '{label}': HISTORICAL — already scraped, skipping")
+                    self.logger.info(f"Report '{label}': HISTORICAL - already scraped, skipping")
                     log_scrape('cuic', label, 'skipped', 0, 0, 'Historical data already exists')
                     continue
 
             try:
-                # Between reports: close extra tabs, navigate back to reports root
                 if i > 0:
+                    self.logger.info("Closing previous report and navigating back...")
                     navigation.close_report_page(self)
                     navigation.navigate_to_reports_root(self)
 
+                self.logger.info("Getting reports iframe...")
                 frame = navigation.get_reports_frame(self)
                 if not frame:
+                    self.logger.error(f"Reports iframe not found for '{label}'")
+                    self.screenshot(f"r{i+1}_no_iframe", is_step=False)
                     log_scrape('cuic', label, 'error', 0, time.time() - t0,
                                'Reports iframe not found')
                     continue
 
+                self.logger.info(f"Opening report '{name}' in folder '{folder}'...")
                 if not navigation.open_report(self, frame, folder, name):
+                    self.logger.error(f"Could not open {folder}/{name}")
+                    self.screenshot(f"r{i+1}_open_failed", is_step=False)
                     log_scrape('cuic', label, 'error', 0, time.time() - t0,
                                f'Could not open {folder}/{name}')
                     continue
 
+                self.logger.info("Running filter wizard...")
                 filters = report.get('filters', {})
                 if not wizard.run_filter_wizard(self, filters):
+                    self.logger.error(f"Filter wizard failed for '{label}'")
                     log_scrape('cuic', label, 'error', 0, time.time() - t0,
                                'Filter wizard failed')
                     continue
 
+                self.logger.info("Scraping report data...")
                 data = scraper.scrape_data(self, label)
                 elapsed = time.time() - t0
 
@@ -152,16 +170,21 @@ class Worker(BaseWorker):
                     all_data.extend(data)
                     log_scrape('cuic', label, 'success', len(data), elapsed, '')
                     self.logger.info(
-                        f"Report '{label}': {len(data)} records in {elapsed:.1f}s")
+                        f"[OK] Report '{label}': {len(data)} records in {elapsed:.1f}s")
                 else:
+                    self.logger.warning(f"Report '{label}': no data returned after {elapsed:.1f}s")
+                    self.screenshot(f"r{i+1}_no_data", is_step=False)
                     log_scrape('cuic', label, 'no_data', 0, elapsed, 'No data found')
 
             except Exception as e:
-                log_scrape('cuic', label, 'error', 0, time.time() - t0, str(e))
-                self.logger.error(f"Report '{label}' failed: {e}")
+                elapsed = time.time() - t0
+                log_scrape('cuic', label, 'error', 0, elapsed, str(e))
+                self.logger.error(f"Report '{label}' failed after {elapsed:.1f}s: {e}")
+                self.logger.error(f"  {traceback.format_exc()}")
+                self.screenshot(f"r{i+1}_exception", is_step=False)
 
-        # Final cleanup
         navigation.close_report_page(self)
+        self.logger.info(f"Scrape complete: {len(all_data)} total records from {len(enabled)} report(s)")
         return all_data
 
     # ══════════════════════════════════════════════════════════════════════

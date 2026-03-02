@@ -15,38 +15,55 @@ from . import javascript
 def scrape_data(worker, report_label: str = '') -> List[Dict[str, Any]]:
     """Main scraper entry point. Tries all methods in order."""
     try:
+        worker.logger.info(f"  Waiting {worker.timeout_long}ms for report data to render...")
         worker.page.wait_for_timeout(worker.timeout_long)
 
         all_pages = worker.context.pages
         target = all_pages[-1] if len(all_pages) > 1 else worker.page
+        worker.logger.info(f"  Scraper: {len(all_pages)} page(s), "
+                         f"targeting {'last page' if len(all_pages) > 1 else 'main page'}")
+        worker.logger.info(f"  Target has {len(target.frames)} frame(s)")
 
-        for frame in target.frames:
-            # ── Primary: ag-grid JavaScript API (gets ALL rows) ──
+        for fi, frame in enumerate(target.frames):
+            url_short = frame.url[:80] if frame.url else '(empty)'
+            has_ag = False
+            try:
+                has_ag = bool(frame.query_selector('.ag-root, .ag-body-viewport, [class*="ag-theme"]'))
+            except Exception:
+                pass
+
+            if not has_ag:
+                continue
+
+            worker.logger.info(f"  Frame {fi}: ag-grid detected ({url_short})")
+
             data = _scrape_ag_grid_api(worker, frame, report_label)
             if data:
                 worker.logger.info(f"Scraped {len(data)} records via ag-grid JS API")
                 worker.screenshot("04_done")
                 return data
 
-            # ── Fallback 1: DOM scraping (visible rows only) ─────
             data = _scrape_ag_grid_dom(worker, frame, report_label)
             if data:
                 worker.logger.info(f"Scraped {len(data)} records via ag-grid DOM fallback")
                 worker.screenshot("04_done")
                 return data
 
-            # ── Fallback 2: plain HTML tables ────────────────────
             data = _scrape_html_tables(worker, frame, report_label)
             if data:
                 worker.logger.info(f"Scraped {len(data)} records from HTML tables")
                 worker.screenshot("04_done")
                 return data
 
+            worker.logger.info(f"  Frame {fi}: ag-grid found but no data rows extracted")
+
         worker.logger.warning("No report data found in any frame")
         worker.screenshot("no_data", is_step=False)
         return []
     except Exception as e:
         worker.logger.error(f"Scrape failed: {e}")
+        import traceback
+        worker.logger.error(f"  {traceback.format_exc()}")
         worker.screenshot("scrape_error", is_step=False)
         return []
 
@@ -61,15 +78,15 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '') -> List[Dict[str,
         result = frame.evaluate(javascript.AG_GRID_JS)
 
         if not isinstance(result, dict):
-            worker.logger.debug("ag-grid JS API: unexpected return type")
+            worker.logger.info("    ag-grid JS API: unexpected return type")
             return []
         if 'error' in result:
-            worker.logger.debug(f"ag-grid JS API: {result['error']}")
+            worker.logger.info(f"    ag-grid JS API: {result['error']}")
             return []
 
         columns = result['columns']
         rows    = result['rows']
-        worker.logger.info(f"ag-grid JS API: {len(columns)} columns, {result['rowCount']} rows")
+        worker.logger.info(f"    ag-grid JS API: {len(columns)} columns, {result['rowCount']} rows")
 
         # Build header names (prefer headerName, fall back to field)
         hdrs = [c.get('headerName') or c.get('field', f'col_{i}')

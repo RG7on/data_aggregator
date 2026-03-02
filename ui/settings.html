@@ -2506,6 +2506,29 @@ function buildSettings() {
         reports:            cuicReports.map(r => {
           const f = Object.assign({}, r.filters || {});
           if (r._wizard_meta) f._meta = r._wizard_meta;
+          // Normalize step keys to paramName so saved JSON matches what wizard apply expects
+          const meta = r._wizard_meta || f._meta;
+          const steps = meta && meta.steps;
+          if (steps && Array.isArray(steps)) {
+            steps.forEach((stepMeta, i) => {
+              const stepKey = 'step_' + (i + 1);
+              const stepVals = f[stepKey];
+              if (!stepVals || typeof stepVals !== 'object') return;
+              const params = stepMeta.params || [];
+              const normalized = {};
+              params.forEach(p => {
+                const pn = (p.paramName || '').trim();
+                const label = (p.label || '').trim();
+                if (!pn) return;
+                let val = stepVals[pn];
+                if (val === undefined && label) val = stepVals[label];
+                if (val === undefined && label) val = stepVals[label.replace(/\s+/g, ' ').trim()];
+                if (val !== undefined) normalized[pn] = val;
+              });
+              ['_field_filters'].forEach(k => { if (stepVals[k] !== undefined) normalized[k] = stepVals[k]; });
+              if (Object.keys(normalized).length) f[stepKey] = normalized;
+            });
+          }
           return { label: r.label, folder: r.folder, name: r.name, enabled: r.enabled !== false, data_type: r.data_type || 'ongoing', filters: f };
         }),
         timeout_nav_ms:     parseInt(document.getElementById('cuic-t-nav').value) || 30000,
@@ -2601,10 +2624,15 @@ async function saveAll() {
       fetch('/api/settings',    { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(buildSettings()) }),
       fetch('/api/credentials', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(buildCredentials()) })
     ]);
-    if (r1.ok && r2.ok) showToast('Settings saved!');
-    else showToast('Save failed: ' + (await r1.text()) + (await r2.text()), 'error');
+    if (r1.ok && r2.ok) {
+      showToast('Settings saved!');
+      return true;
+    }
+    showToast('Save failed: ' + (await r1.text()) + (await r2.text()), 'error');
+    return false;
   } catch(e) {
     showToast('Server offline — use Export tab to copy JSON manually', 'error');
+    return false;
   }
 }
 
@@ -2612,14 +2640,24 @@ async function saveAll() {
 async function startManualScrape() {
   const btn = document.getElementById('manual-scrape-btn');
   const statusEl = document.getElementById('manual-scrape-status');
+  // Disable immediately to prevent double-run from double-click or fast second click
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '⏳ Starting...';
+  statusEl.textContent = 'Saving settings...';
+  statusEl.style.color = 'var(--accent)';
   try {
-    // Save settings first so workers use the latest config
-    await saveAll();
+    // Save settings first so workers use the latest config; do not run if save failed
+    const saved = await saveAll();
+    if (!saved) {
+      btn.disabled = false;
+      btn.textContent = '▶ Start Scrape Now';
+      statusEl.textContent = 'Save failed. Fix and save before running.';
+      statusEl.style.color = 'var(--red)';
+      return;
+    }
 
-    btn.disabled = true;
-    btn.textContent = '⏳ Starting...';
-    statusEl.textContent = 'Saving settings and starting scrape...';
-    statusEl.style.color = 'var(--accent)';
+    statusEl.textContent = 'Starting scrape...';
 
     const res = await fetch('/api/run-scrape', { method: 'POST' });
     const data = await res.json();

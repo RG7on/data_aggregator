@@ -108,8 +108,16 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
     /* ── DATETIME filter (HCFFilterCtrl / datetime-filter) ── */
     const dtFilter = sec.querySelector('datetime-filter');
     if (dtFilter) {
+        /* The DateTimeFilterCtrl scope lives on an INNER element
+           <div ng-controller="DateTimeFilterCtrl as sel">, NOT on the
+           <datetime-filter> directive element itself. */
+        const dtCtrlEl = dtFilter.querySelector('[ng-controller*="DateTimeFilter"]')
+                      || dtFilter.querySelector('.dateTimeFilter');
         let dtScope;
-        try { dtScope = angular.element(dtFilter).scope(); } catch(e) {}
+        try {
+            dtScope = dtCtrlEl ? angular.element(dtCtrlEl).scope()
+                               : angular.element(dtFilter).scope();
+        } catch(e) {}
         if (dtScope) {
             /* Read the heading text for label */
             const heading = sec.querySelector('.accordion--navigation a');
@@ -120,8 +128,10 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
             const selEl = dtFilter.querySelector('.csSelect-container');
             if (selEl) {
                 try {
+                    /* csSelect options live on isolateScope() */
+                    const selIso = angular.element(selEl).isolateScope();
                     const selScope = angular.element(selEl).scope();
-                    const opts = selScope?.csSelect?.options || selScope?.sel?.options || [];
+                    const opts = selIso?.csSelect?.options || selScope?.sel?.options || [];
                     opts.forEach(o => datePresets.push({
                         value: o.value || o.id || '',
                         label: o.label || o.name || o.value || ''
@@ -165,12 +175,15 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
             const currentTime1   = cfg.startTime      || '';
             const currentTime2   = cfg.endTime        || '';
 
-            /* Days section — hidden by ng-hide when preset is THISDAY or LASTDAY
-               ng-hide="dateTimeField.relativeRange=='THISDAY'||dateTimeField.relativeRange=='LASTDAY'" */
-            const hasDays       = (relativeRange !== 'THISDAY' && relativeRange !== 'LASTDAY');
-            const allDayChecked = cfg.allDayChecked || 'true';   /* 'true'=All Day, 'false'=Custom */
-            /* daysKey = ['mon','tue','wed','thu','fri','sat','sun'] on the scope */
+            /* Days section — visibility depends on TWO conditions:
+               1. The datetime-filter must support days (template has the days section)
+               2. The preset is NOT THISDAY or LASTDAY (toggled by ng-hide)
+               We check daysKey existence AND template presence to confirm support. */
             const daysKey = dtScope.daysKey || ['mon','tue','wed','thu','fri','sat','sun'];
+            const daysTemplateEl = dtFilter.querySelector('[ng-if="dateTimeField.showDays"], [ng-show*="showDays"], .days-filter, [ng-model*="allDay"]');
+            const hasDaysData = daysKey.some(d => d in dtField);
+            const hasDays = hasDaysData || !!daysTemplateEl;
+            const allDayChecked = cfg.allDayChecked || 'true';   /* 'true'=All Day, 'false'=Custom */
             const days = {};
             daysKey.forEach(d => { days[d] = dtField[d] || ''; }); /* 'checked' or '' */
 
@@ -395,15 +408,16 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
         try {
             const iffScope = angular.element(iffFields).scope();
             if (iffScope && iffScope.vm && iffScope.vm.selectedList) {
-                /* Try to collect operator options from any visible operator csSelect */
-                const opSelEl = iffFields.querySelector('.csSelect-container');
+                /* Try to collect operator options from operator csSelect (isolateScope) */
+                const opSelEls = iffFields.querySelectorAll('.csSelect-container');
+                const opSelEl = opSelEls.length > 1 ? opSelEls[1] : opSelEls[0];
                 if (opSelEl) {
                     try {
-                        const opSelScope = angular.element(opSelEl).scope();
-                        const opts = opSelScope?.csSelect?.options || [];
+                        const opSelIso = angular.element(opSelEl).isolateScope();
+                        const opts = opSelIso?.csSelect?.options || [];
                         opts.forEach(o => availableOperators.push({
-                            value: o.value || o.id || '',
-                            label: o.label || o.name || o.value || ''
+                            value: o.operator || o.value || o.id || '',
+                            label: o.label || o.name || ''
                         }));
                     } catch(e) {}
                 }
@@ -413,9 +427,9 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
                     const fid = pm ? pm[2].trim() : (f.id || f.name || f.fieldName || cn);
                     const lbl = pm ? pm[1].trim() : cn;
                     selectedFieldIds.push(fid);
-                    /* operator may be a string key (e.g. 'EQ') or an object {value, label} */
+                    /* operator may be a string key (e.g. 'EQ') or an object {operator, label} */
                     let op = f.operator;
-                    if (op && typeof op === 'object') op = op.value || op.id || String(op);
+                    if (op && typeof op === 'object') op = op.operator || op.value || op.id || String(op);
                     selectedFields.push({
                         fieldId:    fid,
                         label:      lbl,
@@ -499,19 +513,44 @@ CUIC_WIZARD_READ_JS = r'''() => {
                 p.datePresets = datePresets;
                 p.currentPreset = (item.date1 && item.date1.dropDownSelected)
                     ? item.date1.dropDownSelected.value : '';
+                p.relativeRange = p.currentPreset; /* alias for multistep compat */
                 p.hasDateRange = !!item.date2;
-                /* current date values */
-                if (item.date1 && item.date1.dateValue)
-                    p.currentDate1 = item.date1.dateValue;
-                if (item.date2 && item.date2.dateValue)
-                    p.currentDate2 = item.date2.dateValue;
+                /* enablePicker: true when preset is CUSTOM, false otherwise */
+                p.enablePicker = !!item.enablePicker;
+                p.isRelativeDate = item.enablePicker ? 'no' : 'yes';
+                p.displayFormat = item.displayFormat || '';
+                /* current date values: prefer .date (formatted string), fallback .dateValue */
+                if (item.date1)
+                    p.currentDate1 = item.date1.date || item.date1.dateValue || '';
+                if (item.date2)
+                    p.currentDate2 = item.date2.date || item.date2.dateValue || '';
                 /* time range */
                 p.allTime = item.allTime || 1;
                 p.hasTimeRange = (item.dataType !== 'DATE' && !!item.date2);
-                if (item.time1 && item.time1.dateValue)
-                    p.currentTime1 = item.time1.dateValue;
-                if (item.time2 && item.time2.dateValue)
-                    p.currentTime2 = item.time2.dateValue;
+                p.allTimeChecked = (item.allTime === 1) ? 'true' : 'false';
+                if (item.time1)
+                    p.currentTime1 = item.time1.date || item.time1.dateValue || '';
+                if (item.time2)
+                    p.currentTime2 = item.time2.date || item.time2.dateValue || '';
+                /* Days of week: only present on some report definitions.
+                   item.days is a map {mon:'checked',tue:'',...} when supported.
+                   showDays is toggled by handleRelativeDateChange when
+                   preset !== THISDAY and preset !== LASTDAY. */
+                p.hasDays = ('days' in item) && !!item.days;
+                if (p.hasDays) {
+                    const preset = p.currentPreset;
+                    p.showDays = (preset !== 'THISDAY' && preset !== 'LASTDAY');
+                    p.allDay = item.allDay;
+                    p.allDayChecked = item.allDay ? 'true' : 'false';
+                    const dayKeys = ['mon','tue','wed','thu','fri','sat','sun'];
+                    p.days = {};
+                    dayKeys.forEach(d => { p.days[d] = item.days[d] || item[d] || ''; });
+                } else {
+                    p.showDays = false;
+                    p.allDayChecked = 'true';
+                    p.days = {mon:'checked',tue:'checked',wed:'checked',thu:'checked',
+                              fri:'checked',sat:'checked',sun:'checked'};
+                }
                 break;
             case 'VALUELIST': {
                 p.type = 'cuic_valuelist';
@@ -606,7 +645,8 @@ CUIC_WIZARD_APPLY_JS = r'''(config) => {
                 case 'DATETIME':
                 case 'DATE': {
                     /* val can be a string preset like "THISDAY"
-                       or an object: {preset, date1, date2, allTime, time1, time2} */
+                       or an object: {preset, date1, date2, allTime, time1, time2,
+                                      allTimeChecked, allDayChecked, days, showDays} */
                     const cfg = typeof val === 'string' ? {preset: val} : (val || {});
                     const preset = cfg.preset || null;
 
@@ -631,9 +671,13 @@ CUIC_WIZARD_APPLY_JS = r'''(config) => {
                         }
                     }
                     /* time range: 1=All Day, 2=Custom */
-                    if (cfg.allTime !== undefined)
-                        item.allTime = cfg.allTime;
-                    if (cfg.allTime === 2) {
+                    /* Accept both allTime (1/2) and allTimeChecked ('true'/'false') */
+                    let resolvedAllTime = cfg.allTime;
+                    if (resolvedAllTime === undefined && cfg.allTimeChecked !== undefined)
+                        resolvedAllTime = cfg.allTimeChecked === 'false' ? 2 : 1;
+                    if (resolvedAllTime !== undefined)
+                        item.allTime = resolvedAllTime;
+                    if (item.allTime === 2) {
                         if (cfg.time1 && item.time1) {
                             const t = new Date(cfg.time1);
                             if (!isNaN(t)) item.time1.dateValue = t;
@@ -641,6 +685,21 @@ CUIC_WIZARD_APPLY_JS = r'''(config) => {
                         if (cfg.time2 && item.time2) {
                             const t = new Date(cfg.time2);
                             if (!isNaN(t)) item.time2.dateValue = t;
+                        }
+                    }
+                    /* Days of week — only when item.days exists on the model */
+                    if (item.days || 'days' in item) {
+                        if (cfg.allDayChecked !== undefined) {
+                            item.allDay = (cfg.allDayChecked === 'true' || cfg.allDayChecked === true);
+                        }
+                        if (cfg.days) {
+                            const dayKeys = ['mon','tue','wed','thu','fri','sat','sun'];
+                            dayKeys.forEach(d => {
+                                if (cfg.days[d] !== undefined) {
+                                    if (item.days) item.days[d] = cfg.days[d];
+                                    item[d] = cfg.days[d]; /* 'checked' or '' */
+                                }
+                            });
                         }
                     }
                     results.push({param: paramName, ok: true, value: cfg});
@@ -737,9 +796,20 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
     if (cfg.stepType === 'datetime') {
         const dtFilter = sec.querySelector('datetime-filter');
         if (!dtFilter) return {ok: false, error: 'no_datetime_filter'};
+
+        /* The datetime-filter directive creates an OUTER scope on the
+           <datetime-filter> tag itself, but the DateTimeFilterCtrl with
+           relativeRangeSelected, updateRDChange, dateTimeField, config,
+           daysKey etc. lives on an INNER element:
+             <div ng-controller="DateTimeFilterCtrl as sel">
+           We must get scope() from THAT inner element. */
+        const dtCtrlEl = dtFilter.querySelector('[ng-controller*="DateTimeFilter"]')
+                      || dtFilter.querySelector('.dateTimeFilter');
         let scope;
-        try { scope = angular.element(dtFilter).scope(); }
-        catch(e) { return {ok: false, error: e.message}; }
+        try {
+            scope = dtCtrlEl ? angular.element(dtCtrlEl).scope()
+                             : angular.element(dtFilter).scope();
+        } catch(e) { return {ok: false, error: e.message}; }
         if (!scope) return {ok: false, error: 'no_scope'};
 
         try {
@@ -747,14 +817,16 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
             if (vals.preset !== undefined) {
                 const selEl = dtFilter.querySelector('.csSelect-container');
                 if (selEl) {
+                    /* csSelect options live on isolateScope(), sel.options on regular scope */
+                    const selIso = angular.element(selEl).isolateScope();
                     const selScope = angular.element(selEl).scope();
-                    const opts = selScope?.csSelect?.options || scope.sel?.options || [];
+                    const opts = selIso?.csSelect?.options || selScope?.sel?.options || [];
                     const opt  = opts.find(o =>
                         (o.value || o.id || '') === vals.preset ||
                         (o.label || o.name  || '') === vals.preset);
                     if (opt) {
                         scope.relativeRangeSelected = opt;
-                        if (selScope && selScope.csSelect) selScope.csSelect.selected = opt;
+                        if (selIso && selIso.csSelect) selIso.csSelect.selected = opt;
                         if (typeof scope.updateRDChange === 'function') scope.updateRDChange(0);
                         actions.push({field: 'preset', value: vals.preset, ok: true});
                     } else {
@@ -883,23 +955,47 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
                     }
                 }
             } else if (Array.isArray(vals.selectedValues) && vals.selectedValues.length) {
+                /* Replace selection atomically: merge left+right, then split by saved names in one pass */
                 if (swIso && Array.isArray(swIso.leftModel)) {
-                    const [toMove, remaining] = extractByName(swIso.leftModel, vals.selectedValues);
+                    const allRight = flattenModel(swIso.rightModel || []);
+                    /* Deduplicate combined list by name before re-splitting */
+                    const rawCombined = (swIso.leftModel || []).concat(allRight);
+                    const seenNames = new Set();
+                    const combined = [];
+                    rawCombined.forEach(v => {
+                        const n = v.name || '';
+                        if (!seenNames.has(n)) { seenNames.add(n); combined.push(v); }
+                    });
+                    const leftCount = swIso.leftModel.length;
+                    const rightCount = allRight.length;
+                    const [toMove, remaining] = extractByName(combined, vals.selectedValues);
                     swIso.leftModel  = remaining;
-                    swIso.rightModel = (swIso.rightModel||[]).concat(toMove);
+                    swIso.rightModel = toMove;
                     try { swIso.$apply(); } catch(e) {}
                     actions.push({field: 'selectedValues', count: toMove.length,
+                                  requested: vals.selectedValues.length,
+                                  matchedNames: toMove.map(v => v.name || '?'),
+                                  leftBefore: leftCount, rightBefore: rightCount,
+                                  combined: combined.length,
                                   method: 'switcher_iso', ok: true});
                 } else {
                     const fc = findFilterCtrl();
                     if (fc && fc.filterField) {
-                        const [toMove, remaining] = extractByName(
-                            fc.leftAttributes||[], vals.selectedValues);
+                        const leftAttrs = fc.leftAttributes || [];
+                        const rightAttrs = flattenModel(fc.filterField.value || []);
+                        const combined = leftAttrs.concat(rightAttrs);
+                        const leftCount = leftAttrs.length;
+                        const rightCount = rightAttrs.length;
+                        const [toMove, remaining] = extractByName(combined, vals.selectedValues);
                         fc.leftAttributes    = remaining;
-                        fc.filterField.value = (fc.filterField.value||[]).concat(toMove);
+                        fc.filterField.value = toMove;
                         const cf2 = sec.querySelector('cuic-filter');
                         try { if(cf2) angular.element(cf2).scope().$apply(); } catch(e) {}
                         actions.push({field: 'selectedValues', count: toMove.length,
+                                      requested: vals.selectedValues.length,
+                                      matchedNames: toMove.map(v => v.name || '?'),
+                                      leftBefore: leftCount, rightBefore: rightCount,
+                                      combined: combined.length,
                                       method: 'filterCtrl', ok: true});
                     } else {
                         actions.push({field: 'selectedValues', ok: false, error: 'no_apply_method'});
@@ -918,36 +1014,77 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
 
         try {
             const iffScope = angular.element(iffFields).scope();
-            if (!iffScope || !iffScope.vm || !iffScope.vm.selectedList)
-                return {ok: false, error: 'no_vm_selectedList'};
+            let vm = iffScope && iffScope.vm;
+            let s = iffScope;
+            for (let d = 0; !vm && s && d < 5; d++, s = s.$parent) {
+                vm = s.vm;
+            }
+            if (!vm || !vm.selectedList) return {ok: false, error: 'no_vm_selectedList'};
 
-            /* vals.fields = [{fieldId|id, operator, value1, value2}, ...] */
-            (vals.fields || []).forEach(fv => {
+            const fieldsToApply = vals.fields || [];
+            if (fieldsToApply.length === 0) {
+                try { iffScope.$apply(); } catch(e) {}
+                return {ok: true, actions: []};
+            }
+
+            /* Clear existing selection so we replace with saved fields */
+            vm.selectedList.length = 0;
+            const availableOpts = vm.fields || [];
+            if (!availableOpts.length) {
+                try { iffScope.$apply(); } catch(e) {}
+                return {ok: false, error: 'no_vm_fields', actions: []};
+            }
+
+            /* Collect operator options from the operator csSelect dropdown.
+               CUIC operator objects use {operator: "G", label: "Greater than"} format,
+               NOT {value: ..., label: ...}. The options live on isolateScope(). */
+            let operatorOpts = [];
+            try {
+                const opSelEls = iffFields.querySelectorAll('.csSelect-container');
+                /* The first csSelect is the field picker; the second (index 1) is operators.
+                   If only one exists, it might be the combined field+operator dropdown. */
+                const opSelEl = opSelEls.length > 1 ? opSelEls[1] : opSelEls[0];
+                if (opSelEl) {
+                    const opSelIso = angular.element(opSelEl).isolateScope();
+                    operatorOpts = opSelIso?.csSelect?.options || [];
+                }
+            } catch(e) {}
+
+            function resolveOperator(rawOp) {
+                if (!rawOp) return rawOp;
+                if (typeof rawOp === 'object') return rawOp;
+                /* Match by operator code (e.g. "G", "EQ") or label text */
+                const match = operatorOpts.find(o =>
+                    (o.operator || o.value || o.id || '') === rawOp ||
+                    (o.label || o.name || '') === rawOp);
+                if (match) return match;
+                /* Fallback: construct object in CUIC's expected format {operator, label} */
+                return {operator: rawOp, label: rawOp};
+            }
+
+            /* Add each saved field: clone the Angular opt object for proper watcher compatibility */
+            fieldsToApply.forEach(fv => {
                 const fvId = (fv.fieldId || fv.id || '').trim();
-                const item = iffScope.vm.selectedList.find(f => {
-                    const cn  = (f.combinedName || '').trim();
+                const opt = availableOpts.find(o => {
+                    const oid = (o.fieldId || o.id || o.name || '').trim();
+                    const cn  = (o.combinedName || '').trim();
                     const pm  = cn.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
-                    const fid = pm ? pm[2].trim() : cn;
-                    return fid === fvId || cn === fvId;
+                    const fid = pm ? pm[2].trim() : oid;
+                    return fid === fvId || oid === fvId || cn === fvId || (cn && cn.indexOf('(' + fvId + ')') >= 0);
                 });
-                if (!item) {
-                    actions.push({field: 'operator_' + fvId, ok: false,
-                                  error: 'field_not_in_selectedList'});
+                if (!opt) {
+                    actions.push({field: 'add_' + fvId, ok: false, error: 'field_not_in_available'});
                     return;
                 }
-                if (fv.operator !== undefined) {
-                    item.operator = fv.operator;
-                    actions.push({field: 'operator_' + fvId, value: fv.operator, ok: true});
-                }
-                if (fv.value1 !== undefined) {
-                    item.value1 = fv.value1;
-                    actions.push({field: 'value1_' + fvId, value: fv.value1, ok: true});
-                }
-                if (fv.value2 !== undefined) {
-                    item.value2 = fv.value2;
-                    actions.push({field: 'value2_' + fvId, value: fv.value2, ok: true});
-                }
+                const entry = Object.assign({}, opt);
+                entry.operator   = resolveOperator(fv.operator !== undefined ? fv.operator : '');
+                entry.value1     = fv.value1 !== undefined ? String(fv.value1) : '';
+                entry.value2     = fv.value2 !== undefined ? String(fv.value2) : '';
+                entry.showInput2 = !!fv.showInput2;
+                vm.selectedList.push(entry);
+                actions.push({field: 'add_' + fvId, value: entry.combinedName || fvId, ok: true});
             });
+
             try { iffScope.$apply(); } catch(e) {}
         } catch(e) {
             return {ok: false, error: e.message, actions};

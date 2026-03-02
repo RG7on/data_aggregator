@@ -226,7 +226,7 @@ def export_csv(output_dir: str = None, shared_drive_path: str = None):
         output_dir = get_output_dir()
     local_csv = os.path.join(output_dir, CSV_FILENAME)
     _atomic_write_csv(df, local_csv)
-    logger.info(f"Exported {len(df)} rows → {local_csv}")
+    logger.info(f"Exported {len(df)} rows -> {local_csv}")
 
     # 2. Shared drive CSV (if configured)
     if shared_drive_path is None:
@@ -239,10 +239,10 @@ def export_csv(output_dir: str = None, shared_drive_path: str = None):
             if parent and not os.path.exists(parent):
                 os.makedirs(parent, exist_ok=True)
             _atomic_write_csv(df, shared_drive_path)
-            logger.info(f"Exported {len(df)} rows → {shared_drive_path} (shared drive)")
+            logger.info(f"Exported {len(df)} rows -> {shared_drive_path} (shared drive)")
         except Exception as e:
             logger.error(f"Failed to write to shared drive: {e}")
-            logger.error("Local CSV is still up-to-date — data is safe.")
+            logger.error("Local CSV is still up-to-date - data is safe.")
 
 
 def _atomic_write_csv(df: pd.DataFrame, path: str):
@@ -276,7 +276,7 @@ def migrate_csv_to_db(csv_path: str = None):
     # Ensure expected columns
     required = {'date', 'timestamp', 'source', 'metric_title', 'value'}
     if not required.issubset(set(df.columns)):
-        logger.warning(f"CSV columns {list(df.columns)} don't match expected schema — skipping migration")
+        logger.warning(f"CSV columns {list(df.columns)} don't match expected schema - skipping migration")
         return 0
 
     # Fill missing optional columns
