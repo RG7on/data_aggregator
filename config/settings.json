@@ -1075,10 +1075,23 @@
               ]
             },
             "step_1": {
-              "DateTime  (DateTime)": "LASTYR"
+              "DateTime  (DateTime)": {
+                "preset": "LASTMTH",
+                "allDayChecked": "false",
+                "days": {
+                  "mon": "",
+                  "wed": "checked",
+                  "thu": "",
+                  "fri": "",
+                  "sun": "",
+                  "sat": ""
+                }
+              }
             },
             "step_2": {
               "Call Types(CallTypeID)": [
+                "AGENT_XFER_CALLTYPE",
+                "AgentTransfer_CT",
                 "General_IT_CT",
                 "RTPS_CT",
                 "SAP_CT",
@@ -1091,7 +1104,7 @@
                 {
                   "id": "Calls Handled (CallsHandled)",
                   "operator": "G",
-                  "value1": "10"
+                  "value1": "5"
                 }
               ]
             }

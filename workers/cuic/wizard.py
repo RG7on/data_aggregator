@@ -392,7 +392,8 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                                 f"{a.get('matchedNames', a.get('value', a.get('error', '')))}")
                         applied = True
                         applied_frame = f
-                        worker.page.wait_for_timeout(300)
+                        if ptype != 'cuic_field_filter':
+                            worker.page.wait_for_timeout(300)
                         break
                     elif result and result.get('error'):
                         worker.logger.debug(f"    {pn}: frame skip: {result.get('error','')}")
@@ -404,16 +405,10 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
             # Field filter Pass 2: set operators/values after cuic-filter elements render
             if applied and ptype == 'cuic_field_filter':
                 try:
-                    # Wait for cuic-filter elements to appear in the DOM
-                    # (Angular compiles them asynchronously after $apply)
-                    for f in worker.page.frames:
-                        try:
-                            f.wait_for_selector(
-                                '#cuic-iff-fields cuic-filter', timeout=3000)
-                            break
-                        except Exception:
-                            continue
-                    worker.page.wait_for_timeout(200)  # small buffer for Angular init
+                    # Wait for cuic-filter elements on the frame that Pass 1 used
+                    # (elements are inside collapsed accordions so use 'attached' not 'visible')
+                    applied_frame.wait_for_selector(
+                        '#cuic-iff-fields cuic-filter', state='attached', timeout=3000)
 
                     result2 = applied_frame.evaluate(
                         javascript.CUIC_FIELD_FILTER_PASS2_JS, val)
