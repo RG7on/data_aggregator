@@ -427,8 +427,10 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
                     const fid = pm ? pm[2].trim() : (f.id || f.name || f.fieldName || cn);
                     const lbl = pm ? pm[1].trim() : cn;
                     selectedFieldIds.push(fid);
-                    /* operator may be a string key (e.g. 'EQ') or an object {operator, label} */
+                    /* operator may be in f.operator (string/object) or f.selected
+                       (the csSelect ng-model stores the full option object there) */
                     let op = f.operator;
+                    if (!op && f.selected) op = f.selected;
                     if (op && typeof op === 'object') op = op.operator || op.value || op.id || String(op);
                     selectedFields.push({
                         fieldId:    fid,
@@ -1008,6 +1010,9 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
     }
 
     /* ──────────────────────────────────────────────────────── FIELD FILTER */
+    /* Pass 1: add fields to vm.selectedList, trigger $apply() so Angular
+       renders cuic-filter directive rows.  Operator/value are set in a
+       separate Pass 2 call after the DOM elements have compiled.  */
     else if (cfg.stepType === 'field_filter') {
         const iffFields = sec.querySelector('#cuic-iff-fields');
         if (!iffFields) return {ok: false, error: 'no_iff_fields'};
@@ -1035,34 +1040,10 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
                 return {ok: false, error: 'no_vm_fields', actions: []};
             }
 
-            /* Collect operator options from the operator csSelect dropdown.
-               CUIC operator objects use {operator: "G", label: "Greater than"} format,
-               NOT {value: ..., label: ...}. The options live on isolateScope(). */
-            let operatorOpts = [];
-            try {
-                const opSelEls = iffFields.querySelectorAll('.csSelect-container');
-                /* The first csSelect is the field picker; the second (index 1) is operators.
-                   If only one exists, it might be the combined field+operator dropdown. */
-                const opSelEl = opSelEls.length > 1 ? opSelEls[1] : opSelEls[0];
-                if (opSelEl) {
-                    const opSelIso = angular.element(opSelEl).isolateScope();
-                    operatorOpts = opSelIso?.csSelect?.options || [];
-                }
-            } catch(e) {}
-
-            function resolveOperator(rawOp) {
-                if (!rawOp) return rawOp;
-                if (typeof rawOp === 'object') return rawOp;
-                /* Match by operator code (e.g. "G", "EQ") or label text */
-                const match = operatorOpts.find(o =>
-                    (o.operator || o.value || o.id || '') === rawOp ||
-                    (o.label || o.name || '') === rawOp);
-                if (match) return match;
-                /* Fallback: construct object in CUIC's expected format {operator, label} */
-                return {operator: rawOp, label: rawOp};
-            }
-
-            /* Add each saved field: clone the Angular opt object for proper watcher compatibility */
+            /* Add each saved field to selectedList.
+               value1/value2/selected are pre-set on the entry for completeness,
+               but Angular's cuic-filter directive may overwrite them during
+               its init phase.  The reliable set happens in Pass 2. */
             fieldsToApply.forEach(fv => {
                 const fvId = (fv.fieldId || fv.id || '').trim();
                 const opt = availableOpts.find(o => {
@@ -1077,7 +1058,6 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
                     return;
                 }
                 const entry = Object.assign({}, opt);
-                entry.operator   = resolveOperator(fv.operator !== undefined ? fv.operator : '');
                 entry.value1     = fv.value1 !== undefined ? String(fv.value1) : '';
                 entry.value2     = fv.value2 !== undefined ? String(fv.value2) : '';
                 entry.showInput2 = !!fv.showInput2;
@@ -1085,6 +1065,7 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
                 actions.push({field: 'add_' + fvId, value: entry.combinedName || fvId, ok: true});
             });
 
+            /* Digest so Angular starts rendering cuic-filter elements */
             try { iffScope.$apply(); } catch(e) {}
         } catch(e) {
             return {ok: false, error: e.message, actions};
@@ -1093,6 +1074,120 @@ CUIC_MULTISTEP_APPLY_JS = r'''(cfg) => {
 
     return {ok: true, actions};
 }'''
+
+# ── Field filter Pass 2: set operators and values ────────────────────
+# Called AFTER CUIC_MULTISTEP_APPLY_JS (stepType='field_filter') once the
+# cuic-filter DOM elements have been rendered by Angular's ng-repeat.
+# wizard.py waits for 'cuic-filter' elements to appear before calling this.
+#
+# fieldsToApply = [{fieldId/id, operator, value1, value2, showInput2}, ...]
+CUIC_FIELD_FILTER_PASS2_JS = r'''(fieldsToApply) => {
+    if (typeof angular === 'undefined') return {ok: false, error: 'no_angular'};
+
+    /* Find the visible field-filter section */
+    const sections = document.querySelectorAll('filter-wizard .steps > section');
+    let sec = null;
+    sections.forEach(s => { if (s.style.display !== 'none') sec = s; });
+    if (!sec) return {ok: false, error: 'no_visible_section'};
+
+    const iffFields = sec.querySelector('#cuic-iff-fields');
+    if (!iffFields) return {ok: false, error: 'no_iff_fields'};
+
+    const actions = [];
+
+    /* Find all cuic-filter elements rendered by ng-repeat="field in vm.selectedList" */
+    const cfEls = iffFields.querySelectorAll('cuic-filter');
+    if (!cfEls.length) return {ok: false, error: 'no_cuic_filter_elements', count: 0};
+
+    const iffScope = angular.element(iffFields).scope();
+
+    cfEls.forEach(cfEl => {
+        try {
+            /* Walk scopes to find filterCtrl — it may be on this element
+               or on a child scope created by cuic-filter directive */
+            let cfScope = angular.element(cfEl).scope();
+            let fc = cfScope && cfScope.filterCtrl;
+            if (!fc) {
+                /* Try isolateScope */
+                let iso = angular.element(cfEl).isolateScope();
+                fc = iso && iso.filterCtrl;
+            }
+            if (!fc) {
+                /* Walk child scopes */
+                let cs = cfScope && cfScope.$$childHead;
+                for (let d = 0; !fc && cs && d < 8; d++, cs = cs.$$nextSibling) {
+                    fc = cs.filterCtrl;
+                    if (!fc && cs.$$childHead) {
+                        let cs2 = cs.$$childHead;
+                        for (let d2 = 0; !fc && cs2 && d2 < 5; d2++, cs2 = cs2.$$nextSibling) {
+                            fc = cs2.filterCtrl;
+                        }
+                    }
+                }
+            }
+            if (!fc || !fc.filterField) {
+                actions.push({field: 'unknown', ok: false, error: 'no_filterCtrl'});
+                return;
+            }
+
+            /* Match this row back to its saved settings by combinedName / fieldId */
+            const cn = (fc.filterField.combinedName || '').trim();
+            const pm = cn.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+            const rowFieldId = pm ? pm[2].trim()
+                                 : (fc.filterField.fieldId || fc.filterField.id
+                                    || fc.filterField.name || cn);
+            const fv = fieldsToApply.find(f => {
+                const fvId = (f.fieldId || f.id || '').trim();
+                return fvId === rowFieldId
+                    || cn === fvId
+                    || (cn && cn.indexOf('(' + fvId + ')') >= 0);
+            });
+            if (!fv) {
+                actions.push({field: rowFieldId, ok: false, error: 'no_saved_match'});
+                return;
+            }
+
+            /* Resolve saved operator string to the actual option object
+               from filterCtrl.options[filterType] so csSelect renders correctly */
+            const rawOp = fv.operator !== undefined ? fv.operator : '';
+            if (rawOp) {
+                const ft     = fc.filterField.filterType;
+                const opOpts = (fc.options && ft) ? (fc.options[ft] || []) : [];
+                const opMatch = opOpts.find(o =>
+                    (o.operator || o.value || o.id || '') === rawOp ||
+                    (o.label || o.name || '') === rawOp);
+                if (opMatch) {
+                    fc.filterField.selected = opMatch;
+                    actions.push({field: 'op_' + rowFieldId, value: rawOp, ok: true});
+                } else {
+                    /* Fallback: minimal object */
+                    fc.filterField.selected = {operator: rawOp, label: rawOp};
+                    actions.push({field: 'op_' + rowFieldId, value: rawOp, ok: false,
+                                  error: 'operator_not_in_options',
+                                  available: opOpts.map(o => o.operator || o.value || ''),
+                                  filterType: ft || 'unknown'});
+                }
+            }
+
+            /* Set value1/value2 through filterCtrl for reliable binding */
+            if (fv.value1 !== undefined) {
+                fc.filterField.value1 = String(fv.value1);
+                actions.push({field: 'val_' + rowFieldId, value: fv.value1, ok: true});
+            }
+            if (fv.value2 !== undefined) fc.filterField.value2 = String(fv.value2);
+            if (fv.showInput2 !== undefined) fc.filterField.showInput2 = !!fv.showInput2;
+
+        } catch(e) {
+            actions.push({field: 'err', error: e.message, ok: false});
+        }
+    });
+
+    /* Final digest to update the UI */
+    try { iffScope.$apply(); } catch(e) {}
+
+    return {ok: true, actions, count: cfEls.length};
+}'''
+
 
 # Fallback: generic HTML form reader (non-CUIC wizards)
 GENERIC_WIZARD_READ_JS = r'''() => {

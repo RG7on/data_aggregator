@@ -1075,20 +1075,23 @@
               ]
             },
             "step_1": {
-              "DateTime  (DateTime)": "LASTWK"
+              "DateTime  (DateTime)": "LASTYR"
             },
             "step_2": {
               "Call Types(CallTypeID)": [
-                "AGENT_XFER_CALLTYPE",
+                "General_IT_CT",
+                "RTPS_CT",
+                "SAP_CT",
+                "Subsurface_CT",
                 "Telcom_CT"
               ]
             },
             "step_3": {
               "_field_filters": [
                 {
-                  "id": "% Abandon (per_aban)",
+                  "id": "Calls Handled (CallsHandled)",
                   "operator": "G",
-                  "value1": "1"
+                  "value1": "10"
                 }
               ]
             }

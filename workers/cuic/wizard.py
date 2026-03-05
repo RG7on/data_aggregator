@@ -380,6 +380,7 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
 
             # Try every frame until the JS applies successfully
             applied = False
+            applied_frame = None
             for f in worker.page.frames:
                 try:
                     result = f.evaluate(javascript.CUIC_MULTISTEP_APPLY_JS, cfg)
@@ -390,6 +391,7 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                                 f"      {status} {a.get('field','')}: "
                                 f"{a.get('matchedNames', a.get('value', a.get('error', '')))}")
                         applied = True
+                        applied_frame = f
                         worker.page.wait_for_timeout(300)
                         break
                     elif result and result.get('error'):
@@ -398,6 +400,35 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                     worker.logger.debug(f"    {pn}: frame error: {e}")
             if not applied:
                 worker.logger.warning(f"    {pn}: could NOT be applied")
+
+            # Field filter Pass 2: set operators/values after cuic-filter elements render
+            if applied and ptype == 'cuic_field_filter':
+                try:
+                    # Wait for cuic-filter elements to appear in the DOM
+                    # (Angular compiles them asynchronously after $apply)
+                    for f in worker.page.frames:
+                        try:
+                            f.wait_for_selector(
+                                '#cuic-iff-fields cuic-filter', timeout=3000)
+                            break
+                        except Exception:
+                            continue
+                    worker.page.wait_for_timeout(200)  # small buffer for Angular init
+
+                    result2 = applied_frame.evaluate(
+                        javascript.CUIC_FIELD_FILTER_PASS2_JS, val)
+                    if result2 and result2.get('ok'):
+                        for a in result2.get('actions', []):
+                            status = 'v' if a.get('ok') else 'x'
+                            worker.logger.info(
+                                f"      {status} {a.get('field','')}: "
+                                f"{a.get('value', a.get('error', ''))}")
+                    elif result2:
+                        worker.logger.warning(
+                            f"    {pn} pass2: {result2.get('error','')} "
+                            f"(count={result2.get('count', '?')})")
+                except Exception as e:
+                    worker.logger.warning(f"    {pn} pass2 error: {e}")
 
     else:
         # ── Generic: DOM-based ──
