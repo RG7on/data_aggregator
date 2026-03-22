@@ -892,6 +892,17 @@ class Worker(BaseWorker):
         os.makedirs(profile_dir, exist_ok=True)
         self.logger.info(f"Chrome profile: {profile_dir}")
 
+        # Remove stale Chrome lock files that can cause ERR_ABORTED on launch.
+        # These are left behind when Chrome is force-killed or crashes.
+        for lock in ('SingletonLock', 'SingletonSocket', '.parentlock'):
+            lock_path = os.path.join(profile_dir, lock)
+            if os.path.exists(lock_path):
+                try:
+                    os.remove(lock_path)
+                    self.logger.debug(f"Removed stale lock: {lock}")
+                except Exception:
+                    pass
+
         self._playwright = sync_playwright().start()
         # launch_persistent_context returns BrowserContext directly — no Browser object
         self.context = self._playwright.chromium.launch_persistent_context(
@@ -903,6 +914,10 @@ class Worker(BaseWorker):
                 '--no-sandbox',
                 '--disable-dev-shm-usage',
                 '--ignore-certificate-errors',
+                '--no-first-run',
+                '--no-default-browser-check',
+                '--disable-infobars',
+                '--disable-session-crashed-bubble',
             ],
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -941,7 +956,20 @@ class Worker(BaseWorker):
         Returns True if landed on SMAX, False if stuck on SSO after the timeout.
         """
         try:
-            self.page.goto(self.base_url, wait_until='domcontentloaded', timeout=30000)
+            # Use 'commit' instead of 'domcontentloaded': SMAX's SAML flow involves
+            # a JavaScript form.submit() that starts a secondary navigation. Playwright
+            # marks the original goto as ERR_ABORTED when that secondary navigation
+            # starts. 'commit' fires on the first server response and avoids this.
+            try:
+                self.page.goto(self.base_url, wait_until='commit', timeout=30000)
+            except Exception as e:
+                # ERR_ABORTED is expected during SAML redirect chains; the browser has
+                # already navigated somewhere — check the URL before giving up.
+                current = self.page.url
+                self.logger.debug(f"goto raised during auth check (url={current[:60]}): {e}")
+                if not current or current == 'about:blank':
+                    self.logger.warning(f"Auth check failed — blank page after goto: {e}")
+                    return False
             # Wait for the SAML round-trip to resolve (SMAX -> Microsoft -> SMAX).
             # If the session is valid the browser returns to SMAX within a few seconds.
             # If the session is expired it stays on Microsoft's login page.
@@ -974,7 +1002,23 @@ class Worker(BaseWorker):
         self.logger.info(f"Waiting up to {self.SSO_WAIT_TIMEOUT // 60000} minutes...")
         self.logger.info("=" * 60)
 
-        self.page.goto(self.base_url, wait_until='domcontentloaded', timeout=30000)
+        # Navigate to SMAX — the SAML SP will redirect to Microsoft login.
+        # ERR_ABORTED is expected here: SMAX's SAML redirect chain includes a
+        # JavaScript form.submit() which starts a secondary navigation. Playwright
+        # marks the original goto as aborted when that secondary navigation fires.
+        # This is NOT a real failure — the browser has navigated to the login page.
+        try:
+            self.page.goto(self.base_url, wait_until='commit', timeout=30000)
+        except Exception as e:
+            current = self.page.url
+            self.logger.debug(f"goto raised (expected during SAML redirect, url={current[:60]}): {e}")
+            if not current or current == 'about:blank':
+                # Truly blank page — something is wrong
+                raise RuntimeError(f"Browser did not navigate: {e}") from e
+
+        # At this point the browser is somewhere in the SSO flow.
+        # Log where we landed so the user can see the browser is working.
+        self.logger.info(f"Browser navigated to: {self.page.url[:80]}")
 
         # Wait until the browser leaves the Microsoft SSO domain
         self.page.wait_for_function(
@@ -1041,8 +1085,23 @@ class Worker(BaseWorker):
                 worker._wait_for_sso_auth()
 
             worker.logger.info(f"Discovery: navigating to {url}")
-            worker.page.goto(url, wait_until='domcontentloaded',
-                             timeout=worker.PAGE_LOAD_TIMEOUT)
+            # Use 'commit' to avoid ERR_ABORTED from SAML redirect chains.
+            # If the session is valid SMAX loads; if expired we'll land on SSO.
+            try:
+                worker.page.goto(url, wait_until='commit',
+                                 timeout=worker.PAGE_LOAD_TIMEOUT)
+            except Exception as e:
+                current = worker.page.url
+                worker.logger.debug(f"goto raised during discovery (url={current[:60]}): {e}")
+                if not current or current == 'about:blank':
+                    raise
+
+            # If we ended up on the SSO page the session expired mid-run.
+            if worker.SSO_INDICATOR in worker.page.url:
+                raise RuntimeError(
+                    'Session expired. Close this dialog and run discovery again '
+                    'to complete the Microsoft login.'
+                )
 
             # Wait for the properties panel to render
             try:
