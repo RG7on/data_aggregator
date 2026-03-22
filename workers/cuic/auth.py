@@ -7,24 +7,56 @@ Login and logout methods for CUIC.
 from . import selectors
 
 
+def _find_and_fill(worker, page, fallbacks, value, field_name):
+    """Try multiple selectors to find and fill a field."""
+    for sel in fallbacks:
+        try:
+            el = page.locator(sel)
+            if el.count() > 0 and el.first.is_visible():
+                el.first.fill(value)
+                worker.logger.info(f"  Filled {field_name} via: {sel}")
+                return True
+        except Exception:
+            continue
+    worker.logger.error(f"  Could not find {field_name} with any selector")
+    return False
+
+
+def _find_and_click(worker, page, fallbacks, button_name):
+    """Try multiple selectors to find and click a button."""
+    for sel in fallbacks:
+        try:
+            el = page.locator(sel)
+            if el.count() > 0 and el.first.is_visible():
+                el.first.click()
+                worker.logger.info(f"  Clicked {button_name} via: {sel}")
+                return True
+        except Exception:
+            continue
+    worker.logger.error(f"  Could not find {button_name} with any selector")
+    return False
+
+
 def login(worker) -> bool:
     """Login to CUIC (2-stage: username → password + LDAP)."""
     try:
         worker.page.goto(worker.url, wait_until='domcontentloaded', timeout=worker.timeout_nav)
-        worker.page.wait_for_timeout(worker.timeout_short)
 
         # Stage 1: username → Next
-        worker.page.wait_for_selector(selectors.USERNAME_XPATH, timeout=worker.timeout_nav)
-        worker.page.fill(selectors.USERNAME_XPATH, worker.username)
-        worker.page.click(selectors.NEXT_BTN_XPATH)
+        worker.page.wait_for_selector(selectors.USERNAME_SELECTOR, timeout=worker.timeout_nav)
+        if not _find_and_fill(worker, worker.page, selectors.USERNAME_FALLBACKS, worker.username, "username"):
+            return False
+        if not _find_and_click(worker, worker.page, selectors.NEXT_BTN_FALLBACKS, "Next button"):
+            return False
         worker.page.wait_for_load_state('domcontentloaded')
-        worker.page.wait_for_timeout(worker.timeout_short)
 
         # Stage 2: password + LDAP → Sign In
-        worker.page.wait_for_selector(selectors.PASSWORD_XPATH, timeout=worker.timeout_nav)
-        worker.page.fill(selectors.PASSWORD_XPATH, worker.password)
-        worker.page.select_option(selectors.DOMAIN_SELECT_XPATH, value="LDAP")
-        worker.page.click(selectors.SIGN_IN_BTN_XPATH)
+        worker.page.wait_for_selector(selectors.PASSWORD_SELECTOR, timeout=worker.timeout_nav)
+        if not _find_and_fill(worker, worker.page, selectors.PASSWORD_FALLBACKS, worker.password, "password"):
+            return False
+        worker.page.select_option(selectors.DOMAIN_SELECT_SELECTOR, value="LDAP")
+        if not _find_and_click(worker, worker.page, selectors.SIGN_IN_BTN_FALLBACKS, "Sign In button"):
+            return False
 
         worker.page.wait_for_selector(selectors.REPORTS_TAB_CSS, timeout=worker.timeout_nav)
         worker.logger.info("Login OK")
@@ -98,20 +130,34 @@ def logout(worker) -> bool:
 
         # ── XPath/CSS multi-strategy clicks ──────────────────────────
         try:
-            # IMPORTANT: User menu button is inside remote_iframe_0 iframe!
+            # IMPORTANT: User menu button is inside the identity gadget iframe
             worker.logger.info("STEP 1: Locating identity_gadget iframe...")
-            
-            identity_frame = main_page.frame(name='remote_iframe_0')
+
+            identity_frame = main_page.frame(name=selectors.IDENTITY_IFRAME_NAME)
             if not identity_frame:
-                worker.logger.error("  [FAIL] Could not find remote_iframe_0")
+                # Fallback: find frame containing user menu elements
+                worker.logger.info("  Name-based lookup failed, trying content detection...")
+                for f in main_page.frames:
+                    try:
+                        for marker in selectors.IDENTITY_IFRAME_CONTENT_MARKERS:
+                            if f.query_selector(marker):
+                                identity_frame = f
+                                worker.logger.info(f"  Found identity frame via content: {marker} in {f.name}")
+                                break
+                    except Exception:
+                        pass
+                    if identity_frame:
+                        break
+            if not identity_frame:
+                worker.logger.error("  [FAIL] Could not find identity iframe by name or content")
                 try:
                     main_page.screenshot(path=f"{worker.log_dir}/logout_iframe_not_found.png")
                     worker.logger.info("Screenshot: logout_iframe_not_found.png")
                 except Exception:
                     pass
                 return False
-            
-            worker.logger.info("  [OK] Found iframe: remote_iframe_0")
+
+            worker.logger.info(f"  [OK] Found identity iframe: {identity_frame.name}")
 
             # Try specific selectors for the user menu button INSIDE the iframe
             # Start with most specific, fall back to generic
@@ -120,9 +166,8 @@ def logout(worker) -> bool:
                 'button[id*="user"]',                      # Button with 'user' in ID
                 'a[id*="user"]',                           # Link with 'user' in ID
                 'div.user-info',                           # Class-based
-                'button:visible',                          # Any visible button (fallback)
-                'a:visible',                               # Any visible link (fallback)
-                'div:visible',                             # Any visible div (last resort)
+                '[aria-label*="user" i]',                  # ARIA-based
+                '[title*="user" i]',                       # Title-based
             ]
             
             worker.logger.info("STEP 2: Clicking user menu button (inside iframe)...")
@@ -173,12 +218,10 @@ def logout(worker) -> bool:
             # STEP 4: Click sign-out link (in MAIN page, not iframe)
             # The dropdown menu appears in the main page after clicking the iframe button
             signout_selectors = [
-                '#so_anchor',                          # Most reliable - direct ID of <a>
-                '#signout-btn1 a',                     # ID of <li> + descendant <a>
-                'a:has-text("Sign Out")',             # Text match
-                'ul#id-gt-ul a:has-text("Sign Out")', # Full path with text
-                'xpath=//a[@id="so_anchor"]',         # XPath for anchor
-                'xpath=//li[@id="signout-btn1"]/a',   # XPath with ID
+                '#so_anchor',                          # Direct ID (best)
+                '#signout-btn1 a',                     # Parent ID + child
+                'a:has-text("Sign Out")',              # Text match
+                'ul#id-gt-ul a:has-text("Sign Out")', # Scoped text fallback
             ]
             
             worker.logger.info("STEP 4: Clicking sign-out link (in main page)...")
@@ -228,7 +271,10 @@ def logout(worker) -> bool:
             pass
 
         # ── Verification ─────────────────────────────────────────────
-        main_page.wait_for_timeout(2000)
+        try:
+            main_page.wait_for_load_state('networkidle', timeout=5000)
+        except Exception:
+            pass  # Best-effort wait for page to settle
         try:
             final_url = main_page.url
             is_logout_page = 'logout' in final_url.lower()
