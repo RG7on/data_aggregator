@@ -38,8 +38,9 @@ import time
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from playwright.sync_api import sync_playwright
 from core.base_worker import BaseWorker
-from core.config import get_worker_settings, get_worker_credentials
+from core.config import get_worker_settings, get_worker_credentials, get_global_settings
 from core.database import has_historical_data, log_scrape
 from typing import Dict, Any, List, Tuple
 
@@ -95,7 +96,8 @@ class Worker(BaseWorker):
     # the saved auth state file.
     SSO_INDICATOR = 'login.microsoftonline.com'  # Domain present in SSO redirect URLs
     SSO_WAIT_TIMEOUT = 300_000                   # 5 minutes for user to complete MFA
-    AUTH_STATE_FILE = 'smax_auth_state.json'     # Stored under config/ directory
+    AUTH_STATE_FILE = 'smax_auth_state.json'     # Legacy — kept for backward compat
+    CHROME_PROFILE_DIR = 'smax_chrome_profile'   # Persistent Chrome profile under config/
     # ============================================================
     # SMAX REPORT PROPERTIES READER (AngularJS)
     # ============================================================
@@ -355,13 +357,12 @@ class Worker(BaseWorker):
     def run(self) -> List[Dict[str, Any]]:
         """Execute the worker. Opens all reports in parallel tabs for speed.
 
-        Authentication flow:
-        1. Load saved Microsoft SSO session state (config/smax_auth_state.json) if present
-        2. Navigate to base URL — if still on SMAX, proceed immediately
-        3. If redirected to Microsoft SSO (session expired or first run):
-           a. Restart in headed mode (user must be at keyboard)
-           b. Wait for user to complete sign-in + MFA
-           c. Save fresh session state for next run
+        Authentication:
+        - Uses a persistent Chrome profile (config/smax_chrome_profile/).
+        - Microsoft SSO session is stored natively by Chrome — persists across
+          restarts without any JSON tricks.
+        - First run (or after session expiry): restarts in headed mode so the
+          user can complete Microsoft sign-in + MFA. Subsequent runs are silent.
         """
         self._load_config()
 
@@ -372,30 +373,23 @@ class Worker(BaseWorker):
 
         result = []
         try:
-            # ── Step 1: Start with saved SSO session if available ──────
-            auth_file = self._auth_state_path()
-            state_to_load = auth_file if os.path.exists(auth_file) else None
-            if state_to_load:
-                self.logger.info(f"Loading saved auth state from: {auth_file}")
-            else:
-                self.logger.info("No saved auth state found — will authenticate via SSO")
-
-            try:
-                self.setup_browser(storage_state=state_to_load)
-            except Exception as e:
-                self.logger.warning(f"Could not load auth state ({e}) — starting fresh")
-                self.setup_browser()
+            # ── Step 1: Start browser with persistent profile ──────────
+            self.setup_browser()
 
             # ── Step 2: Check whether the session is still valid ───────
             if not self._ensure_authenticated():
                 self.logger.info("Session expired — re-authenticating via Microsoft SSO (headed)")
                 self.teardown_browser()
-                self.setup_browser(headless=False, storage_state=None)
+                self.setup_browser(headless=False)
                 self._wait_for_sso_auth()
 
-                # Verify auth succeeded before proceeding
-                if not self._ensure_authenticated():
+                # _wait_for_sso_auth() confirmed the browser left the SSO domain.
+                # Check current URL instead of navigating again (another goto()
+                # would trigger a new SAML round-trip).
+                current_url = self.page.url
+                if self.SSO_INDICATOR in current_url:
                     raise RuntimeError("Authentication failed after Microsoft SSO attempt")
+                self.logger.info(f"Post-SSO verification OK (URL: {current_url[:80]})")
 
             # ── Step 3: Scrape ─────────────────────────────────────────
             result = self.scrape()
@@ -869,25 +863,100 @@ class Worker(BaseWorker):
     # ============================================================
 
     def _auth_state_path(self) -> str:
-        """Absolute path to the stored Microsoft SSO session state file."""
+        """Absolute path to the stored Microsoft SSO session state file (legacy)."""
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         return os.path.join(project_root, 'config', self.AUTH_STATE_FILE)
+
+    def _profile_dir(self) -> str:
+        """Absolute path to Chrome user data directory. Created on first run."""
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(project_root, 'config', self.CHROME_PROFILE_DIR)
+
+    def setup_browser(self, headless: bool = None, storage_state: str = None, **kwargs):
+        """Override base class to use a persistent Chrome profile.
+
+        With launch_persistent_context() Chrome stores cookies, localStorage,
+        and all session data in a real on-disk profile directory. Microsoft SSO
+        sessions survive browser restarts — no JSON storage_state tricks needed.
+
+        The storage_state parameter is accepted but ignored (kept for signature
+        compatibility with base_worker callers).
+        """
+        cfg = get_global_settings()
+        if headless is None:
+            headless = cfg.get('headless', True)
+        self._screenshot_steps = cfg.get('screenshot_steps', False)
+        self._screenshot_errors = cfg.get('screenshot_errors', True)
+
+        profile_dir = self._profile_dir()
+        os.makedirs(profile_dir, exist_ok=True)
+        self.logger.info(f"Chrome profile: {profile_dir}")
+
+        self._playwright = sync_playwright().start()
+        # launch_persistent_context returns BrowserContext directly — no Browser object
+        self.context = self._playwright.chromium.launch_persistent_context(
+            user_data_dir=profile_dir,
+            headless=headless,
+            channel='chrome',
+            args=[
+                '--disable-blink-features=AutomationControlled',
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--ignore-certificate-errors',
+            ],
+            viewport={'width': 1920, 'height': 1080},
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            ignore_https_errors=True,
+        )
+        self.browser = None  # No separate Browser object with persistent context
+        self.page = self.context.pages[0] if self.context.pages else self.context.new_page()
+        self.logger.info("Browser initialized successfully")
+        return self.page
+
+    def teardown_browser(self):
+        """Persistent context teardown — skips browser.close() (no separate browser)."""
+        for name, obj, method in [
+            ("page",       self.page,         "close"),
+            ("context",    self.context,      "close"),
+            ("playwright", self._playwright,  "stop"),
+        ]:
+            if obj is not None:
+                try:
+                    getattr(obj, method)()
+                except Exception as e:
+                    self.logger.warning(f"Error closing {name}: {e}")
+        self.page = None
+        self.context = None
+        self.browser = None
+        self._playwright = None
+        self.logger.info("Browser closed successfully")
 
     def _ensure_authenticated(self) -> bool:
         """Navigate to base URL and check whether Microsoft SSO intercepts.
 
-        Returns True if already authenticated, False if SSO redirect detected.
+        SMAX uses SAML SP-initiated SSO, so even a valid session briefly passes
+        through login.microsoftonline.com before landing back on SMAX. This method
+        waits up to 15 s for that round-trip to complete before deciding.
+
+        Returns True if landed on SMAX, False if stuck on SSO after the timeout.
         """
         try:
             self.page.goto(self.base_url, wait_until='domcontentloaded', timeout=30000)
-            # Wait for any JS-driven redirects to settle
-            self.page.wait_for_timeout(2000)
-            url = self.page.url
-            if self.SSO_INDICATOR in url:
-                self.logger.info(f"SSO redirect detected: {url[:80]}")
+            # Wait for the SAML round-trip to resolve (SMAX -> Microsoft -> SMAX).
+            # If the session is valid the browser returns to SMAX within a few seconds.
+            # If the session is expired it stays on Microsoft's login page.
+            try:
+                self.page.wait_for_function(
+                    f'() => !window.location.href.includes("{self.SSO_INDICATOR}")',
+                    timeout=15000
+                )
+                url = self.page.url
+                self.logger.info(f"Authenticated (URL: {url[:80]})")
+                return True
+            except Exception:
+                url = self.page.url
+                self.logger.info(f"SSO redirect detected (not authenticated): {url[:80]}")
                 return False
-            self.logger.info(f"Already authenticated (URL: {url[:80]})")
-            return True
         except Exception as e:
             self.logger.warning(f"Auth check failed: {e}")
             return False
@@ -923,11 +992,8 @@ class Worker(BaseWorker):
         self._save_auth_state()
 
     def _save_auth_state(self):
-        """Persist browser context state (cookies + localStorage) to disk."""
-        path = self._auth_state_path()
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        self.context.storage_state(path=path)
-        self.logger.info(f"Auth state saved → {path}")
+        """No-op: session is stored automatically in the persistent Chrome profile."""
+        self.logger.info("Session stored in persistent Chrome profile.")
 
     def _login_if_needed(self):
         """Legacy form-based login — no longer active.
@@ -965,19 +1031,13 @@ class Worker(BaseWorker):
         result = {'error': ''}
 
         try:
-            # Load saved SSO session if available (same flow as run())
-            auth_file = worker._auth_state_path()
-            state_to_load = auth_file if os.path.exists(auth_file) else None
-            try:
-                worker.setup_browser(storage_state=state_to_load)
-            except Exception as e:
-                worker.logger.warning(f"Could not load auth state ({e}) — starting fresh")
-                worker.setup_browser()
+            # Use persistent Chrome profile — same SSO flow as run()
+            worker.setup_browser()
 
             if not worker._ensure_authenticated():
                 worker.logger.info("Discovery: SSO auth required — opening headed browser")
                 worker.teardown_browser()
-                worker.setup_browser(headless=False, storage_state=None)
+                worker.setup_browser(headless=False)
                 worker._wait_for_sso_auth()
 
             worker.logger.info(f"Discovery: navigating to {url}")
