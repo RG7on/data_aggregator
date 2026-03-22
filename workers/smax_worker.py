@@ -66,14 +66,19 @@ class Worker(BaseWorker):
     # SELECTORS
     # ============================================================
 
-    # XPath: Button to switch from chart view to table/grid view
-    TABLE_VIEW_BUTTON = 'xpath=/html/body/div[1]/div/div[2]/div[2]/div/div/div/div/div[3]/div[1]/span/button[2]'
+    # Button to switch from chart view to table/grid view
+    TABLE_VIEW_BUTTON = '[data-aid="report-toggle-Grid"]'
+    TABLE_VIEW_FALLBACKS = [
+        '[data-aid="report-toggle-Grid"]',     # data-aid (best)
+        'button[title="Show Table"]',          # title attribute
+        'button:has(i.icon-table)',            # icon class inside button
+    ]
 
-    # XPath: Report title (span[3] in header)
-    TITLE_XPATH = 'xpath=/html/body/div[1]/div/div[2]/div[2]/div/div/div/div/div[1]/div/span[3]'
+    # Report title (in report-area-header)
+    TITLE_SELECTOR = '[data-aid="report-name"]'
 
-    # XPath: Total row count (span[1] in header)
-    TOTAL_XPATH = 'xpath=/html/body/div[1]/div/div[2]/div[2]/div/div/div/div/div[1]/div/span[1]'
+    # Total row count (in report-area-header)
+    TOTAL_SELECTOR = '[data-aid="report-total-count"]'
 
     # CSS: SlickGrid selectors (scoped to report grid, NOT sidebar grid)
     GRID_HEADER_SELECTOR = 'pl-report-grid .slick-header-column'
@@ -457,8 +462,12 @@ class Worker(BaseWorker):
             self.logger.warning(f"{len(failed_tabs)} tab(s) still failed: "
                                 f"{[tabs[i][1].get('label','?') for i in failed_tabs]}")
         
-        # Small buffer for final rendering
-        tabs[0][0].wait_for_timeout(2000)
+        # Wait for grid to be ready rather than arbitrary timeout
+        try:
+            tabs[0][0].locator(self.GRID_ROW_SELECTOR).first.wait_for(
+                state='visible', timeout=5000)
+        except Exception:
+            pass  # Best-effort; scraping will fail clearly if grid isn't ready
         
         self.logger.info(f"All tabs ready in {time.time() - start_time:.1f}s")
         
@@ -494,18 +503,25 @@ class Worker(BaseWorker):
     def _switch_to_table_view(self, page):
         """
         Click the 'Table View' button and wait for the SlickGrid to render.
-        
+        Uses a fallback chain of selectors for resilience.
+
         Args:
             page: Playwright Page object
         """
-        # Wait for the table-view button to appear (page loaded enough)
-        page.wait_for_selector(self.TABLE_VIEW_BUTTON, timeout=self.ELEMENT_WAIT_TIMEOUT)
-        
-        # Click to switch from chart to table/grid view
-        page.click(self.TABLE_VIEW_BUTTON)
-        
-        # Wait for grid data rows to appear
-        page.wait_for_selector(self.GRID_ROW_SELECTOR, timeout=self.ELEMENT_WAIT_TIMEOUT)
+        for sel in self.TABLE_VIEW_FALLBACKS:
+            try:
+                btn = page.locator(sel)
+                if btn.count() > 0:
+                    btn.first.wait_for(state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
+                    btn.first.click()
+                    # Wait for grid data rows to appear
+                    page.locator(self.GRID_ROW_SELECTOR).first.wait_for(
+                        state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
+                    self.logger.info(f"  Table view activated via: {sel}")
+                    return
+            except Exception:
+                continue
+        raise Exception("Table View button not found with any selector")
     
     # ============================================================
     # Data Extraction
@@ -597,7 +613,7 @@ class Worker(BaseWorker):
         
         for i, el in enumerate(header_els):
             name_el = el.query_selector(self.HEADER_NAME_SELECTOR)
-            name = name_el.inner_text().strip() if name_el else ''
+            name = name_el.text_content().strip() if name_el else ''
             if name:
                 headers.append(name)
                 header_indices.append(i)
@@ -681,7 +697,7 @@ class Worker(BaseWorker):
             else:
                 at_bottom_count = 0
                 
-            # Wait for render (SlickGrid is virtual)
+            # SlickGrid virtual scroll render buffer — no DOM event to wait for
             page.wait_for_timeout(500)
             
         return headers, collected_rows
@@ -754,13 +770,13 @@ class Worker(BaseWorker):
     # ============================================================
     
     def _get_report_title(self, page=None) -> str:
-        """Extract the report title from span[3] in the header."""
+        """Extract the report title from the report-area-header."""
         if page is None:
             page = self.page
         try:
-            el = page.query_selector(self.TITLE_XPATH)
+            el = page.query_selector(self.TITLE_SELECTOR)
             if el:
-                text = el.inner_text().strip()
+                text = el.text_content().strip()
                 if text and text != 'No columns to select':
                     return text
             return "Unknown Report"
@@ -769,13 +785,13 @@ class Worker(BaseWorker):
             return "Unknown Report"
     
     def _get_total_rows(self, page=None) -> int:
-        """Extract the total row count from span[1] in the header."""
+        """Extract the total row count from the report-area-header."""
         if page is None:
             page = self.page
         try:
-            el = page.query_selector(self.TOTAL_XPATH)
+            el = page.query_selector(self.TOTAL_SELECTOR)
             if el:
-                text = el.inner_text().strip()
+                text = el.text_content().strip()
                 parsed = self._parse_number(text)
                 if parsed > 0:
                     return parsed
@@ -871,9 +887,6 @@ class Worker(BaseWorker):
             worker.page.goto(url, wait_until='domcontentloaded',
                              timeout=worker.PAGE_LOAD_TIMEOUT)
 
-            # Wait for the report properties sidebar to be available
-            worker.page.wait_for_timeout(5000)
-
             # Wait for the properties panel to render
             try:
                 worker.page.wait_for_selector(
@@ -885,8 +898,20 @@ class Worker(BaseWorker):
                 worker.logger.info("Properties sidebar selector not found, "
                                    "trying to read properties anyway")
 
-            # Additional wait for AngularJS to finish rendering
-            worker.page.wait_for_timeout(3000)
+            # Wait for AngularJS to finish rendering before reading properties
+            try:
+                worker.page.wait_for_function(
+                    '''() => {
+                        try {
+                            if (typeof angular === 'undefined') return true;
+                            const pending = angular.element(document).injector().get('$http').pendingRequests;
+                            return pending.length === 0;
+                        } catch(e) { return true; }
+                    }''',
+                    timeout=10000
+                )
+            except Exception:
+                worker.logger.debug("Angular wait timed out, proceeding anyway")
 
             # Read properties via injected JS
             props = worker.page.evaluate(worker.SMAX_PROPERTIES_READ_JS)
