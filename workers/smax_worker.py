@@ -88,6 +88,15 @@ class Worker(BaseWorker):
     HEADER_NAME_SELECTOR = '.slick-column-name'
 
     # ============================================================
+    # MICROSOFT SSO AUTHENTICATION
+    # ============================================================
+    # SMAX uses Microsoft Entra ID (SAML SSO). The session is stored
+    # as cookies — persists across browser launches when loaded from
+    # the saved auth state file.
+    SSO_INDICATOR = 'login.microsoftonline.com'  # Domain present in SSO redirect URLs
+    SSO_WAIT_TIMEOUT = 300_000                   # 5 minutes for user to complete MFA
+    AUTH_STATE_FILE = 'smax_auth_state.json'     # Stored under config/ directory
+    # ============================================================
     # SMAX REPORT PROPERTIES READER (AngularJS)
     # ============================================================
     # Reads the "Report Properties" sidebar from a loaded SMAX report page.
@@ -344,7 +353,16 @@ class Worker(BaseWorker):
         self.MAX_RETRIES = cfg.get('max_retries', 2)
 
     def run(self) -> List[Dict[str, Any]]:
-        """Execute the worker. Opens all reports in parallel tabs for speed."""
+        """Execute the worker. Opens all reports in parallel tabs for speed.
+
+        Authentication flow:
+        1. Load saved Microsoft SSO session state (config/smax_auth_state.json) if present
+        2. Navigate to base URL — if still on SMAX, proceed immediately
+        3. If redirected to Microsoft SSO (session expired or first run):
+           a. Restart in headed mode (user must be at keyboard)
+           b. Wait for user to complete sign-in + MFA
+           c. Save fresh session state for next run
+        """
         self._load_config()
 
         enabled = [r for r in self.reports if r.get('enabled', True)]
@@ -354,14 +372,32 @@ class Worker(BaseWorker):
 
         result = []
         try:
-            self.setup_browser()
-
-            if self.username and self.password:
-                self.logger.info("Attempting SMAX login...")
-                self._login_if_needed()
+            # ── Step 1: Start with saved SSO session if available ──────
+            auth_file = self._auth_state_path()
+            state_to_load = auth_file if os.path.exists(auth_file) else None
+            if state_to_load:
+                self.logger.info(f"Loading saved auth state from: {auth_file}")
             else:
-                self.logger.warning("No SMAX credentials configured - attempting without login")
+                self.logger.info("No saved auth state found — will authenticate via SSO")
 
+            try:
+                self.setup_browser(storage_state=state_to_load)
+            except Exception as e:
+                self.logger.warning(f"Could not load auth state ({e}) — starting fresh")
+                self.setup_browser()
+
+            # ── Step 2: Check whether the session is still valid ───────
+            if not self._ensure_authenticated():
+                self.logger.info("Session expired — re-authenticating via Microsoft SSO (headed)")
+                self.teardown_browser()
+                self.setup_browser(headless=False, storage_state=None)
+                self._wait_for_sso_auth()
+
+                # Verify auth succeeded before proceeding
+                if not self._ensure_authenticated():
+                    raise RuntimeError("Authentication failed after Microsoft SSO attempt")
+
+            # ── Step 3: Scrape ─────────────────────────────────────────
             result = self.scrape()
 
         except Exception as e:
@@ -829,29 +865,80 @@ class Worker(BaseWorker):
             return 0
     
     # ============================================================
-    # Authentication
+    # MICROSOFT SSO SESSION MANAGEMENT
     # ============================================================
 
-    def _login_if_needed(self):
-        """Perform SMAX login if credentials are configured."""
-        if not self.username or not self.password:
-            return
+    def _auth_state_path(self) -> str:
+        """Absolute path to the stored Microsoft SSO session state file."""
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(project_root, 'config', self.AUTH_STATE_FILE)
 
-        self.page.goto(f"{self.base_url}/login", wait_until='networkidle')
+    def _ensure_authenticated(self) -> bool:
+        """Navigate to base URL and check whether Microsoft SSO intercepts.
 
-        if 'login' not in self.page.url.lower():
-            self.logger.info("Already logged in to SMAX")
-            return
+        Returns True if already authenticated, False if SSO redirect detected.
+        """
+        try:
+            self.page.goto(self.base_url, wait_until='domcontentloaded', timeout=30000)
+            # Wait for any JS-driven redirects to settle
+            self.page.wait_for_timeout(2000)
+            url = self.page.url
+            if self.SSO_INDICATOR in url:
+                self.logger.info(f"SSO redirect detected: {url[:80]}")
+                return False
+            self.logger.info(f"Already authenticated (URL: {url[:80]})")
+            return True
+        except Exception as e:
+            self.logger.warning(f"Auth check failed: {e}")
+            return False
 
-        self.login_with_form(
-            url=f"{self.base_url}/login",
-            username=self.username,
-            password=self.password,
-            username_selector='#username',
-            password_selector='#password',
-            submit_selector='button[type="submit"]',
-            success_indicator='.dashboard, .main-content'
+    def _wait_for_sso_auth(self):
+        """Open SMAX and wait for the user to complete Microsoft SSO + MFA.
+
+        The browser MUST be in headed mode at this point. Once the browser URL
+        returns to the SMAX domain, saves the context state for future runs.
+        """
+        self.logger.info("=" * 60)
+        self.logger.info("MICROSOFT SSO AUTHENTICATION REQUIRED")
+        self.logger.info("A browser window has opened — please log in.")
+        self.logger.info("Complete the Microsoft sign-in (including MFA if prompted).")
+        self.logger.info(f"Waiting up to {self.SSO_WAIT_TIMEOUT // 60000} minutes...")
+        self.logger.info("=" * 60)
+
+        self.page.goto(self.base_url, wait_until='domcontentloaded', timeout=30000)
+
+        # Wait until the browser leaves the Microsoft SSO domain
+        self.page.wait_for_function(
+            f'() => !window.location.href.includes("{self.SSO_INDICATOR}")',
+            timeout=self.SSO_WAIT_TIMEOUT
         )
+
+        # Allow SMAX to finish loading after the final SSO redirect
+        try:
+            self.page.wait_for_load_state('networkidle', timeout=30000)
+        except Exception:
+            pass
+
+        self.logger.info("SSO authentication completed.")
+        self._save_auth_state()
+
+    def _save_auth_state(self):
+        """Persist browser context state (cookies + localStorage) to disk."""
+        path = self._auth_state_path()
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        self.context.storage_state(path=path)
+        self.logger.info(f"Auth state saved → {path}")
+
+    def _login_if_needed(self):
+        """Legacy form-based login — no longer active.
+
+        SMAX now uses Microsoft Entra ID (SAML SSO). Session management is
+        handled by _ensure_authenticated() / _wait_for_sso_auth() in run().
+        This stub is kept to avoid breaking any external callers.
+        """
+        pass
+
+
 
     # ============================================================
     # REPORT PROPERTIES DISCOVERY (called from settings server)
@@ -878,10 +965,20 @@ class Worker(BaseWorker):
         result = {'error': ''}
 
         try:
-            worker.setup_browser()
+            # Load saved SSO session if available (same flow as run())
+            auth_file = worker._auth_state_path()
+            state_to_load = auth_file if os.path.exists(auth_file) else None
+            try:
+                worker.setup_browser(storage_state=state_to_load)
+            except Exception as e:
+                worker.logger.warning(f"Could not load auth state ({e}) — starting fresh")
+                worker.setup_browser()
 
-            if worker.username and worker.password:
-                worker._login_if_needed()
+            if not worker._ensure_authenticated():
+                worker.logger.info("Discovery: SSO auth required — opening headed browser")
+                worker.teardown_browser()
+                worker.setup_browser(headless=False, storage_state=None)
+                worker._wait_for_sso_auth()
 
             worker.logger.info(f"Discovery: navigating to {url}")
             worker.page.goto(url, wait_until='domcontentloaded',

@@ -48,10 +48,15 @@ class BaseWorker(ABC):
         self.page: Optional[Page] = None
         self._playwright = None
     
-    def setup_browser(self, headless: bool = None, use_system_chrome: bool = None, ignore_https_errors: bool = True) -> Page:
+    def setup_browser(self, headless: bool = None, use_system_chrome: bool = None, ignore_https_errors: bool = True, storage_state: str = None) -> Page:
         """
         Initialize Playwright browser with common settings.
         Settings are read from config/settings.json unless explicitly overridden.
+
+        Args:
+            storage_state: Path to a JSON file produced by context.storage_state().
+                           When provided, the browser context starts pre-loaded with
+                           the saved cookies/localStorage (e.g. SSO session).
         """
         cfg = get_global_settings()
         if headless is None:
@@ -101,6 +106,7 @@ class BaseWorker(ABC):
             )
         
         self.context = self.browser.new_context(
+            storage_state=storage_state,
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             ignore_https_errors=ignore_https_errors
