@@ -85,7 +85,7 @@ class Worker(BaseWorker):
             logout_ok = auth.logout(self)
             
             if logout_ok:
-                # Small delay so logout screen is visible when headless=false
+                # Intentional delay so logout screen is visible in headed mode
                 if self.page and not self.page.is_closed():
                     self.page.wait_for_timeout(1500)
             else:

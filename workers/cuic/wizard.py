@@ -228,7 +228,7 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
       Flat generic:          {"field_id": val}  (applied to every step)
     """
     try:
-        worker.page.wait_for_timeout(worker.timeout_medium)
+        worker.page.wait_for_timeout(worker.timeout_medium)  # Wizard initialization settle time
         filters = filters or {}
 
         # Separate metadata from actual filter values
@@ -287,7 +287,7 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
                     if clean:
                         apply_filters_to_step(worker, step_info, clean)
 
-                worker.page.wait_for_timeout(800)
+                worker.page.wait_for_timeout(800)  # Post-filter-apply settle time
 
             # Try Next first (middle steps), then Run (last step)
             if click_wizard_button(worker, 'Next'):
@@ -300,7 +300,7 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
                 worker.logger.debug(f"  Wizard step {step}: no Next/Run button")
                 break
 
-        worker.page.wait_for_timeout(worker.timeout_long)
+        worker.page.wait_for_timeout(worker.timeout_long)  # Report generation wait after wizard completes
         worker.logger.info("Filter wizard done")
         worker.screenshot("03_report_running")
         return True
