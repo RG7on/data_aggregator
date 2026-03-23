@@ -62,7 +62,17 @@ class Worker(BaseWorker):
     ELEMENT_WAIT_TIMEOUT = 30000
     TAB_STAGGER_DELAY = 2000    # ms between opening tabs (avoids server rate-limits)
     MAX_RETRIES = 2             # retry failed tabs this many times
-    
+
+    # Display-value substrings that signal a closed (fully past) time window.
+    # Used to auto-detect data_type = 'historical' from report filter properties
+    # when the report config does not explicitly set data_type.
+    _HISTORICAL_DISPLAY_PATTERNS = frozenset({
+        'past year', 'previous year', 'last year',
+        'previous month', 'past month', 'last month',
+        'previous week', 'past week', 'last week',
+        'previous quarter', 'past quarter', 'last quarter',
+    })
+
     # ============================================================
     # SELECTORS
     # ============================================================
@@ -353,6 +363,27 @@ class Worker(BaseWorker):
         self.ELEMENT_WAIT_TIMEOUT = cfg.get('element_wait_timeout_ms', 30000)
         self.TAB_STAGGER_DELAY = cfg.get('tab_stagger_delay_ms', 2000)
         self.MAX_RETRIES = cfg.get('max_retries', 2)
+        self._autodetect_data_types()
+
+    def _autodetect_data_types(self):
+        """Auto-classify reports as 'historical' based on their filter display values.
+
+        Only fires when 'data_type' is absent from the report config — explicit
+        settings ('ongoing' or 'historical') are always respected.
+        """
+        for report in self.reports:
+            if 'data_type' in report:
+                continue
+            filters = report.get('properties', {}).get('filters', [])
+            for f in filters:
+                dv = (f.get('display_value') or '').lower()
+                if any(pat in dv for pat in self._HISTORICAL_DISPLAY_PATTERNS):
+                    report['data_type'] = 'historical'
+                    self.logger.debug(
+                        f"Auto-detected '{report.get('label')}' as historical "
+                        f"(filter '{f.get('field_label')}': {dv!r})"
+                    )
+                    break
 
     def run(self) -> List[Dict[str, Any]]:
         """Execute the worker. Opens all reports in parallel tabs for speed.
@@ -369,6 +400,7 @@ class Worker(BaseWorker):
         enabled = [r for r in self.reports if r.get('enabled', True)]
         if not enabled:
             self.logger.warning("No enabled SMAX reports configured.")
+            log_scrape('smax', '_worker', 'no_data', 0, 0, 'No enabled reports configured')
             return []
 
         result = []
@@ -398,6 +430,7 @@ class Worker(BaseWorker):
             self.logger.error(f"Worker failed: {e}")
             import traceback
             self.logger.error(traceback.format_exc())
+            log_scrape('smax', '_worker', 'error', 0, 0, str(e))
         finally:
             self.teardown_browser()
 
@@ -441,8 +474,10 @@ class Worker(BaseWorker):
                 if i == 0:
                     tab = self.page
                 else:
-                    tab = self.context.new_page()
+                    # Wait BEFORE creating the new page so the blank tab is
+                    # never visible for the full stagger delay.
                     self.page.wait_for_timeout(self.TAB_STAGGER_DELAY)
+                    tab = self.context.new_page()
 
                 tab.goto(url, wait_until='commit', timeout=self.PAGE_LOAD_TIMEOUT)
                 tabs.append((tab, report))
@@ -519,7 +554,7 @@ class Worker(BaseWorker):
             label = report.get('label', url.split('/')[-1] if url else f'report_{i}')
             t0 = time.time()
             try:
-                report_data = self._extract_from_page(tab, url)
+                report_data = self._extract_from_page(tab, url, label)
                 elapsed = time.time() - t0
                 if report_data:
                     all_results.extend(report_data)
@@ -587,7 +622,7 @@ class Worker(BaseWorker):
     # Data Extraction
     # ============================================================
     
-    def _extract_from_page(self, page, url: str) -> List[Dict[str, Any]]:
+    def _extract_from_page(self, page, url: str, label: str = '') -> List[Dict[str, Any]]:
         """
         Extract report title, total, and all table rows from a loaded page.
         
@@ -599,8 +634,11 @@ class Worker(BaseWorker):
         results = []
         report_id = url.split('/')[-1][:12]
         
-        # Get report title and total
+        # Get report title; fall back to the config label when the DOM element
+        # is missing (partial page load) so rows are still identifiable.
         report_title = self._get_report_title(page)
+        if report_title == "Unknown Report" and label:
+            report_title = label
         total_rows = self._get_total_rows(page)
 
         self.logger.info(f"  [{report_id}] {report_title}: total={total_rows}")

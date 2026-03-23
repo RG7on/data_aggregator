@@ -1990,7 +1990,7 @@
           "label": "aging_requests",
           "url": "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640",
           "enabled": true,
-          "data_type": "ongoing",
+          "data_type": "historical",
           "properties": {
             "error": "",
             "report_name": "Aging Requests",
