@@ -479,7 +479,12 @@ class Worker(BaseWorker):
                 url = report.get('url', '')
                 try:
                     self.logger.info(f"  Tab {idx+1}: reloading {report.get('label', url.split('/')[-1])}...")
-                    tab.goto(url, wait_until='domcontentloaded', timeout=self.PAGE_LOAD_TIMEOUT)
+                    try:
+                        tab.goto(url, wait_until='commit', timeout=self.PAGE_LOAD_TIMEOUT)
+                    except Exception as e:
+                        if not tab.url or tab.url == 'about:blank':
+                            raise
+                        self.logger.debug(f"  Tab {idx+1}: goto raised (expected SAML): {e}")
                     self._switch_to_table_view(tab)
                     self.logger.info(f"  Tab {idx+1}: ready after retry")
                 except Exception as e:
@@ -540,15 +545,18 @@ class Worker(BaseWorker):
         """
         for sel in self.TABLE_VIEW_FALLBACKS:
             try:
-                btn = page.locator(sel)
-                if btn.count() > 0:
-                    btn.first.wait_for(state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
-                    btn.first.click()
-                    # Wait for grid data rows to appear
-                    page.locator(self.GRID_ROW_SELECTOR).first.wait_for(
-                        state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
-                    self.logger.info(f"  Table view activated via: {sel}")
-                    return
+                btn = page.locator(sel).first
+                # wait_for() blocks until the button is in the DOM — this gives
+                # Angular time to bootstrap. Do NOT use count() here: count() is
+                # an instant synchronous check that returns 0 before Angular loads,
+                # causing all fallbacks to be skipped before any waiting happens.
+                btn.wait_for(state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
+                btn.click()
+                # Wait for SlickGrid rows to render after the view switch
+                page.locator(self.GRID_ROW_SELECTOR).first.wait_for(
+                    state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
+                self.logger.info(f"  Table view activated via: {sel}")
+                return
             except Exception:
                 continue
         raise Exception("Table View button not found with any selector")
