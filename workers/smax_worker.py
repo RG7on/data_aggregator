@@ -450,6 +450,7 @@ class Worker(BaseWorker):
 
             except Exception as e:
                 self.logger.error(f"  Tab {i+1}: failed to open {url}: {e}")
+                log_scrape('smax', label, 'error', 0, 0, f'Tab open failed: {e}')
 
         self.logger.info(f"All {len(tabs)} tabs opened in {time.time() - start_time:.1f}s")
         
@@ -494,8 +495,12 @@ class Worker(BaseWorker):
             failed_tabs = still_failed
 
         if failed_tabs:
-            self.logger.warning(f"{len(failed_tabs)} tab(s) still failed: "
-                                f"{[tabs[i][1].get('label','?') for i in failed_tabs]}")
+            failed_labels = []
+            for i in failed_tabs:
+                lbl = tabs[i][1].get('label', '?')
+                failed_labels.append(lbl)
+                log_scrape('smax', lbl, 'error', 0, 0, 'Tab failed after all retries')
+            self.logger.warning(f"{len(failed_tabs)} tab(s) still failed: {failed_labels}")
         
         # Wait for grid to be ready rather than arbitrary timeout
         try:
@@ -511,17 +516,34 @@ class Worker(BaseWorker):
 
         for i, (tab, report) in enumerate(tabs):
             url = report.get('url', '')
+            label = report.get('label', url.split('/')[-1] if url else f'report_{i}')
+            t0 = time.time()
             try:
                 report_data = self._extract_from_page(tab, url)
-                all_results.extend(report_data)
+                elapsed = time.time() - t0
+                if report_data:
+                    all_results.extend(report_data)
+                    log_scrape('smax', label, 'success', len(report_data), elapsed, '')
+                else:
+                    log_scrape('smax', label, 'no_data', 0, elapsed, 'No data returned')
             except Exception as e:
-                self.logger.error(f"  Tab {i+1}: scrape failed for {report.get('label', url)}: {e}")
+                elapsed = time.time() - t0
+                self.logger.error(f"  Tab {i+1}: scrape failed for {label}: {e}")
+                log_scrape('smax', label, 'error', 0, elapsed, str(e))
 
         # ---- PHASE 4: Clean up extra tabs ----
         for i, (tab, report) in enumerate(tabs):
             if i > 0:
                 try:
                     tab.close()
+                except Exception:
+                    pass
+
+        # Close any stray about:blank tabs that appeared mid-scrape
+        for p in self.context.pages:
+            if p != self.page and p.url == 'about:blank':
+                try:
+                    p.close()
                 except Exception:
                     pass
 
@@ -580,9 +602,14 @@ class Worker(BaseWorker):
         # Get report title and total
         report_title = self._get_report_title(page)
         total_rows = self._get_total_rows(page)
-        
+
         self.logger.info(f"  [{report_id}] {report_title}: total={total_rows}")
-        
+
+        # Skip if page didn't load properly (no title found and no data)
+        if report_title == "Unknown Report" and total_rows == 0:
+            self.logger.warning(f"  [{report_id}] Skipping: Unknown Report with 0 total (page may not have loaded)")
+            return results
+
         # Add the total as its own row
         results.append({
             'metric_title': report_title,
@@ -926,6 +953,7 @@ class Worker(BaseWorker):
                 '--no-default-browser-check',
                 '--disable-infobars',
                 '--disable-session-crashed-bubble',
+                '--restore-last-session=false',
             ],
             viewport={'width': 1920, 'height': 1080},
             user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -933,6 +961,15 @@ class Worker(BaseWorker):
         )
         self.browser = None  # No separate Browser object with persistent context
         self.page = self.context.pages[0] if self.context.pages else self.context.new_page()
+
+        # Close any extra pages Chrome may have restored from the persistent profile
+        for extra_page in self.context.pages:
+            if extra_page != self.page:
+                try:
+                    extra_page.close()
+                except Exception:
+                    pass
+
         self.logger.info("Browser initialized successfully")
         return self.page
 

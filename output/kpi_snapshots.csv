@@ -47,28 +47,28 @@ date,timestamp,source,metric_title,category,sub_category,value
 2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Sep 2025,Review,5.0
 2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,total,,1240.0
 2026-03-22,2026-03-22 19:56:02,smax,Unknown Report,total,,0.0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_% Aban,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_% Queued,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Abandoned,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Abandoned Within Service Level,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Answer Wait Time,,z_call_type_historical_all_fields,21
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Answered,,z_call_type_historical_all_fields,1
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Assigned From Queue,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Average Abandon Delay,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Avg Speed of Answer,,z_call_type_historical_all_fields,21
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Calls Error,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_DateTime,,z_call_type_historical_all_fields,1772013600000
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Default_Treatment,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Flow Out,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Handled,,z_call_type_historical_all_fields,1
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Longest Queued,,z_call_type_historical_all_fields,21
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Max Queued,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Network Routed,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Offered,,z_call_type_historical_all_fields,1
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Other,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Return,,z_call_type_historical_all_fields,0
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Service Level,,z_call_type_historical_all_fields,1
-2026-03-23,2026-03-23 17:02:56,cuic,CUIC_Short Calls,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_% Aban,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_% Queued,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Abandoned,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Abandoned Within Service Level,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Answer Wait Time,,z_call_type_historical_all_fields,21
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Answered,,z_call_type_historical_all_fields,1
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Assigned From Queue,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Average Abandon Delay,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Avg Speed of Answer,,z_call_type_historical_all_fields,21
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Calls Error,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_DateTime,,z_call_type_historical_all_fields,1772013600000
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Default_Treatment,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Flow Out,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Handled,,z_call_type_historical_all_fields,1
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Longest Queued,,z_call_type_historical_all_fields,21
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Max Queued,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Network Routed,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Offered,,z_call_type_historical_all_fields,1
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Other,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Return,,z_call_type_historical_all_fields,0
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Service Level,,z_call_type_historical_all_fields,1
+2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Short Calls,,z_call_type_historical_all_fields,0
 2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Apr 2025,First line support,36.0
 2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Apr 2025,Fulfill,2.0
 2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Aug 2025,Escalate,1.0
