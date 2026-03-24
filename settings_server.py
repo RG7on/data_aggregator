@@ -28,7 +28,18 @@ from core.config import SETTINGS_PATH, CREDENTIALS_PATH
 from core.database import init_db, get_scrape_log, get_latest_scrape_status
 
 PORT = 8580
-UI_FILE = os.path.join(PROJECT_ROOT, 'ui', 'settings.html')
+UI_FILE = os.path.join(PROJECT_ROOT, 'ui', 'index.html')
+UI_DIR  = os.path.join(PROJECT_ROOT, 'ui')
+
+MIME_TYPES = {
+    '.html': 'text/html',
+    '.css':  'text/css',
+    '.js':   'application/javascript',
+    '.json': 'application/json',
+    '.png':  'image/png',
+    '.svg':  'image/svg+xml',
+    '.ico':  'image/x-icon',
+}
 
 # Track running discovery tasks
 _discovery_lock = threading.Lock()
@@ -59,6 +70,16 @@ class SettingsHandler(BaseHTTPRequestHandler):
         elif path == '/api/scrape-running':
             with _scrape_lock:
                 self._send_json({'running': _scrape_running})
+        elif path.startswith('/css/') or path.startswith('/js/'):
+            # Serve static assets from ui/ directory
+            # Security: reject path traversal attempts
+            if '..' in path:
+                self.send_error(400, 'Bad request')
+                return
+            file_path = os.path.join(UI_DIR, path.lstrip('/'))
+            ext = os.path.splitext(file_path)[1].lower()
+            mime = MIME_TYPES.get(ext, 'application/octet-stream')
+            self._serve_file(file_path, mime)
         else:
             self.send_error(404)
 
