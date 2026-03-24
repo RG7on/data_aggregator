@@ -1,0 +1,71 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation "Main navigation" [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - img [ref=e6]
+          - generic [ref=e10]: Data Aggregator
+        - generic [ref=e11]: Control Panel
+      - generic [ref=e12]:
+        - generic [ref=e13]: Overview
+        - button "Dashboard" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - text: Dashboard
+        - generic [ref=e20]: Configuration
+        - button "Global Settings" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - text: Global Settings
+        - button "CUIC Worker" [ref=e26] [cursor=pointer]:
+          - img [ref=e27]
+          - text: CUIC Worker
+        - button "SMAX Worker" [ref=e30] [cursor=pointer]:
+          - img [ref=e31]
+          - text: SMAX Worker
+        - generic [ref=e32]: Data
+        - button "Export / Import" [ref=e33] [cursor=pointer]:
+          - img [ref=e34]
+          - text: Export / Import
+      - generic [ref=e39]:
+        - generic [ref=e42]: Connected
+        - generic [ref=e44]: —
+    - main [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - heading "Dashboard" [level=1] [ref=e48]:
+            - img [ref=e49]
+            - text: Dashboard
+          - paragraph [ref=e54]: System overview and scrape controls
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - generic [ref=e58]: —
+              - generic [ref=e59]: Total Reports
+            - generic [ref=e60]:
+              - generic [ref=e61]: —
+              - generic [ref=e62]: Success Rate
+            - generic [ref=e63]:
+              - generic [ref=e64]: —
+              - generic [ref=e65]: Total Rows (last run)
+            - generic [ref=e66]:
+              - generic [ref=e67]: —
+              - generic [ref=e68]: Last Run
+          - button "Run Scrape Now" [ref=e70] [cursor=pointer]:
+            - img [ref=e71]
+            - text: Run Scrape Now
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - img [ref=e75]
+              - text: Scrape History
+            - table [ref=e79]:
+              - rowgroup [ref=e80]:
+                - row "Time Source Report Status Rows Message" [ref=e81]:
+                  - columnheader "Time" [ref=e82]
+                  - columnheader "Source" [ref=e83]
+                  - columnheader "Report" [ref=e84]
+                  - columnheader "Status" [ref=e85]
+                  - columnheader "Rows" [ref=e86]
+                  - columnheader "Message" [ref=e87]
+              - rowgroup [ref=e88]:
+                - row "Loading…" [ref=e89]:
+                  - cell "Loading…" [ref=e90]
+  - alert
