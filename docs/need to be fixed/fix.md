@@ -15,14 +15,23 @@ When opening multiple report tabs, blank tabs were visible for ~2 seconds before
 
 ---
 
-### ⏸️ POSTPONED — Issue 3: Settings UI/UX redesign
+### ✅ FIXED — Issue 3: Settings UI/UX redesign
 
-**Status**: DEFERRED (handle together with Issue 3)  
-**Timeline**: To be completed as part of comprehensive control panel UI/UX overhaul
+**Status**: RESOLVED  
+**Files Changed**: `ui/index.html`, `ui/css/main.css`, `ui/js/app.js`, `ui/js/settings-io.js`, `ui/js/dashboard.js`, `ui/js/cuic.js`, `ui/js/smax.js`, `settings_server.py`
 
-> One thing that angsts me about our system is the settings UI. So it's not only the settings UI, it's our, like, our service control panel itself. We are firing or starting scraping from there. We are seeing the scraping status from there. We are seeing everything. It's not only for settings. We will change its name sooner or later, but I don't like its UI. It's stupid. It's also hard to use. It's not organized in a way that it should be organized. [...] We need to revamp the whole thing and make it more usable, more user-friendly, and its UX and UI far more better than this.
-
-**Action**: This is a scope-2 redesign that requires comprehensive UX planning and will be tackled together with other UI improvements in a dedicated pass
+**What was done**:
+- Replaced the monolithic `settings.html` (2586 lines) with a fully redesigned multi-file UI (archived as `settings.html.bak`)
+- Dark mode OLED design system (`#020617` base, `#0f172a`/`#1e293b` surfaces, `#3b82f6` accent)
+- Sidebar navigation with 5 pages: Dashboard, Global, CUIC, SMAX, Export
+- Auto-save with 1.5s debounce — no more manual save button
+- CUIC and SMAX connection settings merged with their reports on the same page
+- Full Filter Wizard UI for CUIC reports (multistep, SPAB, generic)
+- SMAX properties discovery panel
+- Dashboard with live scrape stats, status cards, manual scrape trigger, and scrape history log
+- Export/Import page for settings and credentials JSON
+- Pure CSS design system (no build tools, no CDN dependencies, corporate-network safe)
+- `settings_server.py` updated to serve `/css/*` and `/js/*` static routes
 
 **Status**: RESOLVED  
 **Files Changed**: `workers/smax_worker.py`, `core/database.py`
@@ -82,7 +91,7 @@ Now SMAX (and CUIC) scrape history appears correctly in `/api/scrape-log` endpoi
 
 2. ~~We have another issue. It's also not affecting the process itself, but it's considered to be missing. So when you perform any type of scrape, whether it's Testmax or CUIU website, it's going to be shown in the history in the dashboard itself, the scrape history. I've noticed that when I scrape in Testmax, it doesn't show there. It doesn't show in the history itself. So this needs to be addressed.~~
 
-3. One thing that angsts me about our system is the settings UI. So it's not only the settings UI, it's our, like, our service control panel itself. We are firing or starting scraping from there. We are seeing the scraping status from there. We are seeing everything. It's not only for settings. We will change its name sooner or later, but I don't like its UI. It's stupid. It's also hard to use. It's not organized in a way that it should be organized. So we need to work on it. We need first to study it and actually see what do we have, what also we could be adding in the future to make it ready to handle it, or we can just add it to our updated UI set that we are going to create later on. So it's not only the UI we are talking here, we are also talking about the user experience. We are talking in terms of UI and UX. What is also make me anxious that I need to save every time I change settings. Maybe you can do something about this where settings is being saved automatically instead me go and save it manually because it's um It's make me anxious and it's not a very good UI. As I told you, we need to revamp the whole thing and make it more usable, more user-friendly, and its UX and UI far more better than this. We can do better. I'm not talking about something extraordinary, but I'm talking about something actually feels like a real service to use, not some gimmick or thing that feels it will break easily, you know.
+3. ~~One thing that angsts me about our system is the settings UI. So it's not only the settings UI, it's our, like, our service control panel itself. We are firing or starting scraping from there. We are seeing the scraping status from there. We are seeing everything. It's not only for settings. We will change its name sooner or later, but I don't like its UI. It's stupid. It's also hard to use. It's not organized in a way that it should be organized. So we need to work on it. We need first to study it and actually see what do we have, what also we could be adding in the future to make it ready to handle it, or we can just add it to our updated UI set that we are going to create later on. So it's not only the UI we are talking here, we are also talking about the user experience. We are talking in terms of UI and UX. What is also make me anxious that I need to save every time I change settings. Maybe you can do something about this where settings is being saved automatically instead me go and save it manually because it's um It's make me anxious and it's not a very good UI. As I told you, we need to revamp the whole thing and make it more usable, more user-friendly, and its UX and UI far more better than this. We can do better. I'm not talking about something extraordinary, but I'm talking about something actually feels like a real service to use, not some gimmick or thing that feels it will break easily, you know.~~
 
 4. We have another issue, and it's regarding the ability for our service to identify whether the data is historical or it's ongoing data. So as you can see, we have two types of data. We have classified data into two types. There are historical data, there are ongoing data. And the thing behind this is that we have two types of data, data that are not changing. They are closed. So for example, you are getting last or past week data. Past week data is not going to change. It will stay the same and it will not change. So identifying it as historical data or classifying it as historical data will allow our code to, it will avoid scrubbing it again and again and again. So if it is historical data, it will not scrub it again later. It will only scrub ongoing data, the data that are changing, data like today's data, data like this week data. The week is not over, so it's keep scrubbing this week data, the ongoing data, this month, this year data. Things that are from the past are historical, like past year, past month, past week, for example. Those kind of things that are considered to be historical. The thing is, there are one type of report I am pulling from SMS, and it's clearly saying that it's last year. And still our service or our code considering it like ongoing data. So we need to make sure that it identifies the data or classifies the data correctly, whether they are historical or ongoing data for all the websites we are scrabig from.
 
