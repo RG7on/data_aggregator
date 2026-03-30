@@ -654,6 +654,87 @@ code {
 .status-pill.skipped  { background: var(--accent-l); color: var(--accent); }
 .status-pill.running  { background: rgba(249,115,22,0.12); color: var(--orange); }
 
+/* ── AI Insights ─────────────────────────────────────────────────────────── */
+.agent-insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.agent-empty {
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 12.5px;
+}
+
+.agent-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.agent-item.severity-high { border-left-color: var(--red); }
+.agent-item.severity-medium { border-left-color: var(--yellow); }
+.agent-item.severity-low { border-left-color: var(--accent); }
+
+.agent-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.agent-item-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+.agent-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.agent-severity {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.agent-severity.high { background: var(--red-l); color: var(--red); }
+.agent-severity.medium { background: var(--yellow-l); color: var(--yellow); }
+.agent-severity.low { background: var(--accent-l); color: var(--accent); }
+
+.agent-confidence {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.agent-item-why {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.agent-actions {
+  margin: 8px 0 0 16px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.agent-actions li { margin-bottom: 3px; }
+
 /* ── Report Cards ────────────────────────────────────────────────────────── */
 .report-card {
   background: var(--surface2);

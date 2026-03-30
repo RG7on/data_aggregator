@@ -26,6 +26,12 @@ sys.path.insert(0, PROJECT_ROOT)
 
 from core.config import SETTINGS_PATH, CREDENTIALS_PATH
 from core.database import init_db, get_scrape_log, get_latest_scrape_status
+from core.agent_insights import (
+    build_agent_insights,
+    build_health_summary,
+    build_report_insight,
+    parse_agent_query_params,
+)
 
 PORT = 8580
 UI_FILE = os.path.join(PROJECT_ROOT, 'ui', 'index.html')
@@ -70,6 +76,12 @@ class SettingsHandler(BaseHTTPRequestHandler):
         elif path == '/api/scrape-running':
             with _scrape_lock:
                 self._send_json({'running': _scrape_running})
+        elif path == '/api/agent/insights':
+            self._serve_agent_insights()
+        elif path == '/api/agent/health-summary':
+            self._serve_agent_health_summary()
+        elif path.startswith('/api/agent/report/'):
+            self._serve_agent_report(path)
         elif path.startswith('/css/') or path.startswith('/js/'):
             # Serve static assets from ui/ directory
             # Security: reject path traversal attempts
@@ -263,6 +275,44 @@ class SettingsHandler(BaseHTTPRequestHandler):
         try:
             status = get_latest_scrape_status()
             self._send_json(status)
+        except Exception as e:
+            self._send_json({'error': str(e)}, status=500)
+
+    # ── Agent advisory APIs ───────────────────────────────────────────────
+
+    def _serve_agent_insights(self):
+        try:
+            qs = parse_qs(urlparse(self.path).query)
+            opts = parse_agent_query_params(qs)
+            data = build_agent_insights(**opts)
+            self._send_json(data)
+        except Exception as e:
+            self._send_json({'error': str(e)}, status=500)
+
+    def _serve_agent_health_summary(self):
+        try:
+            self._send_json(build_health_summary())
+        except Exception as e:
+            self._send_json({'error': str(e)}, status=500)
+
+    def _serve_agent_report(self, path: str):
+        try:
+            # Path format: /api/agent/report/<source>/<label>
+            parts = path.split('/')
+            if len(parts) < 6:
+                self._send_json({'error': 'Invalid report path'}, status=400)
+                return
+
+            source = parts[4]
+            label = '/'.join(parts[5:])
+
+            qs = parse_qs(urlparse(self.path).query)
+            lookback = int((qs.get('lookback') or ['500'])[0])
+            include_evidence = (qs.get('include_evidence') or ['true'])[0].lower() in ('1', 'true', 'yes', 'on')
+
+            data = build_report_insight(source, label, lookback=lookback, include_evidence=include_evidence)
+            status = 400 if data.get('error') else 200
+            self._send_json(data, status=status)
         except Exception as e:
             self._send_json({'error': str(e)}, status=500)
 
