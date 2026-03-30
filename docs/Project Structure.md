@@ -32,17 +32,27 @@ data_aggregator/
 │   └── README.md               # How to add a new worker
 │
 ├── ui/
-│   └── settings.html           # Browser-based settings editor
+│   ├── index.html              # Control panel (served by settings_server.py)
+│   ├── css/
+│   │   └── main.css
+│   └── js/
+│       ├── app.js              # Sidebar nav, toast, auto-save
+│       ├── dashboard.js        # Stats, scrape log, manual trigger
+│       ├── cuic.js             # CUIC report cards + filter wizard
+│       ├── smax.js             # SMAX report cards + properties explorer
+│       └── settings-io.js      # Export/import settings JSON
 │
 ├── scripts/
 │   ├── run.bat                 # Run with console output
 │   ├── run_silent.bat          # Run silently (Task Scheduler)
-│   └── open_settings.bat       # Open settings page in browser
+│   └── open_settings.bat       # Open control panel in browser
 │
 ├── docs/
+│   ├── CONVENTIONS.md          # Project rules: structure, naming, adding workers
 │   ├── DATA_DICTIONARY.md      # Auto-generated column reference
 │   ├── POWER_BI_README.md      # Power BI integration guide
-│   └── Project Structure.md    # This file
+│   ├── Project Structure.md    # This file
+│   └── reference/              # HTML DOM snapshots for selector development
 │
 ├── output/                     # Worker CSV output (auto-created)
 ├── logs/                       # Log files (auto-created)
@@ -52,6 +62,8 @@ data_aggregator/
 │   ├── install_browsers.bat
 │   └── python_bin/
 │
+├── CHANGELOG.md            # Log of all completed changes
+├── TODO.md                 # Pending work and backlog
 ├── requirements.txt
 └── .gitignore
 ```

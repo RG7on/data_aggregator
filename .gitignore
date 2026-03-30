@@ -71,4 +71,16 @@ desktop.ini
 *test*.py
 test_*.py
 
+# Claude CLI temp folders
+tmpclaude-*/
+
+# Playwright debug output (misplaced at root)
+CDevdata_aggregator*/
+
+# SQLite runtime database (rebuilt on startup)
+output/*.db
+
+# Backup files (use version control instead)
+*.bak
+
 FL_Monitoring_Dashboard/
