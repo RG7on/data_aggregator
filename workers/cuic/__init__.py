@@ -35,6 +35,10 @@ class Worker(BaseWorker):
     SOURCE_NAME = "cuic"
     DESCRIPTION = "Cisco Unified Intelligence Center Scraper"
 
+    # CUIC datetime presets that designate a closed (fully past) time window.
+    # Used to auto-detect data_type = 'historical' when it is not set in config.
+    _HISTORICAL_PRESETS = frozenset({'LASTYR', 'LASTMTH', 'LASTWK', 'LASTQTR'})
+
     # ══════════════════════════════════════════════════════════════════════
     #  CONFIG
     # ══════════════════════════════════════════════════════════════════════
@@ -56,6 +60,31 @@ class Worker(BaseWorker):
         self.timeout_short  = cfg.get('timeout_short_ms',  1500)
         self.timeout_medium = cfg.get('timeout_medium_ms', 2500)
         self.timeout_long   = cfg.get('timeout_long_ms',   8000)
+        self._autodetect_data_types()
+
+    def _autodetect_data_types(self):
+        """Auto-classify reports as 'historical' based on their filter presets.
+
+        Only fires when 'data_type' is absent from the report config — explicit
+        settings ('ongoing' or 'historical') are always respected.
+        """
+        for report in self.reports:
+            if 'data_type' in report:
+                continue
+            steps = (report.get('filters') or {}).get('_meta', {}).get('steps', [])
+            for step in steps:
+                for param in step.get('params', []):
+                    preset = (
+                        param.get('relativeRange') or
+                        param.get('currentPreset') or ''
+                    ).upper()
+                    if preset in self._HISTORICAL_PRESETS:
+                        report['data_type'] = 'historical'
+                        self.logger.debug(
+                            f"Auto-detected '{report.get('label')}' as historical "
+                            f"(filter preset: {preset!r})"
+                        )
+                        break
 
     # ══════════════════════════════════════════════════════════════════════
     #  ENTRY
@@ -85,7 +114,7 @@ class Worker(BaseWorker):
             logout_ok = auth.logout(self)
             
             if logout_ok:
-                # Small delay so logout screen is visible when headless=false
+                # Intentional delay so logout screen is visible in headed mode
                 if self.page and not self.page.is_closed():
                     self.page.wait_for_timeout(1500)
             else:

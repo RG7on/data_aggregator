@@ -51,3 +51,4 @@ Use the table below to find the exact name of the metric you want to display.
 | **CUIC_Return** | cuic | Report from cuic. [Add description] | 2026-02-09 10:47:39 |
 | **CUIC_Service Level** | cuic | Report from cuic. [Add description] | 2026-02-09 10:47:39 |
 | **CUIC_Short Calls** | cuic | Report from cuic. [Add description] | 2026-02-09 10:47:39 |
+| **Unknown Report** | smax | Report from smax. [Add description] | 2026-03-22 19:56:02 |

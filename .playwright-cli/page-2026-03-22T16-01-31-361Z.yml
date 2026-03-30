@@ -1,0 +1,277 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic:
+      - generic [ref=e5]:
+        - navigation "Main menu" [ref=e7]:
+          - button "Main menu dropdown" [ref=e8] [cursor=pointer]
+        - link:
+          - /url: /dashboard
+        - generic [ref=e10]:
+          - generic [ref=e11]: Reports
+          - generic [ref=e12]:
+            - generic [ref=e13]:
+              - link "Reports" [ref=e15] [cursor=pointer]:
+                - /url: /reports
+              - link "Schedules" [ref=e17] [cursor=pointer]:
+                - /url: /schedules
+            - text: 
+        - toolbar [ref=e18]:
+          - listitem
+          - listitem [ref=e19]:
+            - button "Search" [ref=e20] [cursor=pointer]:
+              - generic [ref=e21]: 
+          - listitem [ref=e22]:
+            - button "Recent discussions" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]: 
+          - listitem [ref=e25]:
+            - button "Help" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+          - listitem "Profile page" [ref=e28]:
+            - button "More actions" [ref=e30] [cursor=pointer]:
+              - generic "Al-Sarmi, Al-Muntaser IDSC14X" [ref=e31]
+              - generic [ref=e37]: 
+          - generic:  
+      - generic:
+        - search
+  - generic [ref=e38]:
+    - heading "Report Page" [level=1] [ref=e39]
+    - generic [ref=e41]:
+      - generic [ref=e44]:
+        - button "" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: 
+        - heading "Reports list" [level=3] [ref=e48]
+      - text:       
+    - generic [ref=e49]:
+      - generic [ref=e51]:
+        - generic [ref=e54]:
+          - button "" [ref=e55] [cursor=pointer]:
+            - generic [ref=e56]: 
+          - heading "Report properties" [level=3] [ref=e57]
+        - generic [ref=e59]:
+          - list [ref=e61]:
+            - listitem [ref=e62]:
+              - generic [ref=e63]: General
+            - listitem [ref=e64]:
+              - generic [ref=e65]: Chart
+            - listitem [ref=e66]:
+              - generic [ref=e67]: Details
+          - generic [ref=e68]:
+            - generic:
+              - generic:
+                - generic:
+                  - generic [ref=e69]:
+                    - generic [ref=e70]:
+                      - generic [ref=e71]:
+                        - generic [ref=e73]:
+                          - generic "Report name" [ref=e75]
+                          - generic [ref=e80]: Aging Requests
+                        - generic [ref=e82]:
+                          - generic "Display label" [ref=e84]
+                          - generic [ref=e88]: Aging Requests
+                        - generic [ref=e90]:
+                          - generic "Record type" [ref=e92]
+                          - generic [ref=e97]: Request
+                      - generic [ref=e101]:
+                        - generic [ref=e102]: Filter by
+                        - generic [ref=e106]:
+                          - generic [ref=e107]:
+                            - button "Service desk group" [ref=e108] [cursor=pointer]
+                            - text: ":"
+                            - button "SMX-HELPDESK-CALLOFF, SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-HELPDESK, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access" [ref=e109] [cursor=pointer]
+                            - text:            
+                          - generic [ref=e110]:
+                            - button "Phase Id" [ref=e111] [cursor=pointer]
+                            - text: ":"
+                            - button "First line support, Fulfill, Review, Escalate" [ref=e112] [cursor=pointer]:
+                              - generic [ref=e113]: First line support, Fulfill, Review, Escalate
+                            - text:     
+                          - generic [ref=e114]:
+                            - button "Current assignment" [ref=e115] [cursor=pointer]
+                            - text: ":"
+                            - button "Service Desk, Expert Group, Incident" [ref=e116] [cursor=pointer]:
+                              - generic [ref=e117]: Service Desk, Expert Group, Incident
+                            - text:    
+                          - generic [ref=e118]:
+                            - button "Created time" [ref=e119] [cursor=pointer]
+                            - text: ":"
+                            - button "Past year" [ref=e120] [cursor=pointer]
+                      - generic [ref=e122]:
+                        - generic [ref=e123]: Group by
+                        - generic [ref=e129]:
+                          - generic [ref=e130]:
+                            - generic [ref=e133]:
+                              - generic [ref=e137]: Created time
+                              - generic [ref=e141]: by Months
+                            - generic [ref=e142]:
+                              - generic:   
+                          - generic [ref=e143]:
+                            - generic [ref=e150]: Phase Id
+                            - generic [ref=e151]:
+                              - generic:   
+                      - generic [ref=e153]:
+                        - generic [ref=e154]: Function
+                        - generic [ref=e161]:
+                          - generic [ref=e168]: Count
+                          - generic [ref=e169]:
+                            - generic:   
+                    - group [ref=e172]:
+                      - generic [ref=e173]:  Additional table columns No columns to select
+                    - group [ref=e176] [cursor=pointer]:
+                      - generic [ref=e177]:
+                        - generic [ref=e178]: 
+                        - text: Display results
+                  - generic [ref=e181]:
+                    - generic "checked" [ref=e188]: 
+                    - generic [ref=e189]: Enable chart view
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - button "Save" [disabled] [ref=e194]
+              - button "Cancel" [disabled] [ref=e195]
+            - button "Preview" [disabled] [ref=e196]
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - text: "1240"
+              - heading "Aging Requests" [level=3] [ref=e205]
+            - generic "-Analytic report-" [ref=e207]:
+              - generic [ref=e208]: An
+              - text: "-Analytic report-"
+          - toolbar [ref=e209]:
+            - button "Duplicate" [ref=e213] [cursor=pointer]:
+              - generic [ref=e215]:
+                - generic [ref=e217]: 
+                - text: Duplicate
+            - button "Export CSV" [ref=e221] [cursor=pointer]:
+              - generic [ref=e223]:
+                - generic [ref=e225]: 
+                - text: Export CSV
+            - button "Export XLS" [ref=e229] [cursor=pointer]:
+              - generic [ref=e231]:
+                - generic [ref=e233]: 
+                - text: Export XLS
+            - button "Export PDF" [ref=e237] [cursor=pointer]:
+              - generic [ref=e239]:
+                - generic [ref=e241]: 
+                - text: Export PDF
+            - generic:
+              - generic:
+                - generic: 
+            - generic [ref=e244]:
+              - button "Deactivate" [disabled]:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: 
+                    - text: Deactivate
+            - generic:
+              - generic:  
+          - generic [ref=e245]:
+            - generic [ref=e247]:
+              - button "" [ref=e248] [cursor=pointer]:
+                - radio [checked]
+                - generic [ref=e249]: 
+              - button "" [active] [ref=e250] [cursor=pointer]:
+                - radio [checked]
+                - generic [ref=e251]: 
+            - generic [ref=e252]: "Display:"
+        - generic [ref=e253]:
+          - grid [ref=e404]:
+            - row "Created time by Month Phase Id Count" [ref=e406]:
+              - generic [ref=e408]: Created time by Month
+              - generic [ref=e414]: Phase Id
+              - generic [ref=e418]: Count
+            - generic [ref=e422]:
+              - row "Mar 2025 First line support 12" [ref=e423]:
+                - gridcell "Mar 2025" [ref=e424]
+                - gridcell [ref=e425]: 
+                - gridcell "First line support" [ref=e426]
+                - gridcell "12" [ref=e427]
+              - row "Mar 2025 Review 1" [ref=e428]:
+                - gridcell "Mar 2025" [ref=e429]
+                - gridcell [ref=e430]: 
+                - gridcell "Review" [ref=e431]
+                - gridcell "1" [ref=e432]
+              - row "Apr 2025 First line support 36" [ref=e433]:
+                - gridcell "Apr 2025" [ref=e434]
+                - gridcell [ref=e435]: 
+                - gridcell "First line support" [ref=e436]
+                - gridcell "36" [ref=e437]
+              - row "Apr 2025 Fulfill 2" [ref=e438]:
+                - gridcell "Apr 2025" [ref=e439]
+                - gridcell [ref=e440]: 
+                - gridcell "Fulfill" [ref=e441]
+                - gridcell "2" [ref=e442]
+              - row "May 2025 First line support 31" [ref=e443]:
+                - gridcell "May 2025" [ref=e444]
+                - gridcell [ref=e445]: 
+                - gridcell "First line support" [ref=e446]
+                - gridcell "31" [ref=e447]
+              - row "May 2025 Review 15" [ref=e448]:
+                - gridcell "May 2025" [ref=e449]
+                - gridcell [ref=e450]: 
+                - gridcell "Review" [ref=e451]
+                - gridcell "15" [ref=e452]
+              - row "May 2025 Fulfill 3" [ref=e453]:
+                - gridcell "May 2025" [ref=e454]
+                - gridcell [ref=e455]: 
+                - gridcell "Fulfill" [ref=e456]
+                - gridcell "3" [ref=e457]
+              - row "Jun 2025 First line support 21" [ref=e458]:
+                - gridcell "Jun 2025" [ref=e459]
+                - gridcell [ref=e460]: 
+                - gridcell "First line support" [ref=e461]
+                - gridcell "21" [ref=e462]
+              - row "Jun 2025 Fulfill 3" [ref=e463]:
+                - gridcell "Jun 2025" [ref=e464]
+                - gridcell [ref=e465]: 
+                - gridcell "Fulfill" [ref=e466]
+                - gridcell "3" [ref=e467]
+              - row "Jun 2025 Review 2" [ref=e468]:
+                - gridcell "Jun 2025" [ref=e469]
+                - gridcell [ref=e470]: 
+                - gridcell "Review" [ref=e471]
+                - gridcell "2" [ref=e472]
+              - row "Jun 2025 Escalate 1" [ref=e473]:
+                - gridcell "Jun 2025" [ref=e474]
+                - gridcell [ref=e475]: 
+                - gridcell "Escalate" [ref=e476]
+                - gridcell "1" [ref=e477]
+              - row "Jul 2025 First line support 31" [ref=e478]:
+                - gridcell "Jul 2025" [ref=e479]
+                - gridcell [ref=e480]: 
+                - gridcell "First line support" [ref=e481]
+                - gridcell "31" [ref=e482]
+              - row "Jul 2025 Fulfill 8" [ref=e483]:
+                - gridcell "Jul 2025" [ref=e484]
+                - gridcell [ref=e485]: 
+                - gridcell "Fulfill" [ref=e486]
+                - gridcell "8" [ref=e487]
+              - row "Jul 2025 Escalate 3" [ref=e488]:
+                - gridcell "Jul 2025" [ref=e489]
+                - gridcell [ref=e490]: 
+                - gridcell "Escalate" [ref=e491]
+                - gridcell "3" [ref=e492]
+              - row "Jul 2025 Review 1" [ref=e493]:
+                - gridcell "Jul 2025" [ref=e494]
+                - gridcell [ref=e495]: 
+                - gridcell "Review" [ref=e496]
+                - gridcell "1" [ref=e497]
+              - row "Aug 2025 First line support 48" [ref=e498]:
+                - gridcell "Aug 2025" [ref=e499]
+                - gridcell [ref=e500]: 
+                - gridcell "First line support" [ref=e501]
+                - gridcell "48" [ref=e502]
+              - row "Aug 2025 Fulfill 5" [ref=e503]:
+                - gridcell "Aug 2025" [ref=e504]
+                - gridcell [ref=e505]: 
+                - gridcell "Fulfill" [ref=e506]
+                - gridcell "5" [ref=e507]
+          - generic [ref=e397]:
+            - generic [ref=e398]: Updated 4 hours ago
+            - generic [ref=e399]:
+              - text: Grouping values are calculated using UTC 
+              - generic [ref=e400]: 
+  - contentinfo
+  - status [ref=e401]
+  - status [ref=e402]

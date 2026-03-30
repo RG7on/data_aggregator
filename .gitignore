@@ -46,6 +46,11 @@ python_installer/get-pip.py
 *.env
 config/credentials.json
 
+# Chrome Profiles (persistent browser sessions — never commit)
+# Contains cookies, IndexedDB, SQLite stores, cache, and session state.
+# First-run SSO login populates this directory automatically.
+config/smax_chrome_profile/
+
 # Logs
 logs/
 *.log

@@ -1,0 +1,222 @@
+- generic [active] [ref=e3]:
+  - banner [ref=e4]:
+    - generic:
+      - generic [ref=e5]:
+        - navigation "Main menu" [ref=e7]:
+          - button "Main menu dropdown" [ref=e8] [cursor=pointer]
+        - link:
+          - /url: /dashboard
+        - generic [ref=e10]:
+          - generic [ref=e11]: Reports
+          - generic [ref=e12]:
+            - generic [ref=e13]:
+              - link "Reports" [ref=e15] [cursor=pointer]:
+                - /url: /reports
+              - link "Schedules" [ref=e17] [cursor=pointer]:
+                - /url: /schedules
+            - text: 
+        - toolbar [ref=e18]:
+          - listitem
+          - listitem [ref=e19]:
+            - button "Search" [ref=e20] [cursor=pointer]:
+              - generic [ref=e21]: 
+          - listitem [ref=e22]:
+            - button "Recent discussions" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]: 
+          - listitem [ref=e25]:
+            - button "Help" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]: 
+          - listitem "Profile page" [ref=e28]:
+            - button "More actions" [ref=e30] [cursor=pointer]:
+              - generic "Al-Sarmi, Al-Muntaser IDSC14X" [ref=e31]
+              - generic [ref=e37]: 
+          - generic:  
+      - generic:
+        - search
+  - generic [ref=e38]:
+    - heading "Report Page" [level=1] [ref=e39]
+    - generic [ref=e41]:
+      - generic [ref=e44]:
+        - button "" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: 
+        - heading "Reports list" [level=3] [ref=e48]
+      - text:       
+    - generic [ref=e49]:
+      - generic [ref=e51]:
+        - generic [ref=e54]:
+          - button "" [ref=e55] [cursor=pointer]:
+            - generic [ref=e56]: 
+          - heading "Report properties" [level=3] [ref=e57]
+        - generic [ref=e59]:
+          - list [ref=e61]:
+            - listitem [ref=e62]:
+              - generic [ref=e63]: General
+            - listitem [ref=e64]:
+              - generic [ref=e65]: Chart
+            - listitem [ref=e66]:
+              - generic [ref=e67]: Details
+          - generic [ref=e68]:
+            - generic:
+              - generic:
+                - generic:
+                  - generic [ref=e69]:
+                    - generic [ref=e70]:
+                      - generic [ref=e71]:
+                        - generic [ref=e73]:
+                          - generic "Report name" [ref=e75]
+                          - generic [ref=e80]: Aging Requests
+                        - generic [ref=e82]:
+                          - generic "Display label" [ref=e84]
+                          - generic [ref=e88]: Aging Requests
+                        - generic [ref=e90]:
+                          - generic "Record type" [ref=e92]
+                          - generic [ref=e97]: Request
+                      - generic [ref=e101]:
+                        - generic [ref=e102]: Filter by
+                        - generic [ref=e106]:
+                          - generic [ref=e107]:
+                            - button "Service desk group" [ref=e108] [cursor=pointer]
+                            - text: ":"
+                            - button "SMX-HELPDESK-CALLOFF, SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-HELPDESK, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access" [ref=e109] [cursor=pointer]
+                            - text:            
+                          - generic [ref=e110]:
+                            - button "Phase Id" [ref=e111] [cursor=pointer]
+                            - text: ":"
+                            - button "First line support, Fulfill, Review, Escalate" [ref=e112] [cursor=pointer]:
+                              - generic [ref=e113]: First line support, Fulfill, Review, Escalate
+                            - text:     
+                          - generic [ref=e114]:
+                            - button "Current assignment" [ref=e115] [cursor=pointer]
+                            - text: ":"
+                            - button "Service Desk, Expert Group, Incident" [ref=e116] [cursor=pointer]:
+                              - generic [ref=e117]: Service Desk, Expert Group, Incident
+                            - text:    
+                          - generic [ref=e118]:
+                            - button "Created time" [ref=e119] [cursor=pointer]
+                            - text: ":"
+                            - button "Past year" [ref=e120] [cursor=pointer]
+                      - generic [ref=e122]:
+                        - generic [ref=e123]: Group by
+                        - generic [ref=e129]:
+                          - generic [ref=e130]:
+                            - generic [ref=e133]:
+                              - generic [ref=e137]: Created time
+                              - generic [ref=e141]: by Months
+                            - generic [ref=e142]:
+                              - generic:   
+                          - generic [ref=e143]:
+                            - generic [ref=e150]: Phase Id
+                            - generic [ref=e151]:
+                              - generic:   
+                      - generic [ref=e153]:
+                        - generic [ref=e154]: Function
+                        - generic [ref=e161]:
+                          - generic [ref=e168]: Count
+                          - generic [ref=e169]:
+                            - generic:   
+                    - group [ref=e172]:
+                      - generic [ref=e173]:  Additional table columns No columns to select
+                    - group [ref=e176] [cursor=pointer]:
+                      - generic [ref=e177]:
+                        - generic [ref=e178]: 
+                        - text: Display results
+                  - generic [ref=e181]:
+                    - generic "checked" [ref=e188]: 
+                    - generic [ref=e189]: Enable chart view
+          - generic [ref=e192]:
+            - generic [ref=e193]:
+              - button "Save" [disabled] [ref=e194]
+              - button "Cancel" [disabled] [ref=e195]
+            - button "Preview" [disabled] [ref=e196]
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - generic [ref=e203]:
+              - text: "1240"
+              - heading "Aging Requests" [level=3] [ref=e205]
+            - generic "-Analytic report-" [ref=e207]:
+              - generic [ref=e208]: An
+              - text: "-Analytic report-"
+          - toolbar [ref=e209]:
+            - button "Duplicate" [ref=e213] [cursor=pointer]:
+              - generic [ref=e215]:
+                - generic [ref=e217]: 
+                - text: Duplicate
+            - button "Export CSV" [ref=e221] [cursor=pointer]:
+              - generic [ref=e223]:
+                - generic [ref=e225]: 
+                - text: Export CSV
+            - button "Export XLS" [ref=e229] [cursor=pointer]:
+              - generic [ref=e231]:
+                - generic [ref=e233]: 
+                - text: Export XLS
+            - button "Export PDF" [ref=e237] [cursor=pointer]:
+              - generic [ref=e239]:
+                - generic [ref=e241]: 
+                - text: Export PDF
+            - generic:
+              - generic:
+                - generic: 
+            - generic [ref=e244]:
+              - button "Deactivate" [disabled]:
+                - generic:
+                  - generic:
+                    - generic:
+                      - generic: 
+                    - text: Deactivate
+            - generic:
+              - generic:  
+          - generic [ref=e245]:
+            - generic [ref=e247]:
+              - button "" [ref=e248] [cursor=pointer]:
+                - radio
+                - generic [ref=e249]: 
+              - button "" [ref=e250] [cursor=pointer]:
+                - radio
+                - generic [ref=e251]: 
+            - generic [ref=e252]: "Display:"
+        - generic [ref=e253]:
+          - generic [ref=e255]:
+            - img [ref=e257]:
+              - generic [ref=e259]:
+                - generic [ref=e261]:
+                  - generic [ref=e262]:
+                    - generic [ref=e264]: Apr 20
+                    - generic [ref=e266]: Jun 20
+                    - generic [ref=e268]: Aug 20
+                    - generic [ref=e270]: Oct 20
+                    - generic [ref=e272]: Dec 20
+                    - generic [ref=e273]: Created time by Month
+                  - generic [ref=e275]: Feb 2025
+                  - generic [ref=e277]: Mar 2026
+                - generic [ref=e279]:
+                  - generic [ref=e280]:
+                    - generic [ref=e282]: "0"
+                    - generic [ref=e284]: "20"
+                    - generic [ref=e286]: "40"
+                    - generic [ref=e288]: "60"
+                    - generic [ref=e290]: "80"
+                    - generic [ref=e292]: "100"
+                    - generic [ref=e294]: "120"
+                    - generic [ref=e296]: "140"
+                    - generic [ref=e298]: "160"
+                    - generic [ref=e300]: "180"
+                    - generic [ref=e302]: "200"
+                    - generic [ref=e304]: "220"
+                    - generic [ref=e306]: "240"
+                    - generic [ref=e307]: Count
+                  - generic [ref=e309]: "0"
+                  - generic [ref=e311]: "257"
+            - generic [ref=e384]:
+              - generic "First line support" [ref=e387] [cursor=pointer]
+              - generic "Escalate" [ref=e390] [cursor=pointer]
+              - generic "Fulfill" [ref=e393] [cursor=pointer]
+              - generic "Review" [ref=e396] [cursor=pointer]
+          - generic [ref=e397]:
+            - generic [ref=e398]: Updated 4 hours ago
+            - generic [ref=e399]:
+              - text: Grouping values are calculated using UTC 
+              - generic [ref=e400]: 
+  - contentinfo
+  - status [ref=e401]
+  - status [ref=e402]

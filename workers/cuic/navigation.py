@@ -30,7 +30,14 @@ def navigate_to_reports_root(worker):
     try:
         # Attempt 1: click the Reports tab
         worker.page.click(selectors.REPORTS_TAB_CSS)
-        worker.page.wait_for_timeout(worker.timeout_medium)
+
+        # Wait for the grid to become visible (condition-based, not fixed timeout)
+        frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
+        if frame:
+            try:
+                frame.wait_for_selector(selectors.GRID_CONTAINER, timeout=worker.timeout_nav)
+            except Exception:
+                pass
 
         # Check if the ngGrid is visible in the reports iframe
         frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
@@ -48,7 +55,6 @@ def navigate_to_reports_root(worker):
         worker.logger.info("ngGrid hidden after tab click - reloading page")
         worker.page.goto(worker.url, wait_until='domcontentloaded',
                        timeout=worker.timeout_nav)
-        worker.page.wait_for_timeout(worker.timeout_medium)
         worker.page.wait_for_selector(selectors.REPORTS_TAB_CSS,
                                     timeout=worker.timeout_nav)
     except Exception as e:
@@ -59,8 +65,8 @@ def get_reports_frame(worker):
     """Get the reports iframe containing the ng-grid."""
     try:
         worker.page.click(selectors.REPORTS_TAB_CSS)
-        worker.page.wait_for_timeout(worker.timeout_medium)
 
+        # Wait for reports iframe content instead of fixed timeout
         frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
         if not frame:
             # fallback: find frame with ng-grid
@@ -107,7 +113,13 @@ def open_report(worker, frame, folder_path: str, report_name: str) -> bool:
                     return False
             worker.logger.info(f"Opened folder '{folder}' (depth {depth})")
 
-            worker.page.wait_for_timeout(worker.timeout_medium)
+            # Wait for grid to refresh with new folder contents
+            try:
+                frame_check = _reacquire_frame(worker, frame)
+                if frame_check:
+                    frame_check.wait_for_selector(selectors.GRID_CONTAINER, timeout=worker.timeout_nav)
+            except Exception:
+                worker.page.wait_for_timeout(worker.timeout_short)
 
             # Re-acquire frame if it detached
             frame = _reacquire_frame(worker, frame)
@@ -128,7 +140,8 @@ def open_report(worker, frame, folder_path: str, report_name: str) -> bool:
                 worker.screenshot("report_not_found", is_step=False)
                 return False
         worker.logger.info(f"Clicked report '{report_name}'")
-        worker.page.wait_for_timeout(worker.timeout_medium)
+        # Wait for the report to open (new tab/content load)
+        worker.page.wait_for_timeout(worker.timeout_medium)  # Report opens in popup; no element to wait for
         worker.screenshot("02_report_clicked")
         return True
     except Exception as e:
@@ -160,7 +173,7 @@ def _scroll_and_click_folder(worker, frame, name: str, max_scrolls: int = 20) ->
                 const vp = document.querySelector(s);
                 if (vp) vp.scrollTop += vp.clientHeight;
             }''', selectors.GRID_VIEWPORT)
-            worker.page.wait_for_timeout(400)
+            worker.page.wait_for_timeout(400)  # ng-grid virtual scroll render buffer
             if _click_grid_item(worker, frame, name, is_folder=True):
                 return True
         return False
@@ -243,7 +256,7 @@ def _scroll_and_click(worker, frame, name: str, max_scrolls: int = 20) -> bool:
                 const vp = document.querySelector(s);
                 if (vp) vp.scrollTop += vp.clientHeight;
             }''', selectors.GRID_VIEWPORT)
-            worker.page.wait_for_timeout(400)
+            worker.page.wait_for_timeout(400)  # ng-grid virtual scroll render buffer
             if _click_grid_item(worker, frame, name, is_folder=False):
                 return True
         return False

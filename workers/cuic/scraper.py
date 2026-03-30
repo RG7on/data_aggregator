@@ -15,11 +15,16 @@ from . import javascript
 def scrape_data(worker, report_label: str = '') -> List[Dict[str, Any]]:
     """Main scraper entry point. Tries all methods in order."""
     try:
-        worker.logger.info(f"  Waiting {worker.timeout_long}ms for report data to render...")
-        worker.page.wait_for_timeout(worker.timeout_long)
-
+        # Wait for report content to render — try ag-grid first, then fixed timeout
+        worker.logger.info(f"  Waiting for report data to render...")
         all_pages = worker.context.pages
         target = all_pages[-1] if len(all_pages) > 1 else worker.page
+        try:
+            target.wait_for_selector(
+                '.ag-root, .ag-body-viewport, [class*="ag-theme"], table',
+                timeout=worker.timeout_long)
+        except Exception:
+            worker.logger.info(f"  No grid/table detected within {worker.timeout_long}ms, continuing anyway")
         worker.logger.info(f"  Scraper: {len(all_pages)} page(s), "
                          f"targeting {'last page' if len(all_pages) > 1 else 'main page'}")
         worker.logger.info(f"  Target has {len(target.frames)} frame(s)")

@@ -38,8 +38,9 @@ import time
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from playwright.sync_api import sync_playwright
 from core.base_worker import BaseWorker
-from core.config import get_worker_settings, get_worker_credentials
+from core.config import get_worker_settings, get_worker_credentials, get_global_settings
 from core.database import has_historical_data, log_scrape
 from typing import Dict, Any, List, Tuple
 
@@ -61,19 +62,34 @@ class Worker(BaseWorker):
     ELEMENT_WAIT_TIMEOUT = 30000
     TAB_STAGGER_DELAY = 2000    # ms between opening tabs (avoids server rate-limits)
     MAX_RETRIES = 2             # retry failed tabs this many times
-    
+
+    # Display-value substrings that signal a closed (fully past) time window.
+    # Used to auto-detect data_type = 'historical' from report filter properties
+    # when the report config does not explicitly set data_type.
+    _HISTORICAL_DISPLAY_PATTERNS = frozenset({
+        'past year', 'previous year', 'last year',
+        'previous month', 'past month', 'last month',
+        'previous week', 'past week', 'last week',
+        'previous quarter', 'past quarter', 'last quarter',
+    })
+
     # ============================================================
     # SELECTORS
     # ============================================================
 
-    # XPath: Button to switch from chart view to table/grid view
-    TABLE_VIEW_BUTTON = 'xpath=/html/body/div[1]/div/div[2]/div[2]/div/div/div/div/div[3]/div[1]/span/button[2]'
+    # Button to switch from chart view to table/grid view
+    TABLE_VIEW_BUTTON = '[data-aid="report-toggle-Grid"]'
+    TABLE_VIEW_FALLBACKS = [
+        '[data-aid="report-toggle-Grid"]',     # data-aid (best)
+        'button[title="Show Table"]',          # title attribute
+        'button:has(i.icon-table)',            # icon class inside button
+    ]
 
-    # XPath: Report title (span[3] in header)
-    TITLE_XPATH = 'xpath=/html/body/div[1]/div/div[2]/div[2]/div/div/div/div/div[1]/div/span[3]'
+    # Report title (in report-area-header)
+    TITLE_SELECTOR = '[data-aid="report-name"]'
 
-    # XPath: Total row count (span[1] in header)
-    TOTAL_XPATH = 'xpath=/html/body/div[1]/div/div[2]/div[2]/div/div/div/div/div[1]/div/span[1]'
+    # Total row count (in report-area-header)
+    TOTAL_SELECTOR = '[data-aid="report-total-count"]'
 
     # CSS: SlickGrid selectors (scoped to report grid, NOT sidebar grid)
     GRID_HEADER_SELECTOR = 'pl-report-grid .slick-header-column'
@@ -82,6 +98,16 @@ class Worker(BaseWorker):
     GRID_CELL_SELECTOR = '.slick-cell'
     HEADER_NAME_SELECTOR = '.slick-column-name'
 
+    # ============================================================
+    # MICROSOFT SSO AUTHENTICATION
+    # ============================================================
+    # SMAX uses Microsoft Entra ID (SAML SSO). The session is stored
+    # as cookies — persists across browser launches when loaded from
+    # the saved auth state file.
+    SSO_INDICATOR = 'login.microsoftonline.com'  # Domain present in SSO redirect URLs
+    SSO_WAIT_TIMEOUT = 300_000                   # 5 minutes for user to complete MFA
+    AUTH_STATE_FILE = 'smax_auth_state.json'     # Legacy — kept for backward compat
+    CHROME_PROFILE_DIR = 'smax_chrome_profile'   # Persistent Chrome profile under config/
     # ============================================================
     # SMAX REPORT PROPERTIES READER (AngularJS)
     # ============================================================
@@ -337,32 +363,74 @@ class Worker(BaseWorker):
         self.ELEMENT_WAIT_TIMEOUT = cfg.get('element_wait_timeout_ms', 30000)
         self.TAB_STAGGER_DELAY = cfg.get('tab_stagger_delay_ms', 2000)
         self.MAX_RETRIES = cfg.get('max_retries', 2)
+        self._autodetect_data_types()
+
+    def _autodetect_data_types(self):
+        """Auto-classify reports as 'historical' based on their filter display values.
+
+        Only fires when 'data_type' is absent from the report config — explicit
+        settings ('ongoing' or 'historical') are always respected.
+        """
+        for report in self.reports:
+            if 'data_type' in report:
+                continue
+            filters = report.get('properties', {}).get('filters', [])
+            for f in filters:
+                dv = (f.get('display_value') or '').lower()
+                if any(pat in dv for pat in self._HISTORICAL_DISPLAY_PATTERNS):
+                    report['data_type'] = 'historical'
+                    self.logger.debug(
+                        f"Auto-detected '{report.get('label')}' as historical "
+                        f"(filter '{f.get('field_label')}': {dv!r})"
+                    )
+                    break
 
     def run(self) -> List[Dict[str, Any]]:
-        """Execute the worker. Opens all reports in parallel tabs for speed."""
+        """Execute the worker. Opens all reports in parallel tabs for speed.
+
+        Authentication:
+        - Uses a persistent Chrome profile (config/smax_chrome_profile/).
+        - Microsoft SSO session is stored natively by Chrome — persists across
+          restarts without any JSON tricks.
+        - First run (or after session expiry): restarts in headed mode so the
+          user can complete Microsoft sign-in + MFA. Subsequent runs are silent.
+        """
         self._load_config()
 
         enabled = [r for r in self.reports if r.get('enabled', True)]
         if not enabled:
             self.logger.warning("No enabled SMAX reports configured.")
+            log_scrape('smax', '_worker', 'no_data', 0, 0, 'No enabled reports configured')
             return []
 
         result = []
         try:
+            # ── Step 1: Start browser with persistent profile ──────────
             self.setup_browser()
 
-            if self.username and self.password:
-                self.logger.info("Attempting SMAX login...")
-                self._login_if_needed()
-            else:
-                self.logger.warning("No SMAX credentials configured - attempting without login")
+            # ── Step 2: Check whether the session is still valid ───────
+            if not self._ensure_authenticated():
+                self.logger.info("Session expired — re-authenticating via Microsoft SSO (headed)")
+                self.teardown_browser()
+                self.setup_browser(headless=False)
+                self._wait_for_sso_auth()
 
+                # _wait_for_sso_auth() confirmed the browser left the SSO domain.
+                # Check current URL instead of navigating again (another goto()
+                # would trigger a new SAML round-trip).
+                current_url = self.page.url
+                if self.SSO_INDICATOR in current_url:
+                    raise RuntimeError("Authentication failed after Microsoft SSO attempt")
+                self.logger.info(f"Post-SSO verification OK (URL: {current_url[:80]})")
+
+            # ── Step 3: Scrape ─────────────────────────────────────────
             result = self.scrape()
 
         except Exception as e:
             self.logger.error(f"Worker failed: {e}")
             import traceback
             self.logger.error(traceback.format_exc())
+            log_scrape('smax', '_worker', 'error', 0, 0, str(e))
         finally:
             self.teardown_browser()
 
@@ -406,8 +474,10 @@ class Worker(BaseWorker):
                 if i == 0:
                     tab = self.page
                 else:
-                    tab = self.context.new_page()
+                    # Wait BEFORE creating the new page so the blank tab is
+                    # never visible for the full stagger delay.
                     self.page.wait_for_timeout(self.TAB_STAGGER_DELAY)
+                    tab = self.context.new_page()
 
                 tab.goto(url, wait_until='commit', timeout=self.PAGE_LOAD_TIMEOUT)
                 tabs.append((tab, report))
@@ -415,6 +485,7 @@ class Worker(BaseWorker):
 
             except Exception as e:
                 self.logger.error(f"  Tab {i+1}: failed to open {url}: {e}")
+                log_scrape('smax', label, 'error', 0, 0, f'Tab open failed: {e}')
 
         self.logger.info(f"All {len(tabs)} tabs opened in {time.time() - start_time:.1f}s")
         
@@ -444,7 +515,12 @@ class Worker(BaseWorker):
                 url = report.get('url', '')
                 try:
                     self.logger.info(f"  Tab {idx+1}: reloading {report.get('label', url.split('/')[-1])}...")
-                    tab.goto(url, wait_until='domcontentloaded', timeout=self.PAGE_LOAD_TIMEOUT)
+                    try:
+                        tab.goto(url, wait_until='commit', timeout=self.PAGE_LOAD_TIMEOUT)
+                    except Exception as e:
+                        if not tab.url or tab.url == 'about:blank':
+                            raise
+                        self.logger.debug(f"  Tab {idx+1}: goto raised (expected SAML): {e}")
                     self._switch_to_table_view(tab)
                     self.logger.info(f"  Tab {idx+1}: ready after retry")
                 except Exception as e:
@@ -454,11 +530,19 @@ class Worker(BaseWorker):
             failed_tabs = still_failed
 
         if failed_tabs:
-            self.logger.warning(f"{len(failed_tabs)} tab(s) still failed: "
-                                f"{[tabs[i][1].get('label','?') for i in failed_tabs]}")
+            failed_labels = []
+            for i in failed_tabs:
+                lbl = tabs[i][1].get('label', '?')
+                failed_labels.append(lbl)
+                log_scrape('smax', lbl, 'error', 0, 0, 'Tab failed after all retries')
+            self.logger.warning(f"{len(failed_tabs)} tab(s) still failed: {failed_labels}")
         
-        # Small buffer for final rendering
-        tabs[0][0].wait_for_timeout(2000)
+        # Wait for grid to be ready rather than arbitrary timeout
+        try:
+            tabs[0][0].locator(self.GRID_ROW_SELECTOR).first.wait_for(
+                state='visible', timeout=5000)
+        except Exception:
+            pass  # Best-effort; scraping will fail clearly if grid isn't ready
         
         self.logger.info(f"All tabs ready in {time.time() - start_time:.1f}s")
         
@@ -467,17 +551,34 @@ class Worker(BaseWorker):
 
         for i, (tab, report) in enumerate(tabs):
             url = report.get('url', '')
+            label = report.get('label', url.split('/')[-1] if url else f'report_{i}')
+            t0 = time.time()
             try:
-                report_data = self._extract_from_page(tab, url)
-                all_results.extend(report_data)
+                report_data = self._extract_from_page(tab, url, label)
+                elapsed = time.time() - t0
+                if report_data:
+                    all_results.extend(report_data)
+                    log_scrape('smax', label, 'success', len(report_data), elapsed, '')
+                else:
+                    log_scrape('smax', label, 'no_data', 0, elapsed, 'No data returned')
             except Exception as e:
-                self.logger.error(f"  Tab {i+1}: scrape failed for {report.get('label', url)}: {e}")
+                elapsed = time.time() - t0
+                self.logger.error(f"  Tab {i+1}: scrape failed for {label}: {e}")
+                log_scrape('smax', label, 'error', 0, elapsed, str(e))
 
         # ---- PHASE 4: Clean up extra tabs ----
         for i, (tab, report) in enumerate(tabs):
             if i > 0:
                 try:
                     tab.close()
+                except Exception:
+                    pass
+
+        # Close any stray about:blank tabs that appeared mid-scrape
+        for p in self.context.pages:
+            if p != self.page and p.url == 'about:blank':
+                try:
+                    p.close()
                 except Exception:
                     pass
 
@@ -494,24 +595,34 @@ class Worker(BaseWorker):
     def _switch_to_table_view(self, page):
         """
         Click the 'Table View' button and wait for the SlickGrid to render.
-        
+        Uses a fallback chain of selectors for resilience.
+
         Args:
             page: Playwright Page object
         """
-        # Wait for the table-view button to appear (page loaded enough)
-        page.wait_for_selector(self.TABLE_VIEW_BUTTON, timeout=self.ELEMENT_WAIT_TIMEOUT)
-        
-        # Click to switch from chart to table/grid view
-        page.click(self.TABLE_VIEW_BUTTON)
-        
-        # Wait for grid data rows to appear
-        page.wait_for_selector(self.GRID_ROW_SELECTOR, timeout=self.ELEMENT_WAIT_TIMEOUT)
+        for sel in self.TABLE_VIEW_FALLBACKS:
+            try:
+                btn = page.locator(sel).first
+                # wait_for() blocks until the button is in the DOM — this gives
+                # Angular time to bootstrap. Do NOT use count() here: count() is
+                # an instant synchronous check that returns 0 before Angular loads,
+                # causing all fallbacks to be skipped before any waiting happens.
+                btn.wait_for(state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
+                btn.click()
+                # Wait for SlickGrid rows to render after the view switch
+                page.locator(self.GRID_ROW_SELECTOR).first.wait_for(
+                    state='visible', timeout=self.ELEMENT_WAIT_TIMEOUT)
+                self.logger.info(f"  Table view activated via: {sel}")
+                return
+            except Exception:
+                continue
+        raise Exception("Table View button not found with any selector")
     
     # ============================================================
     # Data Extraction
     # ============================================================
     
-    def _extract_from_page(self, page, url: str) -> List[Dict[str, Any]]:
+    def _extract_from_page(self, page, url: str, label: str = '') -> List[Dict[str, Any]]:
         """
         Extract report title, total, and all table rows from a loaded page.
         
@@ -523,12 +634,20 @@ class Worker(BaseWorker):
         results = []
         report_id = url.split('/')[-1][:12]
         
-        # Get report title and total
+        # Get report title; fall back to the config label when the DOM element
+        # is missing (partial page load) so rows are still identifiable.
         report_title = self._get_report_title(page)
+        if report_title == "Unknown Report" and label:
+            report_title = label
         total_rows = self._get_total_rows(page)
-        
+
         self.logger.info(f"  [{report_id}] {report_title}: total={total_rows}")
-        
+
+        # Skip if page didn't load properly (no title found and no data)
+        if report_title == "Unknown Report" and total_rows == 0:
+            self.logger.warning(f"  [{report_id}] Skipping: Unknown Report with 0 total (page may not have loaded)")
+            return results
+
         # Add the total as its own row
         results.append({
             'metric_title': report_title,
@@ -597,7 +716,7 @@ class Worker(BaseWorker):
         
         for i, el in enumerate(header_els):
             name_el = el.query_selector(self.HEADER_NAME_SELECTOR)
-            name = name_el.inner_text().strip() if name_el else ''
+            name = name_el.text_content().strip() if name_el else ''
             if name:
                 headers.append(name)
                 header_indices.append(i)
@@ -681,7 +800,7 @@ class Worker(BaseWorker):
             else:
                 at_bottom_count = 0
                 
-            # Wait for render (SlickGrid is virtual)
+            # SlickGrid virtual scroll render buffer — no DOM event to wait for
             page.wait_for_timeout(500)
             
         return headers, collected_rows
@@ -754,13 +873,13 @@ class Worker(BaseWorker):
     # ============================================================
     
     def _get_report_title(self, page=None) -> str:
-        """Extract the report title from span[3] in the header."""
+        """Extract the report title from the report-area-header."""
         if page is None:
             page = self.page
         try:
-            el = page.query_selector(self.TITLE_XPATH)
+            el = page.query_selector(self.TITLE_SELECTOR)
             if el:
-                text = el.inner_text().strip()
+                text = el.text_content().strip()
                 if text and text != 'No columns to select':
                     return text
             return "Unknown Report"
@@ -769,13 +888,13 @@ class Worker(BaseWorker):
             return "Unknown Report"
     
     def _get_total_rows(self, page=None) -> int:
-        """Extract the total row count from span[1] in the header."""
+        """Extract the total row count from the report-area-header."""
         if page is None:
             page = self.page
         try:
-            el = page.query_selector(self.TOTAL_XPATH)
+            el = page.query_selector(self.TOTAL_SELECTOR)
             if el:
-                text = el.inner_text().strip()
+                text = el.text_content().strip()
                 parsed = self._parse_number(text)
                 if parsed > 0:
                     return parsed
@@ -813,29 +932,206 @@ class Worker(BaseWorker):
             return 0
     
     # ============================================================
-    # Authentication
+    # MICROSOFT SSO SESSION MANAGEMENT
     # ============================================================
 
-    def _login_if_needed(self):
-        """Perform SMAX login if credentials are configured."""
-        if not self.username or not self.password:
-            return
+    def _auth_state_path(self) -> str:
+        """Absolute path to the stored Microsoft SSO session state file (legacy)."""
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(project_root, 'config', self.AUTH_STATE_FILE)
 
-        self.page.goto(f"{self.base_url}/login", wait_until='networkidle')
+    def _profile_dir(self) -> str:
+        """Absolute path to Chrome user data directory. Created on first run."""
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(project_root, 'config', self.CHROME_PROFILE_DIR)
 
-        if 'login' not in self.page.url.lower():
-            self.logger.info("Already logged in to SMAX")
-            return
+    def setup_browser(self, headless: bool = None, storage_state: str = None, **kwargs):
+        """Override base class to use a persistent Chrome profile.
 
-        self.login_with_form(
-            url=f"{self.base_url}/login",
-            username=self.username,
-            password=self.password,
-            username_selector='#username',
-            password_selector='#password',
-            submit_selector='button[type="submit"]',
-            success_indicator='.dashboard, .main-content'
+        With launch_persistent_context() Chrome stores cookies, localStorage,
+        and all session data in a real on-disk profile directory. Microsoft SSO
+        sessions survive browser restarts — no JSON storage_state tricks needed.
+
+        The storage_state parameter is accepted but ignored (kept for signature
+        compatibility with base_worker callers).
+        """
+        cfg = get_global_settings()
+        if headless is None:
+            headless = cfg.get('headless', True)
+        self._screenshot_steps = cfg.get('screenshot_steps', False)
+        self._screenshot_errors = cfg.get('screenshot_errors', True)
+
+        profile_dir = self._profile_dir()
+        os.makedirs(profile_dir, exist_ok=True)
+        self.logger.info(f"Chrome profile: {profile_dir}")
+
+        # Remove stale Chrome lock files that can cause ERR_ABORTED on launch.
+        # These are left behind when Chrome is force-killed or crashes.
+        for lock in ('SingletonLock', 'SingletonSocket', '.parentlock'):
+            lock_path = os.path.join(profile_dir, lock)
+            if os.path.exists(lock_path):
+                try:
+                    os.remove(lock_path)
+                    self.logger.debug(f"Removed stale lock: {lock}")
+                except Exception:
+                    pass
+
+        self._playwright = sync_playwright().start()
+        # launch_persistent_context returns BrowserContext directly — no Browser object
+        self.context = self._playwright.chromium.launch_persistent_context(
+            user_data_dir=profile_dir,
+            headless=headless,
+            channel='chrome',
+            args=[
+                '--disable-blink-features=AutomationControlled',
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--ignore-certificate-errors',
+                '--no-first-run',
+                '--no-default-browser-check',
+                '--disable-infobars',
+                '--disable-session-crashed-bubble',
+                '--restore-last-session=false',
+            ],
+            viewport={'width': 1920, 'height': 1080},
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            ignore_https_errors=True,
         )
+        self.browser = None  # No separate Browser object with persistent context
+        self.page = self.context.pages[0] if self.context.pages else self.context.new_page()
+
+        # Close any extra pages Chrome may have restored from the persistent profile
+        for extra_page in self.context.pages:
+            if extra_page != self.page:
+                try:
+                    extra_page.close()
+                except Exception:
+                    pass
+
+        self.logger.info("Browser initialized successfully")
+        return self.page
+
+    def teardown_browser(self):
+        """Persistent context teardown — skips browser.close() (no separate browser)."""
+        for name, obj, method in [
+            ("page",       self.page,         "close"),
+            ("context",    self.context,      "close"),
+            ("playwright", self._playwright,  "stop"),
+        ]:
+            if obj is not None:
+                try:
+                    getattr(obj, method)()
+                except Exception as e:
+                    self.logger.warning(f"Error closing {name}: {e}")
+        self.page = None
+        self.context = None
+        self.browser = None
+        self._playwright = None
+        self.logger.info("Browser closed successfully")
+
+    def _ensure_authenticated(self) -> bool:
+        """Navigate to base URL and check whether Microsoft SSO intercepts.
+
+        SMAX uses SAML SP-initiated SSO, so even a valid session briefly passes
+        through login.microsoftonline.com before landing back on SMAX. This method
+        waits up to 15 s for that round-trip to complete before deciding.
+
+        Returns True if landed on SMAX, False if stuck on SSO after the timeout.
+        """
+        try:
+            # Use 'commit' instead of 'domcontentloaded': SMAX's SAML flow involves
+            # a JavaScript form.submit() that starts a secondary navigation. Playwright
+            # marks the original goto as ERR_ABORTED when that secondary navigation
+            # starts. 'commit' fires on the first server response and avoids this.
+            try:
+                self.page.goto(self.base_url, wait_until='commit', timeout=30000)
+            except Exception as e:
+                # ERR_ABORTED is expected during SAML redirect chains; the browser has
+                # already navigated somewhere — check the URL before giving up.
+                current = self.page.url
+                self.logger.debug(f"goto raised during auth check (url={current[:60]}): {e}")
+                if not current or current == 'about:blank':
+                    self.logger.warning(f"Auth check failed — blank page after goto: {e}")
+                    return False
+            # Wait for the SAML round-trip to resolve (SMAX -> Microsoft -> SMAX).
+            # If the session is valid the browser returns to SMAX within a few seconds.
+            # If the session is expired it stays on Microsoft's login page.
+            try:
+                self.page.wait_for_function(
+                    f'() => !window.location.href.includes("{self.SSO_INDICATOR}")',
+                    timeout=15000
+                )
+                url = self.page.url
+                self.logger.info(f"Authenticated (URL: {url[:80]})")
+                return True
+            except Exception:
+                url = self.page.url
+                self.logger.info(f"SSO redirect detected (not authenticated): {url[:80]}")
+                return False
+        except Exception as e:
+            self.logger.warning(f"Auth check failed: {e}")
+            return False
+
+    def _wait_for_sso_auth(self):
+        """Open SMAX and wait for the user to complete Microsoft SSO + MFA.
+
+        The browser MUST be in headed mode at this point. Once the browser URL
+        returns to the SMAX domain, saves the context state for future runs.
+        """
+        self.logger.info("=" * 60)
+        self.logger.info("MICROSOFT SSO AUTHENTICATION REQUIRED")
+        self.logger.info("A browser window has opened — please log in.")
+        self.logger.info("Complete the Microsoft sign-in (including MFA if prompted).")
+        self.logger.info(f"Waiting up to {self.SSO_WAIT_TIMEOUT // 60000} minutes...")
+        self.logger.info("=" * 60)
+
+        # Navigate to SMAX — the SAML SP will redirect to Microsoft login.
+        # ERR_ABORTED is expected here: SMAX's SAML redirect chain includes a
+        # JavaScript form.submit() which starts a secondary navigation. Playwright
+        # marks the original goto as aborted when that secondary navigation fires.
+        # This is NOT a real failure — the browser has navigated to the login page.
+        try:
+            self.page.goto(self.base_url, wait_until='commit', timeout=30000)
+        except Exception as e:
+            current = self.page.url
+            self.logger.debug(f"goto raised (expected during SAML redirect, url={current[:60]}): {e}")
+            if not current or current == 'about:blank':
+                # Truly blank page — something is wrong
+                raise RuntimeError(f"Browser did not navigate: {e}") from e
+
+        # At this point the browser is somewhere in the SSO flow.
+        # Log where we landed so the user can see the browser is working.
+        self.logger.info(f"Browser navigated to: {self.page.url[:80]}")
+
+        # Wait until the browser leaves the Microsoft SSO domain
+        self.page.wait_for_function(
+            f'() => !window.location.href.includes("{self.SSO_INDICATOR}")',
+            timeout=self.SSO_WAIT_TIMEOUT
+        )
+
+        # Allow SMAX to finish loading after the final SSO redirect
+        try:
+            self.page.wait_for_load_state('networkidle', timeout=30000)
+        except Exception:
+            pass
+
+        self.logger.info("SSO authentication completed.")
+        self._save_auth_state()
+
+    def _save_auth_state(self):
+        """No-op: session is stored automatically in the persistent Chrome profile."""
+        self.logger.info("Session stored in persistent Chrome profile.")
+
+    def _login_if_needed(self):
+        """Legacy form-based login — no longer active.
+
+        SMAX now uses Microsoft Entra ID (SAML SSO). Session management is
+        handled by _ensure_authenticated() / _wait_for_sso_auth() in run().
+        This stub is kept to avoid breaking any external callers.
+        """
+        pass
+
+
 
     # ============================================================
     # REPORT PROPERTIES DISCOVERY (called from settings server)
@@ -862,17 +1158,33 @@ class Worker(BaseWorker):
         result = {'error': ''}
 
         try:
+            # Use persistent Chrome profile — same SSO flow as run()
             worker.setup_browser()
 
-            if worker.username and worker.password:
-                worker._login_if_needed()
+            if not worker._ensure_authenticated():
+                worker.logger.info("Discovery: SSO auth required — opening headed browser")
+                worker.teardown_browser()
+                worker.setup_browser(headless=False)
+                worker._wait_for_sso_auth()
 
             worker.logger.info(f"Discovery: navigating to {url}")
-            worker.page.goto(url, wait_until='domcontentloaded',
-                             timeout=worker.PAGE_LOAD_TIMEOUT)
+            # Use 'commit' to avoid ERR_ABORTED from SAML redirect chains.
+            # If the session is valid SMAX loads; if expired we'll land on SSO.
+            try:
+                worker.page.goto(url, wait_until='commit',
+                                 timeout=worker.PAGE_LOAD_TIMEOUT)
+            except Exception as e:
+                current = worker.page.url
+                worker.logger.debug(f"goto raised during discovery (url={current[:60]}): {e}")
+                if not current or current == 'about:blank':
+                    raise
 
-            # Wait for the report properties sidebar to be available
-            worker.page.wait_for_timeout(5000)
+            # If we ended up on the SSO page the session expired mid-run.
+            if worker.SSO_INDICATOR in worker.page.url:
+                raise RuntimeError(
+                    'Session expired. Close this dialog and run discovery again '
+                    'to complete the Microsoft login.'
+                )
 
             # Wait for the properties panel to render
             try:
@@ -885,8 +1197,20 @@ class Worker(BaseWorker):
                 worker.logger.info("Properties sidebar selector not found, "
                                    "trying to read properties anyway")
 
-            # Additional wait for AngularJS to finish rendering
-            worker.page.wait_for_timeout(3000)
+            # Wait for AngularJS to finish rendering before reading properties
+            try:
+                worker.page.wait_for_function(
+                    '''() => {
+                        try {
+                            if (typeof angular === 'undefined') return true;
+                            const pending = angular.element(document).injector().get('$http').pendingRequests;
+                            return pending.length === 0;
+                        } catch(e) { return true; }
+                    }''',
+                    timeout=10000
+                )
+            except Exception:
+                worker.logger.debug("Angular wait timed out, proceeding anyway")
 
             # Read properties via injected JS
             props = worker.page.evaluate(worker.SMAX_PROPERTIES_READ_JS)

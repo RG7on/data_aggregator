@@ -1100,13 +1100,7 @@
               ]
             },
             "step_3": {
-              "_field_filters": [
-                {
-                  "id": "Calls Handled (CallsHandled)",
-                  "operator": "G",
-                  "value1": "5"
-                }
-              ]
+              "_field_filters": []
             }
           }
         },
@@ -1991,7 +1985,285 @@
     "smax": {
       "enabled": false,
       "base_url": "https://smax.corp.pdo.om",
-      "reports": [],
+      "reports": [
+        {
+          "label": "aging_requests",
+          "url": "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640",
+          "enabled": true,
+          "data_type": "historical",
+          "properties": {
+            "error": "",
+            "report_name": "Aging Requests",
+            "display_label": "",
+            "record_type": "Request",
+            "filters": [
+              {
+                "field_id": "ServiceDeskGroup",
+                "field_label": "Service desk group",
+                "negated": false,
+                "operator": "Is",
+                "type": "text",
+                "display_value": "SMX-HELPDESK-CALLOFF, SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-HELPDESK, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access"
+              },
+              {
+                "field_id": "PhaseId",
+                "field_label": "Phase Id",
+                "negated": false,
+                "operator": "Is",
+                "type": "dropdown",
+                "display_value": "First line support, Fulfill, Review, Escalate",
+                "selected_values": [
+                  "First line support",
+                  "Fulfill",
+                  "Review",
+                  "Escalate"
+                ],
+                "value_ids": "FirstLineSupport,Fulfill,Review,Escalate"
+              },
+              {
+                "field_id": "CurrentAssignment",
+                "field_label": "Current assignment",
+                "negated": false,
+                "operator": "Is",
+                "type": "enum",
+                "display_value": "Service Desk, Expert Group, Incident",
+                "enum_options": [
+                  {
+                    "id": "Unassigned",
+                    "label": "Unassigned",
+                    "checked": false
+                  },
+                  {
+                    "id": "ServiceDesk",
+                    "label": "Service Desk",
+                    "checked": true
+                  },
+                  {
+                    "id": "ExpertGroup",
+                    "label": "Expert Group",
+                    "checked": true
+                  },
+                  {
+                    "id": "Incident",
+                    "label": "Incident",
+                    "checked": true
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Service Desk",
+                  "Expert Group",
+                  "Incident"
+                ]
+              },
+              {
+                "field_id": "CreateTime",
+                "field_label": "Created time",
+                "negated": false,
+                "operator": "Is",
+                "type": "date",
+                "display_value": "Past year",
+                "date_presets": []
+              }
+            ],
+            "group_by": [
+              "Created time",
+              "Phase Id"
+            ],
+            "func": {
+              "main": "Count",
+              "secondary": ""
+            },
+            "chart_function": "Count",
+            "chart_legend": [
+              {
+                "label": "First line support",
+                "value": null
+              },
+              {
+                "label": "Escalate",
+                "value": null
+              },
+              {
+                "label": "Fulfill",
+                "value": null
+              },
+              {
+                "label": "Review",
+                "value": null
+              }
+            ]
+          }
+        },
+        {
+          "label": "isc_first_touch_response_1_hour",
+          "url": "https://smax.corp.pdo.om/reports/report/69808de7e4b05f4efa3fa48f",
+          "enabled": true,
+          "data_type": "historical",
+          "properties": {
+            "error": "",
+            "report_name": "ISC: First Touch Response <1 hour",
+            "display_label": "",
+            "record_type": "Request",
+            "filters": [
+              {
+                "field_id": "ServiceDeskGroup",
+                "field_label": "Service desk group",
+                "negated": false,
+                "operator": "Is",
+                "type": "text",
+                "display_value": "SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access"
+              },
+              {
+                "field_id": "CloseTime",
+                "field_label": "Closed time",
+                "negated": false,
+                "operator": "Is",
+                "type": "date",
+                "display_value": "Previous month",
+                "date_presets": []
+              },
+              {
+                "field_id": "PhaseId",
+                "field_label": "Phase Id",
+                "negated": false,
+                "operator": "Is",
+                "type": "dropdown",
+                "display_value": "Close",
+                "selected_values": [
+                  "Close"
+                ],
+                "value_ids": "Close"
+              },
+              {
+                "field_id": "CurrentAssignment",
+                "field_label": "Current assignment",
+                "negated": false,
+                "operator": "Is",
+                "type": "enum",
+                "display_value": "Service Desk",
+                "enum_options": [
+                  {
+                    "id": "Unassigned",
+                    "label": "Unassigned",
+                    "checked": false
+                  },
+                  {
+                    "id": "ServiceDesk",
+                    "label": "Service Desk",
+                    "checked": true
+                  },
+                  {
+                    "id": "ExpertGroup",
+                    "label": "Expert Group",
+                    "checked": false
+                  },
+                  {
+                    "id": "Incident",
+                    "label": "Incident",
+                    "checked": false
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Service Desk"
+                ]
+              },
+              {
+                "field_id": "CreationSource",
+                "field_label": "Creation source",
+                "negated": true,
+                "operator": "Is not",
+                "type": "enum",
+                "display_value": "Self service portal, Other, Virtual Agent",
+                "enum_options": [
+                  {
+                    "id": "CreationSourceEss",
+                    "label": "Self service portal",
+                    "checked": true
+                  },
+                  {
+                    "id": "CreationSourceEssChat",
+                    "label": "Live chat",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceLiveSupport",
+                    "label": "Live support",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceOther",
+                    "label": "Other",
+                    "checked": true
+                  },
+                  {
+                    "id": "CreationSourceEmail",
+                    "label": "Email",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceExternal",
+                    "label": "External",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceMobile",
+                    "label": "Mobile",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceVA",
+                    "label": "Virtual Agent",
+                    "checked": true
+                  },
+                  {
+                    "id": "CreationSourceSAM",
+                    "label": "Software Asset Management",
+                    "checked": false
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Self service portal",
+                  "Other",
+                  "Virtual Agent"
+                ]
+              }
+            ],
+            "group_by": [
+              "First touch"
+            ],
+            "func": {
+              "main": "Percent",
+              "secondary": "Count"
+            },
+            "chart_function": "Percent by Count",
+            "chart_legend": [
+              {
+                "label": "false",
+                "value": "9.1"
+              },
+              {
+                "label": "true",
+                "value": "90.9"
+              }
+            ]
+          }
+        }
+      ],
       "page_load_timeout_ms": 120000,
       "element_wait_timeout_ms": 30000,
       "tab_stagger_delay_ms": 2000,

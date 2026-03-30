@@ -84,6 +84,11 @@ def init_db():
         conn.execute(_CREATE_TABLE)
         conn.execute(_CREATE_INDEX)
         conn.execute(_CREATE_SCRAPE_LOG)
+        # One-time cleanup: remove any rows stored with the 'Unknown Report'
+        # fallback title (partial page loads from earlier runs). They carry
+        # no useful metric identity and cannot be queried meaningfully in
+        # Power BI, so purging them on every startup is safe and idempotent.
+        conn.execute("DELETE FROM kpi_snapshots WHERE metric_title = 'Unknown Report'")
         conn.commit()
         logger.debug("Database initialized")
     finally:
@@ -370,40 +375,26 @@ def get_latest_scrape_status() -> List[Dict[str, Any]]:
         conn.close()
 
 
-def has_historical_data(source: str, metric_title: str) -> bool:
+def has_historical_data(source: str, label: str) -> bool:
     """
-    Check if we already have successfully-scraped data for a historical report.
+    Check if we already have a successful scrape logged for a historical report.
 
-    Returns True if there is at least one row in kpi_snapshots for the given
-    source + metric_title AND the last scrape_log entry for it was a success.
-    This lets the worker skip re-scraping reports whose data never changes.
+    Returns True when scrape_log contains a 'success' entry with row_count > 0
+    for the given source + report_label.  This is the authoritative check:
+    scrape_log.report_label always stores the config label string, which is
+    consistent across runs — unlike kpi_snapshots.metric_title which stores the
+    DOM page title and can differ from the config label.
     """
     conn = _get_conn()
     try:
-        # Check 1: do we have actual data rows?
         cur = conn.execute(
-            "SELECT COUNT(*) FROM kpi_snapshots WHERE source = ? AND metric_title = ?",
-            (source, metric_title)
-        )
-        data_count = cur.fetchone()[0]
-        if data_count == 0:
-            return False
-
-        # Check 2: was the last scrape successful?
-        cur = conn.execute(
-            "SELECT status FROM scrape_log "
-            "WHERE source = ? AND report_label = ? "
+            "SELECT 1 FROM scrape_log "
+            "WHERE source = ? AND report_label = ? AND status = 'success' AND row_count > 0 "
             "ORDER BY id DESC LIMIT 1",
-            (source, metric_title)
+            (source, label)
         )
-        row = cur.fetchone()
-        if row and row[0] == 'success':
-            return True
-
-        return False
+        return cur.fetchone() is not None
     except Exception:
         return False
     finally:
         conn.close()
-
-    return imported
