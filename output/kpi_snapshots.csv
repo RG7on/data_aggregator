@@ -1,142 +1,988 @@
-date,timestamp,source,metric_title,category,sub_category,value
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Apr 2025,First line support,36.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Apr 2025,Fulfill,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Aug 2025,Escalate,1.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Aug 2025,First line support,48.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Aug 2025,Fulfill,5.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Aug 2025,Review,1.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Dec 2025,Escalate,1.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Dec 2025,First line support,92.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Dec 2025,Fulfill,12.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Dec 2025,Review,7.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Feb 2026,Escalate,25.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Feb 2026,First line support,257.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Feb 2026,Fulfill,21.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Feb 2026,Review,3.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jan 2026,Escalate,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jan 2026,First line support,68.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jan 2026,Fulfill,21.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jan 2026,Review,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jul 2025,Escalate,3.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jul 2025,First line support,31.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jul 2025,Fulfill,8.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jul 2025,Review,1.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jun 2025,Escalate,1.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jun 2025,First line support,21.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jun 2025,Fulfill,3.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Jun 2025,Review,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Mar 2025,First line support,12.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Mar 2025,Review,1.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Mar 2026,Escalate,32.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Mar 2026,First line support,233.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Mar 2026,Fulfill,9.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Mar 2026,Review,5.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,May 2025,First line support,31.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,May 2025,Fulfill,3.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,May 2025,Review,15.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Nov 2025,Escalate,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Nov 2025,First line support,42.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Nov 2025,Fulfill,6.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Nov 2025,Review,4.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Oct 2025,Escalate,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Oct 2025,First line support,67.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Oct 2025,Fulfill,11.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Oct 2025,Review,2.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Sep 2025,First line support,68.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Sep 2025,Fulfill,16.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,Sep 2025,Review,5.0
-2026-03-22,2026-03-22 20:08:04,smax,Aging Requests,total,,1240.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_% Aban,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_% Queued,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Abandoned,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Abandoned Within Service Level,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Answer Wait Time,,z_call_type_historical_all_fields,21.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Answered,,z_call_type_historical_all_fields,1.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Assigned From Queue,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Average Abandon Delay,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Avg Speed of Answer,,z_call_type_historical_all_fields,21.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Calls Error,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_DateTime,,z_call_type_historical_all_fields,1772013600000.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Default_Treatment,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Flow Out,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Handled,,z_call_type_historical_all_fields,1.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Longest Queued,,z_call_type_historical_all_fields,21.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Max Queued,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Network Routed,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Offered,,z_call_type_historical_all_fields,1.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Other,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Return,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Service Level,,z_call_type_historical_all_fields,1.0
-2026-03-23,2026-03-23 17:13:28,cuic,CUIC_Short Calls,,z_call_type_historical_all_fields,0.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Apr 2025,First line support,36.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Apr 2025,Fulfill,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Aug 2025,Escalate,1.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Aug 2025,First line support,48.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Aug 2025,Fulfill,5.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Aug 2025,Review,1.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Dec 2025,Escalate,1.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Dec 2025,First line support,92.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Dec 2025,Fulfill,12.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Dec 2025,Review,7.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Feb 2026,Escalate,25.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Feb 2026,First line support,257.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Feb 2026,Fulfill,21.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Feb 2026,Review,3.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jan 2026,Escalate,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jan 2026,First line support,68.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jan 2026,Fulfill,21.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jan 2026,Review,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jul 2025,Escalate,3.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jul 2025,First line support,31.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jul 2025,Fulfill,8.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jul 2025,Review,1.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jun 2025,Escalate,1.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jun 2025,First line support,21.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jun 2025,Fulfill,3.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Jun 2025,Review,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Mar 2025,First line support,11.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Mar 2025,Review,1.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Mar 2026,Escalate,32.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Mar 2026,First line support,232.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Mar 2026,Fulfill,11.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Mar 2026,Review,5.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,May 2025,First line support,31.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,May 2025,Fulfill,3.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,May 2025,Review,15.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Nov 2025,Escalate,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Nov 2025,First line support,42.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Nov 2025,Fulfill,6.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Nov 2025,Review,4.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Oct 2025,Escalate,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Oct 2025,First line support,67.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Oct 2025,Fulfill,11.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Oct 2025,Review,2.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Sep 2025,First line support,68.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Sep 2025,Fulfill,16.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,Sep 2025,Review,5.0
-2026-03-23,2026-03-23 16:31:37,smax,Aging Requests,total,,1240.0
-2026-03-23,2026-03-23 16:31:37,smax,ISC: First Touch Response <1 hour,false,,9.1
-2026-03-23,2026-03-23 16:31:37,smax,ISC: First Touch Response <1 hour,total,,3976.0
-2026-03-23,2026-03-23 16:31:37,smax,ISC: First Touch Response <1 hour,true,,90.9
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_% Aban,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_% Queued,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Abandoned,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Abandoned Within Service Level,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Answer Wait Time,,z_call_type_historical_all_fields,21
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Answered,,z_call_type_historical_all_fields,1
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Assigned From Queue,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Average Abandon Delay,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Avg Speed of Answer,,z_call_type_historical_all_fields,21
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Calls Error,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_DateTime,,z_call_type_historical_all_fields,1772013600000
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Default_Treatment,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Flow Out,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Handled,,z_call_type_historical_all_fields,1
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Longest Queued,,z_call_type_historical_all_fields,21
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Max Queued,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Network Routed,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Offered,,z_call_type_historical_all_fields,1
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Other,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Return,,z_call_type_historical_all_fields,0
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Service Level,,z_call_type_historical_all_fields,1
-2026-03-24,2026-03-24 04:53:36,cuic,CUIC_Short Calls,,z_call_type_historical_all_fields,0
+scrape_timestamp,data_datetime,source,metric_title,category,sub_category,value
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_% Aban,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_% Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Abandoned,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Abandoned Within Service Level,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,198
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Answer Wait Time,Telcom_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Answered,Telcom_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Assigned From Queue,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Average Abandon Delay,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,19.8
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Avg Speed of Answer,Telcom_CT,z_call_type_historical_all_fields,10.5
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Calls Error,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Default_Treatment,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Flow Out,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,9
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Handled,Telcom_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,50
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Longest Queued,Telcom_CT,z_call_type_historical_all_fields,15
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Max Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Network Routed,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Offered,Telcom_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Other,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Return,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.9
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Service Level,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:00:00,cuic,CUIC_Short Calls,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_% Aban,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_% Queued,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Abandoned,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Abandoned Within Service Level,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,207
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Answer Wait Time,RTPS_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,11
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Answered,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Assigned From Queue,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Average Abandon Delay,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,12.9375
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Avg Speed of Answer,RTPS_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,5.5
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Calls Error,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Default_Treatment,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Flow Out,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,15
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Handled,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,41
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Longest Queued,RTPS_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Max Queued,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Network Routed,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,17
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Offered,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Other,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Return,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.9375
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Service Level,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Short Calls,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 07:30:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0.058823529411
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Aban,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Aban,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_% Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned Within Service Level,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Abandoned Within Service Level,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,301
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,72
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answer Wait Time,Subsurface_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answer Wait Time,Telcom_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,4
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answered,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Answered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Assigned From Queue,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Assigned From Queue,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,44
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Average Abandon Delay,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Average Abandon Delay,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,16.722222222222
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Avg Speed of Answer,Subsurface_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Avg Speed of Answer,Telcom_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Calls Error,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Calls Error,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Default_Treatment,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Default_Treatment,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Flow Out,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Flow Out,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,4
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Handled,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Handled,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,37
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,33
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Longest Queued,Subsurface_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Longest Queued,Telcom_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Max Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Max Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Network Routed,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Network Routed,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Offered,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Offered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Other,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Other,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Return,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Return,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.888888888888
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,0.75
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Service Level,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Service Level,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Short Calls,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:00:00,cuic,CUIC_Short Calls,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_% Aban,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_% Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Abandoned,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Abandoned Within Service Level,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,313
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,31
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Answer Wait Time,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,23
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Answered,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Assigned From Queue,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Average Abandon Delay,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,13.608695652173
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,15.5
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Avg Speed of Answer,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Calls Error,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Default_Treatment,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Flow Out,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,25
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Handled,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,35
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,19
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Longest Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Max Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Network Routed,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,23
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Offered,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Other,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Return,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.91304347826
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Service Level,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 08:30:00,cuic,CUIC_Short Calls,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,338
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,16.095238095238
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,20
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,57
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.95238095238
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:00:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Aban,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Aban,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_% Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned Within Service Level,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Abandoned Within Service Level,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,262
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answer Wait Time,Subsurface_CT,z_call_type_historical_all_fields,6
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answer Wait Time,Telcom_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answered,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Answered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Assigned From Queue,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Assigned From Queue,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Average Abandon Delay,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Average Abandon Delay,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,14.555555555555
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Avg Speed of Answer,Subsurface_CT,z_call_type_historical_all_fields,6
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Avg Speed of Answer,Telcom_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Calls Error,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Calls Error,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Default_Treatment,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Default_Treatment,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Flow Out,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Flow Out,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,20
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Handled,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Handled,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,27
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Longest Queued,Subsurface_CT,z_call_type_historical_all_fields,6
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Longest Queued,Telcom_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Max Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Max Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Network Routed,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Network Routed,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Offered,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Offered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Other,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Other,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Return,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Return,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Service Level,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Service Level,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Short Calls,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 09:30:00,cuic,CUIC_Short Calls,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_% Aban,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_% Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Abandoned,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Abandoned Within Service Level,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,234
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,33
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Answer Wait Time,Telcom_CT,z_call_type_historical_all_fields,22
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,14
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Answered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Assigned From Queue,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Average Abandon Delay,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,16.714285714285
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,16.5
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Avg Speed of Answer,Telcom_CT,z_call_type_historical_all_fields,22
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Calls Error,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Default_Treatment,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Flow Out,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,12
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Handled,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,54
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,17
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Longest Queued,Telcom_CT,z_call_type_historical_all_fields,22
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Max Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Network Routed,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,14
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Offered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Other,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Return,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.928571428571
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Service Level,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:00:00,cuic,CUIC_Short Calls,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Aban,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Aban,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Queued,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_% Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned Within Service Level,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Abandoned Within Service Level,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,340
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answer Wait Time,RTPS_CT,z_call_type_historical_all_fields,46
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,32
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answer Wait Time,Telcom_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answered,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Answered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Assigned From Queue,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Assigned From Queue,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Average Abandon Delay,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Average Abandon Delay,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,18.888888888888
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Avg Speed of Answer,RTPS_CT,z_call_type_historical_all_fields,46
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,10.666666666666
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Avg Speed of Answer,Telcom_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Calls Error,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Calls Error,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Default_Treatment,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Default_Treatment,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Flow Out,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Flow Out,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,19
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Handled,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,4
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Handled,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,39
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Longest Queued,RTPS_CT,z_call_type_historical_all_fields,46
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,12
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Longest Queued,Telcom_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Max Queued,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Max Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Network Routed,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Network Routed,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Offered,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Offered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Other,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Other,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Return,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Return,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.777777777777
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Service Level,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Service Level,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Short Calls,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 10:30:00,cuic,CUIC_Short Calls,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_% Aban,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_% Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Abandoned,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Abandoned Within Service Level,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,116
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Answer Wait Time,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,6
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Answered,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Assigned From Queue,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Average Abandon Delay,Subsurface_CT,z_call_type_historical_all_fields,43
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,19.333333333333
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Avg Speed of Answer,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Calls Error,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Default_Treatment,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Flow Out,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Handled,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,44
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Longest Queued,Subsurface_CT,z_call_type_historical_all_fields,17
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Max Queued,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Network Routed,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,6
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Offered,Subsurface_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Other,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Return,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.833333333333
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Service Level,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:00:00,cuic,CUIC_Short Calls,Subsurface_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0.111111111111
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,112
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,67
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,25
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 11:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0.25
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,102
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,4
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,82
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,25.5
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,38
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.4
+2026-03-31 14:27:23,2026-03-30 12:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,43
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,14.333333333333
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,17
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 12:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_% Aban,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_% Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Abandoned,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Abandoned Within Service Level,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,113
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Answer Wait Time,Telcom_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Answered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Assigned From Queue,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Average Abandon Delay,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,14.125
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Avg Speed of Answer,Telcom_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Calls Error,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Default_Treatment,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Flow Out,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,9
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Handled,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,24
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Longest Queued,Telcom_CT,z_call_type_historical_all_fields,16
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Max Queued,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Network Routed,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,9
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Offered,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Other,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Return,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Service Level,Telcom_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:00:00,cuic,CUIC_Short Calls,Telcom_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,163
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,52
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,11
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,4
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,14.818181818181
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,47
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,4
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.90909090909
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 13:30:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_% Aban,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_% Queued,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Abandoned,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Abandoned Within Service Level,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,158
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Answer Wait Time,RTPS_CT,z_call_type_historical_all_fields,24
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,35
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Answered,RTPS_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Assigned From Queue,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Average Abandon Delay,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,15.8
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Avg Speed of Answer,RTPS_CT,z_call_type_historical_all_fields,12
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,11.666666666666
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Calls Error,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Default_Treatment,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Flow Out,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Handled,RTPS_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,30
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Longest Queued,RTPS_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,18
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Max Queued,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Network Routed,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,10
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Offered,RTPS_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Other,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Return,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Service Level,RTPS_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Short Calls,RTPS_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:00:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_% Aban,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_% Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Abandoned,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Abandoned Within Service Level,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,195
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Answer Wait Time,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Answered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Assigned From Queue,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Average Abandon Delay,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,15
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Avg Speed of Answer,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Calls Error,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Default_Treatment,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Flow Out,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Handled,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,28
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Longest Queued,SAP_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Max Queued,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Network Routed,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,13
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Offered,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Other,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Return,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Service Level,SAP_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 14:30:00,cuic,CUIC_Short Calls,SAP_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0.111111111111
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,110
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,7
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,85
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,15.714285714285
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,37
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,8
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0.875
+2026-03-31 14:27:23,2026-03-30 15:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,145
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,11
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,13.181818181818
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,11
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,21
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,11
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 15:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,38
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,19
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,26
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,2
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 16:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,88
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,17.6
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,6
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,26
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 16:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,19
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,19
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,19
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 17:00:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_% Aban,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_% Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Abandoned,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Abandoned Within Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Answer Wait Time,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Answered,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Assigned From Queue,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Average Abandon Delay,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Avg Speed of Answer,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Calls Error,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Default_Treatment,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Flow Out,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Handled,General_IT_CT,z_call_type_historical_all_fields,1
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Longest Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Max Queued,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Network Routed,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Offered,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Other,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Return,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Service Level,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-30 17:30:00,cuic,CUIC_Short Calls,General_IT_CT,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_% Aban,,z_call_type_historical_all_fields,1.87%
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_% Queued,,z_call_type_historical_all_fields,0.00%
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Abandoned,,z_call_type_historical_all_fields,5
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Abandoned Within Service Level,,z_call_type_historical_all_fields,3
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Answer Wait Time,,z_call_type_historical_all_fields,01:08:20
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Answered,,z_call_type_historical_all_fields,263
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Assigned From Queue,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Average Abandon Delay,,z_call_type_historical_all_fields,00:01:04
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Avg Speed of Answer,,z_call_type_historical_all_fields,00:00:16
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Calls Error,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Default_Treatment,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Flow Out,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Handled,,z_call_type_historical_all_fields,263
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Longest Queued,,z_call_type_historical_all_fields,00:00:57
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Max Queued,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Network Routed,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Offered,,z_call_type_historical_all_fields,268
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Other,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Return,,z_call_type_historical_all_fields,0
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Service Level,,z_call_type_historical_all_fields,92.45%
+2026-03-31 14:27:23,2026-03-31,cuic,CUIC_Short Calls,,z_call_type_historical_all_fields,0

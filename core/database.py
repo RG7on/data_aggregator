@@ -47,20 +47,20 @@ def _get_conn() -> sqlite3.Connection:
 
 _CREATE_TABLE = """
 CREATE TABLE IF NOT EXISTS kpi_snapshots (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    date          TEXT    NOT NULL,
-    timestamp     TEXT    NOT NULL,
-    source        TEXT    NOT NULL,
-    metric_title  TEXT    NOT NULL,
-    category      TEXT    NOT NULL DEFAULT '',
-    sub_category  TEXT    NOT NULL DEFAULT '',
-    value         TEXT    NOT NULL DEFAULT ''
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    scrape_timestamp TEXT    NOT NULL,           -- when the scrape ran
+    data_datetime    TEXT    NOT NULL DEFAULT '', -- report DateTime: 'YYYY-MM-DD HH:MM:SS' (interval rows) or 'YYYY-MM-DD' (consolidated)
+    source           TEXT    NOT NULL,
+    metric_title     TEXT    NOT NULL,
+    category         TEXT    NOT NULL DEFAULT '', -- call type / group key
+    sub_category     TEXT    NOT NULL DEFAULT '', -- report label
+    value            TEXT    NOT NULL DEFAULT ''
 );
 """
 
 _CREATE_INDEX = """
 CREATE UNIQUE INDEX IF NOT EXISTS idx_kpi_dedup
-    ON kpi_snapshots (date, source, metric_title, category, sub_category);
+    ON kpi_snapshots (data_datetime, source, metric_title, category, sub_category);
 """
 
 _CREATE_SCRAPE_LOG = """
@@ -82,12 +82,23 @@ def init_db():
     conn = _get_conn()
     try:
         conn.execute(_CREATE_TABLE)
-        conn.execute(_CREATE_INDEX)
         conn.execute(_CREATE_SCRAPE_LOG)
-        # One-time cleanup: remove any rows stored with the 'Unknown Report'
-        # fallback title (partial page loads from earlier runs). They carry
-        # no useful metric identity and cannot be queried meaningfully in
-        # Power BI, so purging them on every startup is safe and idempotent.
+        # Schema migrations for existing databases (safe to run repeatedly)
+        # Detect old schema: if either data_date or interval columns exist,
+        # drop and recreate the table (development data only — no production loss).
+        cols = {row[1] for row in conn.execute("PRAGMA table_info(kpi_snapshots)").fetchall()}
+        if 'data_date' in cols or 'interval' in cols:
+            conn.execute("DROP TABLE IF EXISTS kpi_snapshots")
+            conn.execute(_CREATE_TABLE)
+            conn.commit()
+            logger.info("Schema migrated: replaced data_date+interval with data_datetime")
+        elif 'data_datetime' not in cols and cols:
+            conn.execute("ALTER TABLE kpi_snapshots ADD COLUMN data_datetime TEXT NOT NULL DEFAULT ''")
+            conn.commit()
+            logger.info("Schema migrated: added data_datetime column")
+        # Rebuild dedup index
+        conn.execute("DROP INDEX IF EXISTS idx_kpi_dedup")
+        conn.execute(_CREATE_INDEX)
         conn.execute("DELETE FROM kpi_snapshots WHERE metric_title = 'Unknown Report'")
         conn.commit()
         logger.debug("Database initialized")
@@ -100,12 +111,12 @@ def init_db():
 # ══════════════════════════════════════════════════════════════════════════
 
 _UPSERT_SQL = """
-INSERT INTO kpi_snapshots (date, timestamp, source, metric_title, category, sub_category, value)
+INSERT INTO kpi_snapshots (scrape_timestamp, data_datetime, source, metric_title, category, sub_category, value)
 VALUES (?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (date, source, metric_title, category, sub_category)
+ON CONFLICT (data_datetime, source, metric_title, category, sub_category)
 DO UPDATE SET
-    timestamp = excluded.timestamp,
-    value     = excluded.value;
+    scrape_timestamp = excluded.scrape_timestamp,
+    value            = excluded.value;
 """
 
 
@@ -115,20 +126,24 @@ def upsert_metrics(source_name: str, data: List[Dict[str, Any]],
     Insert or update a batch of metrics in one transaction.
 
     Each dict in *data* should have:
-        metric_title, category (opt), sub_category (opt), value
+        metric_title, category (opt), sub_category (opt), interval (opt),
+        data_date (opt — date the metrics are FOR), value
     """
     if not data:
         return
 
     if current_date is None:
         current_date = datetime.now().strftime('%Y-%m-%d')
-    ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    scraped_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     rows = []
     for item in data:
+        # data_datetime: use the datetime embedded in the record (from the report's
+        # DateTime column). Consolidated rows have no DateTime, fall back to today.
+        data_datetime = item.get('data_datetime', '') or current_date
         rows.append((
-            current_date,
-            ts,
+            scraped_at,
+            data_datetime,
             source_name,
             item.get('metric_title', ''),
             item.get('category', ''),
@@ -154,8 +169,8 @@ def query_all() -> pd.DataFrame:
     conn = _get_conn()
     try:
         df = pd.read_sql_query(
-            "SELECT date, timestamp, source, metric_title, category, sub_category, value "
-            "FROM kpi_snapshots ORDER BY date, source, metric_title",
+            "SELECT scrape_timestamp, data_datetime, source, metric_title, category, sub_category, value "
+            "FROM kpi_snapshots ORDER BY data_datetime, source, metric_title, category",
             conn
         )
         return df
@@ -164,15 +179,15 @@ def query_all() -> pd.DataFrame:
 
 
 def query_by_date(start_date: str, end_date: str = None) -> pd.DataFrame:
-    """Return rows within a date range."""
+    """Return rows within a date range (matches on the date portion of data_datetime)."""
     if end_date is None:
         end_date = start_date
     conn = _get_conn()
     try:
         df = pd.read_sql_query(
-            "SELECT date, timestamp, source, metric_title, category, sub_category, value "
-            "FROM kpi_snapshots WHERE date BETWEEN ? AND ? "
-            "ORDER BY date, source, metric_title",
+            "SELECT scrape_timestamp, data_datetime, source, metric_title, category, sub_category, value "
+            "FROM kpi_snapshots WHERE substr(data_datetime, 1, 10) BETWEEN ? AND ? "
+            "ORDER BY data_datetime, source, metric_title, category",
             conn, params=(start_date, end_date)
         )
         return df
@@ -202,7 +217,7 @@ def cleanup_old_data(days_to_keep: int = None):
     cutoff = (datetime.now() - timedelta(days=days_to_keep)).strftime('%Y-%m-%d')
     conn = _get_conn()
     try:
-        cur = conn.execute("DELETE FROM kpi_snapshots WHERE date < ?", (cutoff,))
+        cur = conn.execute("DELETE FROM kpi_snapshots WHERE substr(data_datetime, 1, 10) < ?", (cutoff,))
         deleted = cur.rowcount
         conn.commit()
         if deleted:
@@ -218,13 +233,21 @@ def cleanup_old_data(days_to_keep: int = None):
 
 def export_csv(output_dir: str = None, shared_drive_path: str = None):
     """
-    Export the full database to CSV (atomic write).
+    Export a rolling window of the database to CSV (atomic write).
+
+    The window size is controlled by ``csv_export_days`` in settings
+    (default 30).  The full history stays in SQLite; the CSV only
+    carries recent data so Power BI refreshes stay fast.
 
     Writes to:
       1. output/kpi_snapshots.csv  (always)
       2. shared_drive_path         (if configured in settings)
     """
-    df = query_all()
+    csv_days = get_global_settings().get('csv_export_days', 30)
+    start = (datetime.now() - timedelta(days=csv_days)).strftime('%Y-%m-%d')
+    end   = datetime.now().strftime('%Y-%m-%d')
+    df = query_by_date(start, end)
+    logger.info(f"CSV export window: {start} → {end} ({csv_days} days, {len(df)} rows)")
 
     # 1. Local CSV (atomic)
     if output_dir is None:

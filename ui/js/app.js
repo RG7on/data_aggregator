@@ -94,3 +94,16 @@ function setAutosaveStatus(state, label) {
   wrapper.className = 'autosave-status' + (state ? ' ' + state : '');
   text.textContent = label;
 }
+
+// ── Developer Tools ───────────────────────────────────────────────────────
+async function clearAllData() {
+  if (!confirm('This will permanently delete ALL data from the database and the CSV file.\n\nThis cannot be undone. Continue?')) return;
+  try {
+    const res  = await fetch('/api/clear-data', { method: 'POST' });
+    const data = await res.json();
+    if (data.error) { showToast('Error: ' + data.error, 'error'); return; }
+    showToast('Database and CSV cleared successfully.', 'success');
+  } catch(e) {
+    showToast('Clear failed: ' + e.message, 'error');
+  }
+}

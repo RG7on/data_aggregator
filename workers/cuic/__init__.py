@@ -192,7 +192,7 @@ class Worker(BaseWorker):
                     continue
 
                 self.logger.info("Scraping report data...")
-                data = scraper.scrape_data(self, label)
+                data = scraper.scrape_data(self, label, report_config=report)
                 elapsed = time.time() - t0
 
                 if data:

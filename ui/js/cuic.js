@@ -69,6 +69,12 @@ function renderCuicReports() {
           <option value="historical" ${r.data_type==='historical'?'selected':''}>📦 Historical (scrape once)</option>
         </select>
       </div>
+      <div class="inline-row"><label>Row Mode</label>
+        <div class="row-mode-seg">
+          <button type="button" class="${(r.row_mode||'consolidated_only')==='consolidated_only'?'active':''}" onclick="cuicReports[${i}].row_mode='consolidated_only';renderCuicReports()">📊 Consolidated only</button>
+          <button type="button" class="${r.row_mode==='all'?'active':''}" onclick="cuicReports[${i}].row_mode='all';renderCuicReports()">🔢 All rows</button>
+        </div>
+      </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
         <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
           \u25B6 Re-validate Path
@@ -76,6 +82,7 @@ function renderCuicReports() {
         <span style="font-size:11px;color:var(--muted)">Re-open browser to update report filters</span>
       </div>
       ${filterHtml}
+      ${renderColumnsPanel(r, i)}
       ${statusHtml}
     </div>`;
   }).join('');
@@ -1021,7 +1028,13 @@ async function discoverFilters(reportIdx) {
           if (p.type === 'cuic_field_filter' && p.selectedFieldIds?.length) r.filters[sk][pn] = p.selectedFieldIds;
         });
       });
-      showToast(`Discovered ${data.steps.length} wizard step(s) with ${total} parameter(s)!`, 'success');
+      // Store column metadata if discovered
+      if (data._columns_meta && (data._columns_meta.available || []).length > 0) {
+        r._columns_meta = data._columns_meta;
+        showToast(`Discovered ${data.steps.length} wizard step(s) with ${total} parameter(s) and ${data._columns_meta.available.length} columns!`, 'success');
+      } else {
+        showToast(`Discovered ${data.steps.length} wizard step(s) with ${total} parameter(s)!`, 'success');
+      }
 
     } else if (isCuic) {
       const metaObj = { type: 'cuic_spab', params: data.params || [], datePresets: data.datePresets || [] };
@@ -1032,7 +1045,12 @@ async function discoverFilters(reportIdx) {
         if (p.type === 'cuic_datetime' && p.currentPreset) r.filters[pn] = p.currentPreset;
         if (p.type === 'cuic_valuelist' && p.selectedValues?.length) r.filters[pn] = p.selectedValues;
       });
-      showToast(`Discovered ${(data.params||[]).length} CUIC parameter(s)!`, 'success');
+      if (data._columns_meta && (data._columns_meta.available || []).length > 0) {
+        r._columns_meta = data._columns_meta;
+        showToast(`Discovered ${(data.params||[]).length} CUIC parameter(s) and ${data._columns_meta.available.length} columns!`, 'success');
+      } else {
+        showToast(`Discovered ${(data.params||[]).length} CUIC parameter(s)!`, 'success');
+      }
 
     } else {
       r._wizard_meta = { steps: data.steps };
@@ -1042,7 +1060,12 @@ async function discoverFilters(reportIdx) {
         r.filters[sk] = {};
         (step.fields || []).forEach(field => { const key = field.id||field.name||field.label; if (key) r.filters[sk][key] = field.value; });
       });
-      showToast(`Discovered ${data.steps.length} wizard step(s)!`, 'success');
+      if (data._columns_meta && (data._columns_meta.available || []).length > 0) {
+        r._columns_meta = data._columns_meta;
+        showToast(`Discovered ${data.steps.length} wizard step(s) and ${data._columns_meta.available.length} columns!`, 'success');
+      } else {
+        showToast(`Discovered ${data.steps.length} wizard step(s)!`, 'success');
+      }
     }
 
     renderCuicReports();
@@ -1054,4 +1077,120 @@ async function discoverFilters(reportIdx) {
     btn.innerHTML = origHtml;
     btn.disabled  = false;
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  COLUMNS PANEL
+// ══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Renders a collapsible panel for selecting which report columns to extract.
+ * The first column (category/key) is always included and not shown.
+ * report.columns = null  → all columns extracted
+ * report.columns = []    → array of selected headerName strings
+ */
+function renderColumnsPanel(report, idx) {
+  const meta = report._columns_meta;
+  if (!meta || !meta.available || meta.available.length === 0) {
+    // Only show the hint if wizard has already been discovered (so the user
+    // knows what it's for), otherwise stay silent.
+    if (report._wizard_meta || (report.filters && report.filters._meta)) {
+      return `<details class="filter-panel-collapsible">
+        <summary class="filter-panel-toggle">⚙ Column Selection
+          <span style="font-size:11px;font-weight:normal;color:var(--muted);margin-left:8px">Re-run Validate Path to discover columns</span>
+        </summary>
+        <div class="filter-panel" style="padding:10px 14px;color:var(--muted);font-size:12px">
+          No column data yet. Click <strong>Re-validate Path</strong> above to discover available columns.
+        </div>
+      </details>`;
+    }
+    return '';
+  }
+
+  // available[0] is the category column — skipped in the picker (always included)
+  const pickable = meta.available.slice(1);
+  const selCols  = report.columns;  // null = all, array = selected names
+  const isAll    = selCols === null || selCols === undefined;
+  const selSet   = isAll ? null : new Set(selCols);
+  const selCount = isAll ? pickable.length : pickable.filter(c => selSet.has(c.headerName)).length;
+  const cpId     = 'cp-' + idx;
+  const discTs   = meta.discovered_at ? ` · discovered ${meta.discovered_at.replace('T', ' ').substring(0, 16)}` : '';
+
+  let html = `<details class="filter-panel-collapsible">
+    <summary class="filter-panel-toggle">⚙ Column Selection
+      <span class="vl-badge">${selCount} / ${pickable.length} columns${discTs}</span>
+      <span class="filter-clear" onclick="event.stopPropagation();columnsSelectAll(${idx},'${cpId}')">✔ All</span>
+      <span class="filter-clear" style="margin-left:4px" onclick="event.stopPropagation();columnsSelectNone(${idx},'${cpId}')">✖ None</span>
+    </summary>
+    <div class="filter-panel">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">
+        The first column (${esc(meta.available[0].headerName || 'Category')}) is always included as the row identifier.
+      </div>
+      <div class="vl-toolbar" style="margin-bottom:6px">
+        <input type="text" id="${cpId}-search" placeholder="🔍 Filter columns…" oninput="filterCpChecklist('${cpId}',this.value)" style="flex:1;min-width:120px">
+        <button onclick="columnsSelectAll(${idx},'${cpId}')">✅ All</button>
+        <button onclick="columnsSelectNone(${idx},'${cpId}')">☐ None</button>
+        <span class="vl-count" id="${cpId}-count">${selCount} / ${pickable.length}</span>
+      </div>
+      <div class="vl-checklist" id="${cpId}-list">`;
+
+  pickable.forEach(col => {
+    const hn      = col.headerName || col.field || '';
+    const checked = (isAll || selSet.has(hn)) ? 'checked' : '';
+    html += `<label data-name="${attr(hn.toLowerCase())}">
+      <input type="checkbox" value="${attr(hn)}" ${checked}
+        onchange="columnsToggleItem(${idx},'${cpId}')">
+      <span>${esc(hn)}</span></label>`;
+  });
+
+  html += `</div></div></details>`;
+  return html;
+}
+
+function columnsToggleItem(reportIdx, cpId) {
+  const r      = cuicReports[reportIdx];
+  const listEl = document.getElementById(cpId + '-list');
+  if (!listEl) return;
+  const all   = listEl.querySelectorAll('input[type=checkbox]');
+  const checked = Array.from(all).filter(cb => cb.checked).map(cb => cb.value);
+  r.columns = checked.length === all.length ? null : checked;
+  const ce = document.getElementById(cpId + '-count');
+  if (ce) ce.textContent = checked.length + ' / ' + all.length;
+}
+
+function columnsSelectAll(reportIdx, cpId) {
+  const r      = cuicReports[reportIdx];
+  const listEl = document.getElementById(cpId + '-list');
+  if (listEl) {
+    listEl.querySelectorAll('label').forEach(l => {
+      if (l.style.display !== 'none') { const cb = l.querySelector('input'); if (cb) cb.checked = true; }
+    });
+  }
+  r.columns = null;
+  const all   = listEl ? listEl.querySelectorAll('input[type=checkbox]').length : 0;
+  const ce    = document.getElementById(cpId + '-count');
+  if (ce) ce.textContent = all + ' / ' + all;
+}
+
+function columnsSelectNone(reportIdx, cpId) {
+  const r      = cuicReports[reportIdx];
+  const listEl = document.getElementById(cpId + '-list');
+  if (listEl) {
+    listEl.querySelectorAll('label').forEach(l => {
+      if (l.style.display !== 'none') { const cb = l.querySelector('input'); if (cb) cb.checked = false; }
+    });
+  }
+  r.columns = [];
+  const all   = listEl ? listEl.querySelectorAll('input[type=checkbox]').length : 0;
+  const ce    = document.getElementById(cpId + '-count');
+  if (ce) ce.textContent = '0 / ' + all;
+}
+
+function filterCpChecklist(cpId, query) {
+  const listEl = document.getElementById(cpId + '-list');
+  if (!listEl) return;
+  const q = (query || '').toLowerCase();
+  listEl.querySelectorAll('label').forEach(l => {
+    l.style.display = (!q || (l.getAttribute('data-name') || '').includes(q)) ? '' : 'none';
+  });
 }

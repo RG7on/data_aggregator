@@ -482,6 +482,92 @@ def _set_field_value(worker, field: dict, value):
             worker.logger.debug(f"  Could not set {fid or fname}: {e}")
 
 
+def _discover_columns_after_run(worker) -> dict:
+    """Wait for the report grid to render after clicking Run, then extract
+    column definitions using the ag-grid JS API.
+
+    Returns:
+        {
+          'available':      [{headerName, field}, ...],  # all columns incl. first
+          'datetime_field': str,  # field key used to detect consolidated rows
+          'discovered_at':  str,  # ISO timestamp
+        }
+    Callers should handle empty 'available' gracefully.
+    """
+    import datetime as _dt
+    result = {'available': [], 'datetime_field': '', 'discovered_at': ''}
+    try:
+        # Wait for the report page / new tab to render the grid
+        worker.logger.info("  Column discovery: waiting for ag-grid to render...")
+        all_pages = worker.context.pages
+        target = all_pages[-1] if len(all_pages) > 1 else worker.page
+
+        try:
+            target.wait_for_selector(
+                '.ag-root, .ag-body-viewport, [class*="ag-theme"], table',
+                timeout=worker.timeout_long * 2  # reports can be slow
+            )
+        except Exception:
+            worker.logger.info("  Column discovery: grid not detected within timeout, trying anyway")
+
+        # Search every frame for ag-grid
+        for frame in target.frames:
+            try:
+                has_ag = bool(frame.query_selector(
+                    '.ag-root, .ag-body-viewport, [class*="ag-theme"]'))
+            except Exception:
+                continue
+            if not has_ag:
+                continue
+
+            res = frame.evaluate(javascript.AG_GRID_COLUMNS_JS)
+            if not isinstance(res, dict) or 'error' in res:
+                worker.logger.info(f"  Column discovery frame {frame.url[:60]}: {res}")
+                continue
+
+            cols = res.get('columns', [])
+            if not cols:
+                continue
+
+            worker.logger.info(f"  Column discovery: {len(cols)} columns from {frame.url[:60]}")
+
+            # Detect the datetime field — used to identify consolidated rows.
+            # A consolidated row has an empty value in the datetime column.
+            # Heuristics (in order of confidence):
+            #   1. Column whose headerName is exactly/closely "DateTime" (case-insensitive)
+            #   2. First column whose headerName contains "date" (excluding "created", "updated")
+            #   3. Fall back to the second column's field key
+            dt_field = ''
+            skip_words = {'created', 'updated', 'modified', 'database'}
+            for c in cols:
+                hn = (c.get('headerName') or '').strip().lower()
+                if hn in ('datetime', 'date time', 'date/time'):
+                    dt_field = c.get('field', '')
+                    break
+            if not dt_field:
+                for c in cols:
+                    hn = (c.get('headerName') or '').strip().lower()
+                    if 'date' in hn and not any(sw in hn for sw in skip_words):
+                        dt_field = c.get('field', '')
+                        break
+            if not dt_field and len(cols) > 1:
+                dt_field = cols[1].get('field', '')
+                worker.logger.info(
+                    f"  Column discovery: datetime field not found by name, "
+                    f"using second column: {dt_field!r}"
+                )
+
+            result['available'] = cols
+            result['datetime_field'] = dt_field
+            result['discovered_at'] = _dt.datetime.now().isoformat(timespec='seconds')
+            return result
+
+        worker.logger.warning("  Column discovery: no ag-grid frame found after Run")
+    except Exception as e:
+        worker.logger.warning(f"  Column discovery failed: {e}")
+    return result
+
+
 def discover_wizard(worker_class, report_config: dict) -> dict:
     """Open a report and read all wizard steps' fields.
     
@@ -594,6 +680,22 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
             worker.page.wait_for_timeout(worker.timeout_short)
 
         worker.logger.info(f"Discovery: {len(result['steps'])} wizard step(s) found, type={result['type']}")
+
+        # ── Click Run to render the report and discover available columns ──
+        worker.logger.info("Discovery: clicking Run to render the report for column discovery...")
+        run_clicked = click_wizard_button(worker, 'Run')
+        if not run_clicked:
+            worker.logger.warning("Discovery: could not click Run — column discovery skipped")
+        else:
+            result['_columns_meta'] = _discover_columns_after_run(worker)
+            worker.logger.info(
+                f"Discovery: columns_meta={{"
+                f"columns:{len(result['_columns_meta'].get('available', []))}, "
+                f"datetime_field:{result['_columns_meta'].get('datetime_field')!r}}}"
+            )
+            # Close the report tab so logout can proceed cleanly
+            navigation.close_report_page(worker)
+
         return result
 
     except Exception as e:

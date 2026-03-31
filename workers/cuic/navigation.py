@@ -66,10 +66,20 @@ def get_reports_frame(worker):
     try:
         worker.page.click(selectors.REPORTS_TAB_CSS)
 
-        # Wait for reports iframe content instead of fixed timeout
+        # Wait for the iframe element to appear in the DOM before accessing it.
+        # CUIC loads the reports pane asynchronously after the tab click.
+        try:
+            worker.page.wait_for_selector(
+                f'iframe[name="{selectors.REPORTS_IFRAME_NAME}"]',
+                timeout=worker.timeout_nav,
+            )
+        except Exception:
+            pass  # may already be present; proceed to content checks
+
+        # Fast-path: get the named frame
         frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
         if not frame:
-            # fallback: find frame with ng-grid
+            # Fallback 1: find any frame that already has ng-grid content
             for f in worker.page.frames:
                 try:
                     if f.query_selector(selectors.GRID_CONTAINER):
@@ -77,6 +87,20 @@ def get_reports_frame(worker):
                         break
                 except Exception:
                     pass
+
+        if not frame:
+            # Fallback 2: short extra wait, then retry (slow environments)
+            worker.page.wait_for_timeout(2000)
+            frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
+            if not frame:
+                for f in worker.page.frames:
+                    try:
+                        if f.query_selector(selectors.GRID_CONTAINER):
+                            frame = f
+                            break
+                    except Exception:
+                        pass
+
         if not frame:
             worker.logger.error("Reports iframe not found")
             worker.screenshot("iframe_missing", is_step=False)

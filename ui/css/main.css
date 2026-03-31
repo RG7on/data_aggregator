@@ -844,6 +844,37 @@ code {
   opacity: 0.7;
 }
 
+/* ── Row Mode segmented control ─────────────────────────────────────────── */
+.row-mode-seg {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.row-mode-seg button {
+  flex: 1;
+  padding: 7px 12px;
+  background: var(--surface2);
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-align: center;
+}
+.row-mode-seg button:last-child { border-right: none; }
+.row-mode-seg button.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 500;
+}
+.row-mode-seg button:not(.active):hover {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+}
+
 .report-field {
   display: grid;
   grid-template-columns: 150px 1fr;

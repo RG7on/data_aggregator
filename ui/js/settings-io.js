@@ -71,7 +71,11 @@ function buildSettings() {
           }
           return {
             label: r.label, folder: r.folder, name: r.name,
-            enabled: r.enabled !== false, data_type: r.data_type || 'ongoing', filters: f
+            enabled: r.enabled !== false, data_type: r.data_type || 'ongoing',
+            row_mode: r.row_mode || 'consolidated_only',
+            columns: r.columns !== undefined ? r.columns : null,
+            ...(r._columns_meta ? { _columns_meta: r._columns_meta } : {}),
+            filters: f
           };
         }),
         timeout_nav_ms:     parseInt(document.getElementById('cuic-t-nav').value)    || 30000,
@@ -124,9 +128,12 @@ function populateSettings(s) {
     const rep = {
       label: r.label||'', folder: r.folder||'', name: r.name||'',
       enabled: r.enabled !== false, data_type: r.data_type || 'ongoing',
+      row_mode: r.row_mode || 'consolidated_only',
+      columns: r.columns !== undefined ? r.columns : null,
       filters: r.filters || {}
     };
     if (rep.filters._meta) rep._wizard_meta = rep.filters._meta;
+    if (r._columns_meta) rep._columns_meta = r._columns_meta;
     return rep;
   });
   if (!cuicReports.length) {

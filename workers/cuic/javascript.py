@@ -1315,13 +1315,84 @@ AG_GRID_JS = r'''() => {
         return null;
     }
 
+    /* ── get row-group (category) columns ──────────────────── */
+    function getRowGroupCols(api) {
+        // CUIC groups rows by Call Type; that column is hidden from the
+        // regular displayed columns but we need it as the category key.
+        // Try multiple API patterns for different ag-grid versions.
+        const tryFns = [
+            // ag-grid v31+ (columnApi merged into gridApi)
+            () => api.getRowGroupColumns && api.getRowGroupColumns(),
+            // ag-grid < v31 via columnApi
+            () => api.columnApi && api.columnApi.getRowGroupColumns && api.columnApi.getRowGroupColumns(),
+            // via gridOptions columnDefs (inspect definitions directly)
+            () => {
+                const go = api.gridOptions || (api.gridOptionsService && api.gridOptionsService.gridOptions);
+                if (go && go.columnDefs) {
+                    const rgcs = go.columnDefs.filter(c => c.rowGroup || c.rowGroupIndex != null);
+                    return rgcs.length ? rgcs : null;
+                }
+            }
+        ];
+        for (const fn of tryFns) {
+            try {
+                const rgc = fn();
+                if (rgc && rgc.length)
+                    return rgc.map(c => ({
+                        field:      (c.colDef || c).field      || '',
+                        headerName: (c.colDef || c).headerName || ''
+                    }));
+            } catch(e) {}
+        }
+        return [];
+    }
+
     /* ── extract all row data ───────────────────────────────── */
     function getRows(api) {
         const rows = [];
+        const groupFields = [];   // actual data field names used as row-group keys
+
+        // Sequential tracking: forEachNode visits group nodes BEFORE their leaf
+        // rows in tree order, so we just remember the last group key seen and
+        // stamp it onto every data row that follows. This is version-agnostic
+        // and works regardless of whether p.field is set on the parent node.
+        let lastGroupField = '';
+        let lastGroupKey   = '';
+
+        function resolveGroupField(node) {
+            // In order of reliability across ag-grid versions:
+            if (node.field) return node.field;
+            if (node.rowGroupColumn) {
+                const cd = node.rowGroupColumn.colDef || node.rowGroupColumn;
+                if (cd.field) return cd.field;
+            }
+            if (node.groupData) {
+                const k = Object.keys(node.groupData)[0];
+                if (k) return k;
+            }
+            return '';
+        }
+
         try {
-            // Works on all ag-grid versions
             api.forEachNode(node => {
-                if (node.data) rows.push(node.data);
+                if (node.group) {
+                    // Group header node — capture the Call Type name.
+                    const gField = resolveGroupField(node);
+                    if (gField && node.key != null) {
+                        lastGroupField = gField;
+                        lastGroupKey   = node.key;
+                        if (!groupFields.includes(gField)) groupFields.push(gField);
+                    }
+                    return;  // don't push group nodes as data rows
+                }
+                if (!node.data) return;
+
+                // Inject the carry-forward group key when the data row is missing it.
+                if (lastGroupField && lastGroupKey && !node.data[lastGroupField]) {
+                    rows.push(Object.assign({}, node.data, { [lastGroupField]: lastGroupKey }));
+                } else {
+                    rows.push(node.data);
+                }
             });
         } catch(e) {
             // Fallback: getModel().forEachNode()
@@ -1332,18 +1403,152 @@ AG_GRID_JS = r'''() => {
                 });
             } catch(e2) {}
         }
-        return rows;
+        // Also collect pinned-bottom rows (grand total / global consolidated).
+        // Mark them with __isPinnedBottom so Python can assign category='' instead
+        // of inheriting the last call type from carry-forward.
+        try {
+            const bCount = api.getPinnedBottomRowCount
+                ? api.getPinnedBottomRowCount() : 0;
+            for (let i = 0; i < bCount; i++) {
+                const n = api.getPinnedBottomRow(i);
+                if (n && n.data) rows.push(Object.assign({}, n.data, { __isPinnedBottom: true }));
+            }
+        } catch(e) {}
+        return { rows: rows, groupFields: groupFields };
     }
 
     /* ── main ───────────────────────────────────────────────── */
     const api = findApi();
     if (!api) return { error: 'API_NOT_FOUND' };
 
-    const cols = getColumns(api);
-    if (!cols || cols.length === 0) return { error: 'NO_COLUMNS' };
+    const rgCols      = getRowGroupCols(api);
+    const displayCols = getColumns(api);
+    if (!displayCols || displayCols.length === 0) return { error: 'NO_COLUMNS' };
 
-    const rows = getRows(api);
+    const rowResult   = getRows(api);
+    const rows        = rowResult.rows;
+    // groupFields: actual data field names detected from node.parent walking.
+    // These are the REAL field keys whose values are used as category (e.g. the
+    // ag-grid auto-group display column may have field="" but the data is stored
+    // under the original field name like "callType").
+    const groupFields = rowResult.groupFields;
+
     if (rows.length === 0) return { error: 'NO_ROWS' };
 
-    return { columns: cols, rows: rows, rowCount: rows.length };
+    // Build column list.  Start with group-by fields (as concrete data columns)
+    // so that cols[0] always points to the category field with a non-empty key.
+    // Prefer groupFields (observed at runtime) over rgCols (API-queried, may fail).
+    const dispFieldSet = new Set(displayCols.map(c => c.field));
+    const groupColDefs = (groupFields.length ? groupFields : rgCols.map(c => c.field))
+        .filter(f => f && !dispFieldSet.has(f))
+        .map(f => {
+            // Try to get the real headerName from the column API
+            try {
+                const colApi = api.columnApi || api;
+                const col = colApi.getColumn ? colApi.getColumn(f) : null;
+                const hn = col && col.colDef && col.colDef.headerName;
+                return { field: f, headerName: hn || f };
+            } catch(e) { return { field: f, headerName: f }; }
+        });
+
+    // Also filter out any display column whose field is empty/blank – that is the
+    // auto-group placeholder column which carries no actual data.
+    const filteredDisplay = displayCols.filter(c => c.field && c.field !== '');
+    const cols = [...groupColDefs, ...filteredDisplay];
+
+    return { columns: cols, rows: rows, rowCount: rows.length, groupFields: groupFields };
+}'''
+
+# ── Column definition extractor ──────────────────────────────────────────
+# Lightweight variant of AG_GRID_JS — only returns column headers, no rows.
+# Used during Validate Path to discover available columns.
+AG_GRID_COLUMNS_JS = r'''() => {
+    function findApi() {
+        const roots = document.querySelectorAll(
+            '.ag-root-wrapper, .ag-root, [class*="ag-theme"]'
+        );
+        for (const el of roots) {
+            if (el.__agComponent && el.__agComponent.gridApi)
+                return el.__agComponent.gridApi;
+            if (el.gridOptions && el.gridOptions.api)
+                return el.gridOptions.api;
+        }
+        const all = document.querySelectorAll('*');
+        for (const el of all) {
+            if (el.__agComponent && el.__agComponent.gridApi)
+                return el.__agComponent.gridApi;
+        }
+        if (typeof angular !== 'undefined') {
+            const agEl = document.querySelector('.ag-root-wrapper, .ag-root');
+            if (agEl) {
+                const scope = angular.element(agEl).scope();
+                if (scope && scope.gridApi) return scope.gridApi;
+                if (scope && scope.gridOptions && scope.gridOptions.api)
+                    return scope.gridOptions.api;
+            }
+        }
+        if (window.gridApi) return window.gridApi;
+        if (window.gridOptions && window.gridOptions.api) return window.gridOptions.api;
+        return null;
+    }
+
+    function getColumns(api) {
+        try {
+            const cols = api.getColumns ? api.getColumns() :
+                         api.columnModel ? api.columnModel.getColumns() : null;
+            if (cols && cols.length)
+                return cols.map(c => ({
+                    field:      c.colDef ? (c.colDef.field       || '') : (c.field       || ''),
+                    headerName: c.colDef ? (c.colDef.headerName  || '') : (c.headerName  || '')
+                }));
+        } catch(e) {}
+        try {
+            const colApi = api.columnApi || api.columnController;
+            if (colApi) {
+                const cols = colApi.getAllDisplayedColumns
+                    ? colApi.getAllDisplayedColumns() : colApi.getAllColumns();
+                if (cols && cols.length)
+                    return cols.map(c => ({
+                        field:      c.colDef.field      || '',
+                        headerName: c.colDef.headerName || ''
+                    }));
+            }
+        } catch(e) {}
+        try {
+            const cols = api.getAllDisplayedColumns();
+            if (cols && cols.length)
+                return cols.map(c => ({
+                    field:      c.colDef.field      || '',
+                    headerName: c.colDef.headerName || ''
+                }));
+        } catch(e) {}
+        return null;
+    }
+
+    function getRowGroupCols(api) {
+        try {
+            const colApi = api.columnApi || api;
+            if (colApi.getRowGroupColumns) {
+                const rgc = colApi.getRowGroupColumns();
+                if (rgc && rgc.length)
+                    return rgc.map(c => ({
+                        field:      (c.colDef || c).field      || '',
+                        headerName: (c.colDef || c).headerName || ''
+                    }));
+            }
+        } catch(e) {}
+        return [];
+    }
+
+    const api = findApi();
+    if (!api) return { error: 'API_NOT_FOUND' };
+    const rgCols      = getRowGroupCols(api);
+    const displayCols = getColumns(api);
+    if (!displayCols || displayCols.length === 0) return { error: 'NO_COLUMNS' };
+    const dispFieldSet = new Set(displayCols.map(c => c.field));
+    const cols = [
+        ...rgCols.filter(c => c.field && !dispFieldSet.has(c.field)),
+        ...displayCols
+    ];
+    return { columns: cols };
 }'''

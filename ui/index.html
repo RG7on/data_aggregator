@@ -321,6 +321,22 @@
           </div>
         </div>
 
+        <!-- Developer Tools -->
+        <div class="card" style="border: 1px dashed rgba(239,68,68,0.45);">
+          <div class="card-title" style="color:#ef4444">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            Developer Tools
+          </div>
+          <div class="hint" style="margin-bottom:12px;color:#ef4444">⚠ These actions are permanent and cannot be undone.</div>
+          <button class="btn btn-danger" onclick="clearAllData()">🗑 Clear Database &amp; CSV</button>
+          <div class="hint" style="margin-top:6px">Deletes all rows from the SQLite database and removes the kpi_snapshots.csv file.</div>
+        </div>
+
       </div><!-- /page-body -->
     </div>
     <!-- ══════════════════════════════════════════ /PAGE: GLOBAL ══ -->

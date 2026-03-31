@@ -119,6 +119,8 @@ class SettingsHandler(BaseHTTPRequestHandler):
             self._discover_smax_properties()
         elif path == '/api/run-scrape':
             self._run_scrape()
+        elif path == '/api/clear-data':
+            self._clear_data()
         else:
             self.send_error(404)
 
@@ -214,6 +216,29 @@ class SettingsHandler(BaseHTTPRequestHandler):
         _scrape_thread = threading.Thread(target=_bg_scrape, daemon=True)
         _scrape_thread.start()
         self._send_json({'status': 'started', 'message': 'Scrape started in background'})
+
+    def _clear_data(self):
+        """Delete all rows from the database tables and remove the CSV file."""
+        try:
+            import os
+            from core.database import _get_conn, CSV_FILENAME
+            from core.config import get_output_dir
+
+            conn = _get_conn()
+            try:
+                conn.execute('DELETE FROM kpi_snapshots')
+                conn.execute('DELETE FROM scrape_log')
+                conn.commit()
+            finally:
+                conn.close()
+
+            csv_path = os.path.join(get_output_dir(), CSV_FILENAME)
+            if os.path.exists(csv_path):
+                os.remove(csv_path)
+
+            self._send_json({'status': 'ok', 'message': 'Database and CSV cleared'})
+        except Exception as e:
+            self._send_json({'error': str(e)}, status=500)
 
     # ── File serving ──────────────────────────────────────────────────────
 

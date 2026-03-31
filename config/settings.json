@@ -21,6 +21,106 @@
           "name": "Z Call Type Historical All Fields",
           "enabled": true,
           "data_type": "ongoing",
+          "row_mode": "all",
+          "columns": null,
+          "_columns_meta": {
+            "available": [
+              {
+                "field": "",
+                "headerName": "Call Type"
+              },
+              {
+                "field": "DateTime",
+                "headerName": "DateTime"
+              },
+              {
+                "field": "servicelLevel",
+                "headerName": "Service Level"
+              },
+              {
+                "field": "ServiceLevelAband",
+                "headerName": "Abandoned Within Service Level"
+              },
+              {
+                "field": "asa",
+                "headerName": "Avg Speed of Answer"
+              },
+              {
+                "field": "CallsOffered",
+                "headerName": "Offered"
+              },
+              {
+                "field": "RouterQueueCalls",
+                "headerName": "Assigned From Queue"
+              },
+              {
+                "field": "CallsAnswered",
+                "headerName": "Answered"
+              },
+              {
+                "field": "AnswerWaitTime",
+                "headerName": "Answer Wait Time"
+              },
+              {
+                "field": "CallsHandled",
+                "headerName": "Handled"
+              },
+              {
+                "field": "TotalCallsAband",
+                "headerName": "Abandoned"
+              },
+              {
+                "field": "ReturnBR",
+                "headerName": "Return"
+              },
+              {
+                "field": "ICRDefaultRouted",
+                "headerName": "Default_Treatment"
+              },
+              {
+                "field": "NetworkDefaultRouted",
+                "headerName": "Network Routed"
+              },
+              {
+                "field": "OverflowOut",
+                "headerName": "Flow Out"
+              },
+              {
+                "field": "totalerrorcount",
+                "headerName": "Calls Error"
+              },
+              {
+                "field": "Other",
+                "headerName": "Other"
+              },
+              {
+                "field": "per_queued",
+                "headerName": "% Queued"
+              },
+              {
+                "field": "per_aban",
+                "headerName": "% Aban"
+              },
+              {
+                "field": "avg_aban_delay",
+                "headerName": "Average Abandon Delay"
+              },
+              {
+                "field": "ShortCalls",
+                "headerName": "Short Calls"
+              },
+              {
+                "field": "MaxCallsQueued",
+                "headerName": "Max Queued"
+              },
+              {
+                "field": "MaxCallWaitTime",
+                "headerName": "Longest Queued"
+              }
+            ],
+            "datetime_field": "DateTime",
+            "discovered_at": "2026-03-31T11:32:30"
+          },
           "filters": {
             "_meta": {
               "type": "cuic_multistep",
@@ -1075,23 +1175,10 @@
               ]
             },
             "step_1": {
-              "DateTime  (DateTime)": {
-                "preset": "LASTMTH",
-                "allDayChecked": "false",
-                "days": {
-                  "mon": "",
-                  "wed": "checked",
-                  "thu": "",
-                  "fri": "",
-                  "sun": "",
-                  "sat": ""
-                }
-              }
+              "DateTime  (DateTime)": "LASTDAY"
             },
             "step_2": {
               "Call Types(CallTypeID)": [
-                "AGENT_XFER_CALLTYPE",
-                "AgentTransfer_CT",
                 "General_IT_CT",
                 "RTPS_CT",
                 "SAP_CT",
@@ -1099,9 +1186,7 @@
                 "Telcom_CT"
               ]
             },
-            "step_3": {
-              "_field_filters": []
-            }
+            "step_3": {}
           }
         },
         {
@@ -1110,6 +1195,8 @@
           "name": "Agent Historical All Fields",
           "enabled": false,
           "data_type": "ongoing",
+          "row_mode": "consolidated_only",
+          "columns": null,
           "filters": {
             "_meta": {
               "type": "cuic_spab",
