@@ -49,18 +49,19 @@ _CREATE_TABLE = """
 CREATE TABLE IF NOT EXISTS kpi_snapshots (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     scrape_timestamp TEXT    NOT NULL,           -- when the scrape ran
-    data_datetime    TEXT    NOT NULL DEFAULT '', -- report DateTime: 'YYYY-MM-DD HH:MM:SS' (interval rows) or 'YYYY-MM-DD' (consolidated)
+    data_datetime    TEXT    NOT NULL DEFAULT '', -- report DateTime: 'YYYY-MM-DD HH:MM:SS' (interval) or 'YYYY-MM-DD' (consolidated)
     source           TEXT    NOT NULL,
+    report_name      TEXT    NOT NULL DEFAULT '', -- settings label of the report
     metric_title     TEXT    NOT NULL,
     category         TEXT    NOT NULL DEFAULT '', -- call type / group key
-    sub_category     TEXT    NOT NULL DEFAULT '', -- report label
+    sub_category     TEXT    NOT NULL DEFAULT '', -- additional grouping (SMAX only)
     value            TEXT    NOT NULL DEFAULT ''
 );
 """
 
 _CREATE_INDEX = """
 CREATE UNIQUE INDEX IF NOT EXISTS idx_kpi_dedup
-    ON kpi_snapshots (data_datetime, source, metric_title, category, sub_category);
+    ON kpi_snapshots (data_datetime, source, report_name, metric_title, category, sub_category);
 """
 
 _CREATE_SCRAPE_LOG = """
@@ -87,15 +88,11 @@ def init_db():
         # Detect old schema: if either data_date or interval columns exist,
         # drop and recreate the table (development data only — no production loss).
         cols = {row[1] for row in conn.execute("PRAGMA table_info(kpi_snapshots)").fetchall()}
-        if 'data_date' in cols or 'interval' in cols:
+        if 'data_date' in cols or 'interval' in cols or 'report_name' not in cols:
             conn.execute("DROP TABLE IF EXISTS kpi_snapshots")
             conn.execute(_CREATE_TABLE)
             conn.commit()
-            logger.info("Schema migrated: replaced data_date+interval with data_datetime")
-        elif 'data_datetime' not in cols and cols:
-            conn.execute("ALTER TABLE kpi_snapshots ADD COLUMN data_datetime TEXT NOT NULL DEFAULT ''")
-            conn.commit()
-            logger.info("Schema migrated: added data_datetime column")
+            logger.info("Schema migrated: rebuilt kpi_snapshots with current schema")
         # Rebuild dedup index
         conn.execute("DROP INDEX IF EXISTS idx_kpi_dedup")
         conn.execute(_CREATE_INDEX)
@@ -111,9 +108,9 @@ def init_db():
 # ══════════════════════════════════════════════════════════════════════════
 
 _UPSERT_SQL = """
-INSERT INTO kpi_snapshots (scrape_timestamp, data_datetime, source, metric_title, category, sub_category, value)
-VALUES (?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (data_datetime, source, metric_title, category, sub_category)
+INSERT INTO kpi_snapshots (scrape_timestamp, data_datetime, source, report_name, metric_title, category, sub_category, value)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (data_datetime, source, report_name, metric_title, category, sub_category)
 DO UPDATE SET
     scrape_timestamp = excluded.scrape_timestamp,
     value            = excluded.value;
@@ -145,6 +142,7 @@ def upsert_metrics(source_name: str, data: List[Dict[str, Any]],
             scraped_at,
             data_datetime,
             source_name,
+            item.get('report_name', ''),
             item.get('metric_title', ''),
             item.get('category', ''),
             item.get('sub_category', ''),
@@ -169,8 +167,8 @@ def query_all() -> pd.DataFrame:
     conn = _get_conn()
     try:
         df = pd.read_sql_query(
-            "SELECT scrape_timestamp, data_datetime, source, metric_title, category, sub_category, value "
-            "FROM kpi_snapshots ORDER BY data_datetime, source, metric_title, category",
+            "SELECT scrape_timestamp, data_datetime, source, report_name, metric_title, category, sub_category, value "
+            "FROM kpi_snapshots ORDER BY data_datetime, source, report_name, metric_title, category",
             conn
         )
         return df
@@ -185,9 +183,9 @@ def query_by_date(start_date: str, end_date: str = None) -> pd.DataFrame:
     conn = _get_conn()
     try:
         df = pd.read_sql_query(
-            "SELECT scrape_timestamp, data_datetime, source, metric_title, category, sub_category, value "
+            "SELECT scrape_timestamp, data_datetime, source, report_name, metric_title, category, sub_category, value "
             "FROM kpi_snapshots WHERE substr(data_datetime, 1, 10) BETWEEN ? AND ? "
-            "ORDER BY data_datetime, source, metric_title, category",
+            "ORDER BY data_datetime, source, report_name, metric_title, category",
             conn, params=(start_date, end_date)
         )
         return df

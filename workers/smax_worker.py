@@ -650,6 +650,7 @@ class Worker(BaseWorker):
 
         # Add the total as its own row
         results.append({
+            'report_name': label,
             'metric_title': report_title,
             'category': 'total',
             'sub_category': '',
@@ -690,6 +691,7 @@ class Worker(BaseWorker):
                 value = self._parse_value(row[-1])
             
             results.append({
+                'report_name': label,
                 'metric_title': report_title,
                 'category': category,
                 'sub_category': sub_category,

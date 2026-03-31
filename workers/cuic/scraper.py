@@ -213,8 +213,9 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '', report_config: di
                     val = ''
                 data.append({
                     'metric_title':  f"CUIC_{hdrs[ci]}",
+                    'report_name':   report_label,
                     'category':      cat,
-                    'sub_category':  report_label,
+                    'sub_category':  '',
                     'data_datetime': data_datetime,
                     'value':         str(val)
                 })
@@ -266,7 +267,8 @@ def _scrape_ag_grid_dom(worker, frame, report_label: str = '', report_config: di
                 if ci < len(hdrs) and ci < len(vals):
                     data.append({
                         'metric_title': f"CUIC_{hdrs[ci]}",
-                        'category': cat, 'sub_category': report_label, 'value': vals[ci]
+                        'report_name': report_label,
+                        'category': cat, 'sub_category': '', 'value': vals[ci]
                     })
         return data
     except Exception:
@@ -284,6 +286,7 @@ def _scrape_html_tables(worker, frame, report_label: str = '') -> List[Dict[str,
             hdrs = [c.inner_text().strip() for c in rows[0].query_selector_all('th, td')]
             if len(hdrs) < 2:
                 continue
+            prefix = f"CUIC_{report_label}_" if report_label else "CUIC_"
             for row in rows[1:]:
                 vals = [c.inner_text().strip() for c in row.query_selector_all('td')]
                 if len(vals) < 2:
@@ -292,7 +295,8 @@ def _scrape_html_tables(worker, frame, report_label: str = '') -> List[Dict[str,
                 for ci in range(1, min(len(hdrs), len(vals))):
                     data.append({
                         'metric_title': f"CUIC_{hdrs[ci]}",
-                        'category': cat, 'sub_category': report_label, 'value': vals[ci]
+                        'report_name': report_label,
+                        'category': cat, 'sub_category': '', 'value': vals[ci]
                     })
         return data
     except Exception:
