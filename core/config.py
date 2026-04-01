@@ -145,10 +145,11 @@ def _default_settings() -> dict:
                         "filters": {}
                     }
                 ],
-                "timeout_nav_ms": 30000,
-                "timeout_short_ms": 1500,
-                "timeout_medium_ms": 2500,
-                "timeout_long_ms": 8000
+                "use_system_chrome": False,
+                "timeout_nav_ms": 60000,
+                "timeout_short_ms": 2000,
+                "timeout_medium_ms": 5000,
+                "timeout_long_ms": 15000
             },
             "smax": {
                 "enabled": True,

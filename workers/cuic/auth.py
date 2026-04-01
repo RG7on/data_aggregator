@@ -7,6 +7,19 @@ Login and logout methods for CUIC.
 from . import selectors
 
 
+def _direct_logout(worker, page) -> bool:
+    """Fallback logout path when the identity menu UI is unavailable."""
+    try:
+        page.goto('https://148.151.32.77:8444/cuicui/Logout.jsp', wait_until='domcontentloaded', timeout=worker.timeout_nav)
+        page.wait_for_timeout(1500)
+        if 'logout' in (page.url or '').lower() or page.locator('text=Signed Out').count() > 0:
+            worker.logger.info("  [OK] Direct logout fallback reached Logout.jsp")
+            return True
+    except Exception as e:
+        worker.logger.warning(f"  [WARN] Direct logout fallback failed: {e}")
+    return False
+
+
 def _find_and_fill(worker, page, fallbacks, value, field_name):
     """Try multiple selectors to find and fill a field."""
     for sel in fallbacks:
@@ -155,7 +168,7 @@ def logout(worker) -> bool:
                     worker.logger.info("Screenshot: logout_iframe_not_found.png")
                 except Exception:
                     pass
-                return False
+                return _direct_logout(worker, main_page)
 
             worker.logger.info(f"  [OK] Found identity iframe: {identity_frame.name}")
 
@@ -197,7 +210,7 @@ def logout(worker) -> bool:
                     worker.logger.info("Screenshot: logout_menu_not_found.png")
                 except Exception:
                     pass
-                return False
+                return _direct_logout(worker, main_page)
             
             # Wait for dropdown menu to appear (more reliable than fixed timeout)
             worker.logger.info("STEP 3: Waiting for dropdown menu...")
@@ -259,9 +272,11 @@ def logout(worker) -> bool:
                     worker.logger.info("Screenshot: logout_signout_not_found.png")
                 except Exception:
                     pass
+                logged_out = _direct_logout(worker, main_page)
                 
         except Exception as e:
             worker.logger.error(f"[FAIL] Logout click sequence failed: {e}")
+            logged_out = _direct_logout(worker, main_page)
 
         # Screenshot final state
         try:

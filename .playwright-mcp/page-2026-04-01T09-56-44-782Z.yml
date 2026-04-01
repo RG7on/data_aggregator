@@ -1,0 +1,488 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e8]: Cisco Unified Intelligence Center
+    - iframe [ref=e11]:
+      - navigation [ref=f13e2]:
+        - generic [ref=f13e3]:
+          - generic [ref=f13e4] [cursor=pointer]:
+            - generic [ref=f13e6]: 
+            - list [ref=f13e7]:
+              - listitem "Khalid Albusaidi" [ref=f13e8]
+              - listitem "System Configuration Administrator, Security Administrator, Dashboard Designer, Report Designer, Report Definition Designer, Valuelist and Collection Designer" [ref=f13e9]: Administrator
+          - menu
+  - generic [ref=e12]:
+    - navigation "Menu bar" [ref=e14]:
+      - menubar "Menu bar" [ref=e16]:
+        - listitem [ref=e17]:
+          - menuitem "Home" [ref=e18] [cursor=pointer]:
+            - img [ref=e20]
+            - generic [ref=e22]: Home
+        - listitem [ref=e23]:
+          - menuitem "Dashboards" [ref=e24] [cursor=pointer]:
+            - img [ref=e26]
+            - generic [ref=e28]: Dashboards
+        - listitem [ref=e29]:
+          - menuitem "Reports" [ref=e30] [cursor=pointer]:
+            - img [ref=e32]
+            - generic [ref=e34]: Reports
+        - listitem [ref=e35]:
+          - menuitem "Report Definitions" [ref=e36] [cursor=pointer]:
+            - img [ref=e38]
+            - generic [ref=e49]: Report Definitions
+        - listitem [ref=e50]:
+          - menuitem "Value Lists" [ref=e51] [cursor=pointer]:
+            - img [ref=e53]
+            - generic [ref=e55]: Value Lists
+        - listitem [ref=e56]:
+          - button "Configure" [ref=e57] [cursor=pointer]:
+            - img [ref=e59]
+            - generic [ref=e61]: Configure
+        - listitem [ref=e62]:
+          - menuitem "Schedules" [ref=e63] [cursor=pointer]:
+            - img [ref=e65]
+            - generic [ref=e67]: Schedules
+      - text: ...
+    - iframe [ref=e78]:
+      - generic [active] [ref=f16e1]:
+        - main [ref=f16e2]:
+          - generic [ref=f16e3]:
+            - list:
+              - listitem:
+                - link:
+                  - /url: ""
+                  - text: 
+            - generic [ref=f16e7]:
+              - generic [ref=f16e8]:
+                - generic [ref=f16e9]:
+                  - heading "Reports" [level=2] [ref=f16e11]
+                  - generic [ref=f16e12]:
+                    - generic:
+                      - button "":
+                        - generic [ref=f16e13] [cursor=pointer]: 
+                - generic [ref=f16e14]:
+                  - generic [ref=f16e17]:
+                    - generic [ref=f16e19]:
+                      - generic [ref=f16e20]: 
+                      - textbox "All" [ref=f16e21]
+                      - text: 
+                    - list [ref=f16e23]:
+                      - listitem [ref=f16e24]:
+                        - link "All" [ref=f16e25]:
+                          - /url: ""
+                      - listitem [ref=f16e26]:
+                        - link "Favorites 6" [ref=f16e27] [cursor=pointer]:
+                          - /url: ""
+                  - generic [ref=f16e28]:
+                    - button "" [ref=f16e29] [cursor=pointer]
+                    - button "Import" [ref=f16e30] [cursor=pointer]
+                    - button "New " [ref=f16e32]:
+                      - text: New
+                      - generic [ref=f16e33]: 
+              - generic [ref=f16e34]:
+                - generic [ref=f16e37]:
+                  - generic [ref=f16e41] [cursor=pointer]:
+                    - generic "Name" [ref=f16e42]
+                    - generic "Descending" [ref=f16e43]
+                  - generic "Description" [ref=f16e48]
+                  - generic "Report Definition" [ref=f16e53]
+                  - generic "Actions" [ref=f16e57]
+                - generic [ref=f16e59]:
+                  - generic [ref=f16e60]:
+                    - generic [ref=f16e64] [cursor=pointer]:
+                      - generic [ref=f16e65]: 
+                      - generic "HR Dashboard 2023" [ref=f16e67]
+                    - generic [ref=f16e76]: "-"
+                    - generic [ref=f16e84] [cursor=pointer]: 
+                  - generic [ref=f16e85]:
+                    - generic [ref=f16e89] [cursor=pointer]:
+                      - generic [ref=f16e90]: 
+                      - generic "Stock" [ref=f16e92]
+                    - generic [ref=f16e101]: "-"
+                    - generic [ref=f16e109] [cursor=pointer]: 
+                  - generic [ref=f16e110]:
+                    - generic [ref=f16e114] [cursor=pointer]:
+                      - generic [ref=f16e115]: 
+                      - generic "Test" [ref=f16e117]
+                    - generic [ref=f16e126]: "-"
+                    - generic [ref=f16e134] [cursor=pointer]: 
+                  - generic [ref=f16e135]:
+                    - generic [ref=f16e139] [cursor=pointer]:
+                      - generic [ref=f16e140]: 
+                      - generic "Windows 10" [ref=f16e142]
+                    - generic [ref=f16e151]: "-"
+                    - generic [ref=f16e159] [cursor=pointer]: 
+                  - generic [ref=f16e160]:
+                    - generic [ref=f16e164] [cursor=pointer]:
+                      - generic [ref=f16e165]: 
+                      - generic "Windows 10 Dashboard" [ref=f16e167]
+                    - generic [ref=f16e176]: "-"
+                    - generic [ref=f16e184] [cursor=pointer]: 
+                  - generic [ref=f16e185]:
+                    - generic [ref=f16e189] [cursor=pointer]:
+                      - generic [ref=f16e190]: 
+                      - generic "Abandon call report" [ref=f16e192]
+                    - generic "Report Definitions/Abandon call" [ref=f16e201]: Abandon call
+                    - generic [ref=f16e204] [cursor=pointer]:
+                      - generic [ref=f16e206]: ☆
+                      - generic [ref=f16e210]: 
+                  - generic [ref=f16e211]:
+                    - generic [ref=f16e215] [cursor=pointer]:
+                      - generic [ref=f16e216]: 
+                      - generic "AG Test" [ref=f16e218]
+                    - generic "Report Definitions/Imported Report Definitions/AG Test" [ref=f16e227]: AG Test
+                    - generic [ref=f16e230] [cursor=pointer]:
+                      - generic [ref=f16e232]: ★
+                      - generic [ref=f16e236]: 
+                  - generic [ref=f16e237]:
+                    - generic [ref=f16e241] [cursor=pointer]:
+                      - generic [ref=f16e242]: 
+                      - generic "Agent Real Time Graph IFM" [ref=f16e244]
+                    - generic "Agent State Real Time Graph" [ref=f16e249]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent State Real Time Graph" [ref=f16e254]: Agent State Real Time Graph
+                    - generic [ref=f16e257] [cursor=pointer]:
+                      - generic [ref=f16e259]: ☆
+                      - generic [ref=f16e263]: 
+                  - generic [ref=f16e264]:
+                    - generic [ref=f16e268] [cursor=pointer]:
+                      - generic [ref=f16e269]: 
+                      - generic "Agent Real Time IFM" [ref=f16e271]
+                    - generic "Agent_Real_Time" [ref=f16e276]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Real Time" [ref=f16e281]: Agent Real Time
+                    - generic [ref=f16e284] [cursor=pointer]:
+                      - generic [ref=f16e286]: ☆
+                      - generic [ref=f16e290]: 
+                  - generic [ref=f16e291]:
+                    - generic [ref=f16e295] [cursor=pointer]:
+                      - generic [ref=f16e296]: 
+                      - generic "Agent Skill Group Real Time Logistic_Dashboard" [ref=f16e298]
+                    - generic "Agent Skill Group Real Time Logistic_Dashboard" [ref=f16e303]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e308]: Agent Skill Group Real Time
+                    - generic [ref=f16e311] [cursor=pointer]:
+                      - generic [ref=f16e313]: ☆
+                      - generic [ref=f16e317]: 
+                  - generic [ref=f16e318]:
+                    - generic [ref=f16e322] [cursor=pointer]:
+                      - generic [ref=f16e323]: 
+                      - generic "Call Type Historical IFM" [ref=f16e325]
+                    - generic "Call Type Historical All Fields" [ref=f16e330]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e335]: Call Type Historical All Fields
+                    - generic [ref=f16e338] [cursor=pointer]:
+                      - generic [ref=f16e340]: ☆
+                      - generic [ref=f16e344]: 
+                  - generic [ref=f16e345]:
+                    - generic [ref=f16e349] [cursor=pointer]:
+                      - generic [ref=f16e350]: 
+                      - generic "Call Type Real Time Logistic_Dashboard" [ref=f16e352]
+                    - generic "Call Type Real Time Logistic_Dashboard" [ref=f16e357]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e362]: Call Type Real Time
+                    - generic [ref=f16e365] [cursor=pointer]:
+                      - generic [ref=f16e367]: ☆
+                      - generic [ref=f16e371]: 
+                  - generic [ref=f16e372]:
+                    - generic [ref=f16e376] [cursor=pointer]:
+                      - generic [ref=f16e377]: 
+                      - generic "CCTV_Call_Type_Historical" [ref=f16e379]
+                    - generic "Call Type Historical All Fields" [ref=f16e384]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e389]: Call Type Historical All Fields
+                    - generic [ref=f16e392] [cursor=pointer]:
+                      - generic [ref=f16e394]: ☆
+                      - generic [ref=f16e398]: 
+                  - generic [ref=f16e399]:
+                    - generic [ref=f16e403] [cursor=pointer]:
+                      - generic [ref=f16e404]: 
+                      - generic "CT Real Time IFM" [ref=f16e406]
+                    - generic "Call Type Real Time" [ref=f16e411]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e416]: Call Type Real Time
+                    - generic [ref=f16e419] [cursor=pointer]:
+                      - generic [ref=f16e421]: ☆
+                      - generic [ref=f16e425]: 
+                  - generic [ref=f16e426]:
+                    - generic [ref=f16e430] [cursor=pointer]:
+                      - generic [ref=f16e431]: 
+                      - generic "CTHAF" [ref=f16e433]
+                    - generic "Call Type Historical All Fields" [ref=f16e438]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e443]: Call Type Historical All Fields
+                    - generic [ref=f16e446] [cursor=pointer]:
+                      - generic [ref=f16e448]: ☆
+                      - generic [ref=f16e452]: 
+                  - generic [ref=f16e453]:
+                    - generic [ref=f16e457] [cursor=pointer]:
+                      - generic [ref=f16e458]: 
+                      - generic "CUSTOM_Dashboard_CT" [ref=f16e460]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e469]: Call Type Real Time
+                    - generic [ref=f16e472] [cursor=pointer]:
+                      - generic [ref=f16e474]: ☆
+                      - generic [ref=f16e478]: 
+                  - generic [ref=f16e479]:
+                    - generic [ref=f16e483] [cursor=pointer]:
+                      - generic [ref=f16e484]: 
+                      - generic "Custom_Dashboard_SG_RT" [ref=f16e486]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e495]: Agent Skill Group Real Time
+                    - generic [ref=f16e498] [cursor=pointer]:
+                      - generic [ref=f16e500]: ☆
+                      - generic [ref=f16e504]: 
+                  - generic [ref=f16e505]:
+                    - generic [ref=f16e509] [cursor=pointer]:
+                      - generic [ref=f16e510]: 
+                      - generic "Custom_IMMG_CT" [ref=f16e512]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e521]: Call Type Real Time
+                    - generic [ref=f16e524] [cursor=pointer]:
+                      - generic [ref=f16e526]: ☆
+                      - generic [ref=f16e530]: 
+                  - generic [ref=f16e531]:
+                    - generic [ref=f16e535] [cursor=pointer]:
+                      - generic [ref=f16e536]: 
+                      - generic "Custom_Pension_Agent" [ref=f16e538]
+                    - generic "Report Definitions/Imported Report Definitions/Agent Skill Group Real Time" [ref=f16e547]: Agent Skill Group Real Time
+                    - generic [ref=f16e550] [cursor=pointer]:
+                      - generic [ref=f16e552]: ☆
+                      - generic [ref=f16e556]: 
+                  - generic [ref=f16e557]:
+                    - generic [ref=f16e561] [cursor=pointer]:
+                      - generic [ref=f16e562]: 
+                      - generic "Customer_IMMG_Agent" [ref=f16e564]
+                    - generic "Report Definitions/Imported Report Definitions/Agent Skill Group Real Time" [ref=f16e573]: Agent Skill Group Real Time
+                    - generic [ref=f16e576] [cursor=pointer]:
+                      - generic [ref=f16e578]: ☆
+                      - generic [ref=f16e582]: 
+                  - generic [ref=f16e583]:
+                    - generic [ref=f16e587] [cursor=pointer]:
+                      - generic [ref=f16e588]: 
+                      - generic "Cutom_Dashboard_new" [ref=f16e590]
+                    - generic "Call Type Historical All Fields" [ref=f16e595]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e600]: Call Type Historical All Fields
+                    - generic [ref=f16e603] [cursor=pointer]:
+                      - generic [ref=f16e605]: ☆
+                      - generic [ref=f16e609]: 
+                  - generic [ref=f16e610]:
+                    - generic [ref=f16e614] [cursor=pointer]:
+                      - generic [ref=f16e615]: 
+                      - generic "EDM_Dashboard_CT" [ref=f16e617]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e626]: Call Type Real Time
+                    - generic [ref=f16e629] [cursor=pointer]:
+                      - generic [ref=f16e631]: ☆
+                      - generic [ref=f16e635]: 
+                  - generic [ref=f16e636]:
+                    - generic [ref=f16e640] [cursor=pointer]:
+                      - generic [ref=f16e641]: 
+                      - generic "EDM_Dashboard_SG_RT" [ref=f16e643]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e652]: Agent Skill Group Real Time
+                    - generic [ref=f16e655] [cursor=pointer]:
+                      - generic [ref=f16e657]: ☆
+                      - generic [ref=f16e661]: 
+                  - generic [ref=f16e662]:
+                    - generic [ref=f16e666] [cursor=pointer]:
+                      - generic [ref=f16e667]: 
+                      - generic "hamza" [ref=f16e669]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e678]: Call Type Historical All Fields
+                    - generic [ref=f16e681] [cursor=pointer]:
+                      - generic [ref=f16e683]: ☆
+                      - generic [ref=f16e687]: 
+                  - generic [ref=f16e688]:
+                    - generic [ref=f16e692] [cursor=pointer]:
+                      - generic [ref=f16e693]: 
+                      - generic "HR Historical Report Agent All field" [ref=f16e695]
+                    - generic "Agent Historical All Fields" [ref=f16e700]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Historical/Agent Historical All Fields" [ref=f16e705]: Agent Historical All Fields
+                    - generic [ref=f16e708] [cursor=pointer]:
+                      - generic [ref=f16e710]: ☆
+                      - generic [ref=f16e714]: 
+                  - generic [ref=f16e715]:
+                    - generic [ref=f16e719] [cursor=pointer]:
+                      - generic [ref=f16e720]: 
+                      - generic "HR_Call_Type_Historical_AF" [ref=f16e722]
+                    - generic "Call Type Historical All Fields" [ref=f16e727]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e732]: Call Type Historical All Fields
+                    - generic [ref=f16e735] [cursor=pointer]:
+                      - generic [ref=f16e737]: ☆
+                      - generic [ref=f16e741]: 
+                  - generic [ref=f16e742]:
+                    - generic [ref=f16e746] [cursor=pointer]:
+                      - generic [ref=f16e747]: 
+                      - generic "HR_Call_Type_Historical_AF_v3" [ref=f16e749]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields v3" [ref=f16e758]: Call Type Historical All Fields v3
+                    - generic [ref=f16e761] [cursor=pointer]:
+                      - generic [ref=f16e763]: ☆
+                      - generic [ref=f16e767]: 
+                  - generic [ref=f16e768]:
+                    - generic [ref=f16e772] [cursor=pointer]:
+                      - generic [ref=f16e773]: 
+                      - generic "HRF_Agents_Realtime" [ref=f16e775]
+                    - generic "Report Definitions/Imported Report Definitions/Agent Real Time" [ref=f16e784]: Agent Real Time
+                    - generic [ref=f16e787] [cursor=pointer]:
+                      - generic [ref=f16e789]: ☆
+                      - generic [ref=f16e793]: 
+                  - generic [ref=f16e794]:
+                    - generic [ref=f16e798] [cursor=pointer]:
+                      - generic [ref=f16e799]: 
+                      - generic "HRF_Calltype_Historical" [ref=f16e801]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Historical All Fields" [ref=f16e810]: Call Type Historical All Fields
+                    - generic [ref=f16e813] [cursor=pointer]:
+                      - generic [ref=f16e815]: ☆
+                      - generic [ref=f16e819]: 
+                  - generic [ref=f16e820]:
+                    - generic [ref=f16e824] [cursor=pointer]:
+                      - generic [ref=f16e825]: 
+                      - generic "IFM Abandon Calls" [ref=f16e827]
+                    - generic "Report Definitions/IFM Abandon Calls" [ref=f16e836]: IFM Abandon Calls
+                    - generic [ref=f16e839] [cursor=pointer]:
+                      - generic [ref=f16e841]: ☆
+                      - generic [ref=f16e845]: 
+                  - generic [ref=f16e846]:
+                    - generic [ref=f16e850] [cursor=pointer]:
+                      - generic [ref=f16e851]: 
+                      - generic "IFM Agent Real Time" [ref=f16e853]
+                    - generic "Agent_Real_Time" [ref=f16e858]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Real Time" [ref=f16e863]: Agent Real Time
+                    - generic [ref=f16e866] [cursor=pointer]:
+                      - generic [ref=f16e868]: ☆
+                      - generic [ref=f16e872]: 
+                  - generic [ref=f16e873]:
+                    - generic [ref=f16e877] [cursor=pointer]:
+                      - generic [ref=f16e878]: 
+                      - generic "IFM Peripheral Skill Group Historical AF" [ref=f16e880]
+                    - generic "Peripheral Skill Group Historical All Fields" [ref=f16e885]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Historical/Peripheral Skill Group Historical All Fields" [ref=f16e890]: Peripheral Skill Group Historical All Fields
+                    - generic [ref=f16e893] [cursor=pointer]:
+                      - generic [ref=f16e895]: ☆
+                      - generic [ref=f16e899]: 
+                  - generic [ref=f16e900]:
+                    - generic [ref=f16e904] [cursor=pointer]:
+                      - generic [ref=f16e905]: 
+                      - generic "IFM_HD_Dashboard_CT" [ref=f16e907]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e916]: Call Type Real Time
+                    - generic [ref=f16e919] [cursor=pointer]:
+                      - generic [ref=f16e921]: ☆
+                      - generic [ref=f16e925]: 
+                  - generic [ref=f16e926]:
+                    - generic [ref=f16e930] [cursor=pointer]:
+                      - generic [ref=f16e931]: 
+                      - generic "IFM_HD_Dashboard_SG_RT" [ref=f16e933]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e942]: Agent Skill Group Real Time
+                    - generic [ref=f16e945] [cursor=pointer]:
+                      - generic [ref=f16e947]: ☆
+                      - generic [ref=f16e951]: 
+                  - generic [ref=f16e952]:
+                    - generic [ref=f16e956] [cursor=pointer]:
+                      - generic [ref=f16e957]: 
+                      - generic "IMMG_Dashboard_CT" [ref=f16e959]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e968]: Call Type Real Time
+                    - generic [ref=f16e971] [cursor=pointer]:
+                      - generic [ref=f16e973]: ☆
+                      - generic [ref=f16e977]: 
+                  - generic [ref=f16e978]:
+                    - generic [ref=f16e982] [cursor=pointer]:
+                      - generic [ref=f16e983]: 
+                      - generic "IMMG_Dashboard_SG_RT" [ref=f16e985]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e994]: Agent Skill Group Real Time
+                    - generic [ref=f16e997] [cursor=pointer]:
+                      - generic [ref=f16e999]: ☆
+                      - generic [ref=f16e1003]: 
+                  - generic [ref=f16e1004]:
+                    - generic [ref=f16e1008] [cursor=pointer]:
+                      - generic [ref=f16e1009]: 
+                      - generic "IT Help Desk Abandon Calls" [ref=f16e1011]
+                    - generic "Report Definitions/IT Help Desk Abandon Calls" [ref=f16e1020]: IT Help Desk Abandon Calls
+                    - generic [ref=f16e1023] [cursor=pointer]:
+                      - generic [ref=f16e1025]: ★
+                      - generic [ref=f16e1029]: 
+                  - generic [ref=f16e1030]:
+                    - generic [ref=f16e1034] [cursor=pointer]:
+                      - generic [ref=f16e1035]: 
+                      - generic "ITHelpdesk_AgentSG_RealTime" [ref=f16e1037]
+                    - generic "Report Definitions/Imported Report Definitions/Agent Skill Group Real Time" [ref=f16e1046]: Agent Skill Group Real Time
+                    - generic [ref=f16e1049] [cursor=pointer]:
+                      - generic [ref=f16e1051]: ★
+                      - generic [ref=f16e1055]: 
+                  - generic [ref=f16e1056]:
+                    - generic [ref=f16e1060] [cursor=pointer]:
+                      - generic [ref=f16e1061]: 
+                      - generic "MED-CT-Real time" [ref=f16e1063]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e1072]: Call Type Real Time
+                    - generic [ref=f16e1075] [cursor=pointer]:
+                      - generic [ref=f16e1077]: ☆
+                      - generic [ref=f16e1081]: 
+                  - generic [ref=f16e1082]:
+                    - generic [ref=f16e1086] [cursor=pointer]:
+                      - generic [ref=f16e1087]: 
+                      - generic "MED_CT_RealTime" [ref=f16e1089]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e1098]: Call Type Real Time
+                    - generic [ref=f16e1101] [cursor=pointer]:
+                      - generic [ref=f16e1103]: ☆
+                      - generic [ref=f16e1107]: 
+                  - generic [ref=f16e1108]:
+                    - generic [ref=f16e1112] [cursor=pointer]:
+                      - generic [ref=f16e1113]: 
+                      - generic "MED_Dashboard_CT" [ref=f16e1115]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e1124]: Call Type Real Time
+                    - generic [ref=f16e1127] [cursor=pointer]:
+                      - generic [ref=f16e1129]: ☆
+                      - generic [ref=f16e1133]: 
+                  - generic [ref=f16e1134]:
+                    - generic [ref=f16e1138] [cursor=pointer]:
+                      - generic [ref=f16e1139]: 
+                      - generic "MED_Dashboard_SG_RT" [ref=f16e1141]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e1150]: Agent Skill Group Real Time
+                    - generic [ref=f16e1153] [cursor=pointer]:
+                      - generic [ref=f16e1155]: ☆
+                      - generic [ref=f16e1159]: 
+                  - generic [ref=f16e1160]:
+                    - generic [ref=f16e1164] [cursor=pointer]:
+                      - generic [ref=f16e1165]: 
+                      - generic "Outbound Call Details" [ref=f16e1167]
+                    - generic "Report Definitions/Outbound Call Details" [ref=f16e1176]: Outbound Call Details
+                    - generic [ref=f16e1179] [cursor=pointer]:
+                      - generic [ref=f16e1181]: ☆
+                      - generic [ref=f16e1185]: 
+                  - generic [ref=f16e1186]:
+                    - generic [ref=f16e1190] [cursor=pointer]:
+                      - generic [ref=f16e1191]: 
+                      - generic "PENSION_Dashboard_CT" [ref=f16e1193]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e1202]: Call Type Real Time
+                    - generic [ref=f16e1205] [cursor=pointer]:
+                      - generic [ref=f16e1207]: ☆
+                      - generic [ref=f16e1211]: 
+                  - generic [ref=f16e1212]:
+                    - generic [ref=f16e1216] [cursor=pointer]:
+                      - generic [ref=f16e1217]: 
+                      - generic "Pension_Dashboard_SG_RT" [ref=f16e1219]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e1228]: Agent Skill Group Real Time
+                    - generic [ref=f16e1231] [cursor=pointer]:
+                      - generic [ref=f16e1233]: ☆
+                      - generic [ref=f16e1237]: 
+                  - generic [ref=f16e1238]:
+                    - generic [ref=f16e1242] [cursor=pointer]:
+                      - generic [ref=f16e1243]: 
+                      - generic "SAP_Agent_Real Time" [ref=f16e1245]
+                    - generic "Report Definitions/Imported Report Definitions/Agent Real Time" [ref=f16e1254]: Agent Real Time
+                    - generic [ref=f16e1257] [cursor=pointer]:
+                      - generic [ref=f16e1259]: ☆
+                      - generic [ref=f16e1263]: 
+                  - generic [ref=f16e1264]:
+                    - generic [ref=f16e1268] [cursor=pointer]:
+                      - generic [ref=f16e1269]: 
+                      - generic "SAP_Dashboard_CT" [ref=f16e1271]
+                    - generic "Report Definitions/Imported Report Definitions/Call Type Real Time" [ref=f16e1280]: Call Type Real Time
+                    - generic [ref=f16e1283] [cursor=pointer]:
+                      - generic [ref=f16e1285]: ☆
+                      - generic [ref=f16e1289]: 
+                  - generic [ref=f16e1290]:
+                    - generic [ref=f16e1294] [cursor=pointer]:
+                      - generic [ref=f16e1295]: 
+                      - generic "SAP_Dashboard_SG_RT" [ref=f16e1297]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Skill Group Real Time" [ref=f16e1306]: Agent Skill Group Real Time
+                    - generic [ref=f16e1309] [cursor=pointer]:
+                      - generic [ref=f16e1311]: ☆
+                      - generic [ref=f16e1315]: 
+                  - generic [ref=f16e1316]:
+                    - generic [ref=f16e1320] [cursor=pointer]:
+                      - generic [ref=f16e1321]: 
+                      - generic "Test Report" [ref=f16e1323]
+                    - generic "Agent_Real_Time" [ref=f16e1328]
+                    - generic "Report Definitions/Imported Report Definitions/Stock/CCE/CCE_AF_Realtime/Agent Real Time" [ref=f16e1333]: Agent Real Time
+                    - generic [ref=f16e1336] [cursor=pointer]:
+                      - generic [ref=f16e1338]: ☆
+                      - generic [ref=f16e1342]: 
+        - generic [ref=f16e1343]: All

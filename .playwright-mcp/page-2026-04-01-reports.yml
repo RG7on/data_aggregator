@@ -1,0 +1,33 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e8]: Cisco Unified Intelligence Center
+    - iframe [ref=e11]:
+      - navigation [ref=f13e2]:
+        - generic [ref=f13e3]:
+          - generic [ref=f13e4] [cursor=pointer]
+          - menu
+  - generic [ref=e12]:
+    - navigation "Menu bar" [ref=e14]:
+      - menubar "Menu bar" [ref=e16]:
+        - listitem [ref=e17]:
+          - menuitem "Home" [ref=e18] [cursor=pointer]
+        - listitem [ref=e23]:
+          - menuitem "Dashboards" [ref=e24] [cursor=pointer]
+        - listitem [ref=e29]:
+          - menuitem "Reports" [ref=e30] [cursor=pointer]
+        - listitem [ref=e35]:
+          - menuitem "Report Definitions" [ref=e36] [cursor=pointer]
+        - listitem [ref=e50]:
+          - menuitem "Value Lists" [ref=e51] [cursor=pointer]
+        - listitem [ref=e56]:
+          - button "Configure" [ref=e57] [cursor=pointer]
+        - listitem [ref=e62]:
+          - menuitem "Schedules" [ref=e63] [cursor=pointer]
+      - text: ...
+    - iframe [ref=e78]:
+      - generic [active] [ref=f16e1]:
+        - main [ref=f16e2]:
+          - generic [ref=f16e3]
+        - generic [ref=f16e1343]: All

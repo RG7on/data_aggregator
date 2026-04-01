@@ -1,0 +1,13 @@
+- main [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - text: Cisco Unified
+        - text: Intelligence Center
+      - textbox "Enter Username" [ref=e10]
+    - generic [ref=e11]:
+      - button "Next" [disabled] [ref=e12]
+      - text: 
+  - generic [ref=e13]: 
+  - heading "By using Cisco Unified Intelligence Center, you accept the documented Terms of Service and Privacy Statements." [level=6] [ref=e14]
+  - heading "Copyright © 2010 - 2023 Cisco Systems, Inc. All rights reserved." [level=6] [ref=e15]

@@ -1,0 +1,44 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e8]: Cisco Unified Intelligence Center
+    - iframe [ref=e11]:
+      - menu
+  - generic [ref=e12]:
+    - navigation "Menu bar" [ref=e14]:
+      - menubar "Menu bar" [ref=e16]:
+        - listitem [ref=e17]:
+          - menuitem "Home" [ref=e18] [cursor=pointer]:
+            - img [ref=e20]
+            - generic [ref=e22]: Home
+        - listitem [ref=e23]:
+          - menuitem "Dashboards" [ref=e24] [cursor=pointer]:
+            - img [ref=e26]
+            - generic [ref=e28]: Dashboards
+        - listitem [ref=e29]:
+          - menuitem "Reports" [ref=e30] [cursor=pointer]:
+            - img [ref=e32]
+            - generic [ref=e34]: Reports
+        - listitem [ref=e35]:
+          - menuitem "Report Definitions" [ref=e36] [cursor=pointer]:
+            - img [ref=e38]
+            - generic [ref=e49]: Report Definitions
+        - listitem [ref=e50]:
+          - menuitem "Value Lists" [ref=e51] [cursor=pointer]:
+            - img [ref=e53]
+            - generic [ref=e55]: Value Lists
+        - listitem [ref=e56]:
+          - button "Configure" [ref=e57] [cursor=pointer]:
+            - img [ref=e59]
+            - generic [ref=e61]: Configure
+        - listitem [ref=e62]:
+          - menuitem "Schedules" [ref=e63] [cursor=pointer]:
+            - img [ref=e65]
+            - generic [ref=e67]: Schedules
+      - text: ...
+    - iframe [ref=e74]:
+      - main [ref=f14e2]:
+        - heading "Cisco Unified Intelligence Center" [level=1] [ref=f14e3]
+        - heading [level=4]
+        - heading [level=5]

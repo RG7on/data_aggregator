@@ -1,0 +1,19 @@
+- main [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - text: Cisco Unified
+        - text: Intelligence Center
+      - generic [ref=e9]: MUCN464
+      - textbox "Password" [active] [ref=e11]: Kha94%%$$
+      - combobox [ref=e13]:
+        - option "CUIC"
+        - option "LDAP" [selected]
+    - generic [ref=e14]:
+      - button "Sign In" [ref=e15] [cursor=pointer]
+      - text: 
+    - link "Sign In as a different user" [ref=e18] [cursor=pointer]:
+      - /url: ""
+  - generic [ref=e19]: 
+  - heading "By using Cisco Unified Intelligence Center, you accept the documented Terms of Service and Privacy Statements." [level=6] [ref=e20]
+  - heading "Copyright © 2010 - 2023 Cisco Systems, Inc. All rights reserved." [level=6] [ref=e21]

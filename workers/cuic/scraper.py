@@ -26,6 +26,29 @@ def _parse_dt(val) -> str:
     return ''
 
 
+def _derive_group_labels(row: Dict[str, Any], fields: List[str], last_category: str) -> tuple[str, str, str]:
+    """Derive category/sub_category from ag-grid group metadata when available."""
+    if row.get('__isPinnedBottom'):
+        return '', '', last_category
+
+    path = row.get('__groupPath') or []
+    if isinstance(path, list):
+        keys = [
+            str(segment.get('key', '')).strip()
+            for segment in path
+            if isinstance(segment, dict) and str(segment.get('key', '')).strip()
+        ]
+        if keys:
+            category = keys[0]
+            sub_category = ' | '.join(keys[1:]) if len(keys) > 1 else ''
+            return category, sub_category, category
+
+    raw_category = str(row.get(fields[0], '') if fields and fields[0] else '').strip()
+    if raw_category:
+        last_category = raw_category
+    return last_category, '', last_category
+
+
 def scrape_data(worker, report_label: str = '', report_config: dict = None) -> List[Dict[str, Any]]:
     """Main scraper entry point. Tries all methods in order."""
     try:
@@ -155,18 +178,27 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '', report_config: di
             if not dt_field:
                 dt_field = fields[1] if len(fields) > 1 else ''
 
-        if row_mode == 'consolidated_only' and dt_field:
+        if row_mode == 'consolidated_only':
             before_count = len(rows)
-            rows = [r for r in rows if not r.get(dt_field)]
+            rows = [
+                row for row in rows
+                if row.get('__isGroupNode')
+                or row.get('__isPinnedBottom')
+                or (dt_field and not row.get(dt_field))
+            ]
             worker.logger.info(
                 f"    Row filter (consolidated_only, dt_field={dt_field!r}): "
-                f"{before_count} → {len(rows)} rows"
+                f"{before_count} → {len(rows)} rows "
+                f"(group={sum(1 for r in rows if r.get('__isGroupNode'))}, "
+                f"pinned={sum(1 for r in rows if r.get('__isPinnedBottom'))}, "
+                f"blank_dt={sum(1 for r in rows if dt_field and not r.get(dt_field))})"
             )
-        elif row_mode == 'consolidated_only' and not dt_field:
-            worker.logger.warning(
-                "    Row filter: consolidated_only requested but "
-                "datetime field not detected — returning all rows"
-            )
+            if not rows:
+                worker.logger.warning(
+                    "    Row filter: consolidated_only found no grouped/pinned/blank-datetime rows — "
+                    "returning all rows"
+                )
+                rows = result['rows']
 
         # ── Column filtering ─────────────────────────────────────────
         selected_cols = cfg.get('columns')  # None = all, list = selected headerNames
@@ -188,17 +220,7 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '', report_config: di
         data = []
         last_cat = ''   # carry-forward call type via sequential group tracking
         for row in rows:
-            # Pinned-bottom rows are the global grand total (across ALL call types).
-            # They must NOT inherit a call type from carry-forward — leave category=''.
-            is_pinned = row.get('__isPinnedBottom', False)
-
-            raw_cat = str(row.get(fields[0], '') if fields[0] else '') if fields else ''
-            if not is_pinned:
-                if raw_cat:
-                    last_cat = raw_cat
-                cat = last_cat
-            else:
-                cat = ''  # global grand total — no specific call type
+            cat, sub_cat, last_cat = _derive_group_labels(row, fields, last_cat)
 
             # Extract the datetime from the report's DateTime field.
             dt_raw = row.get(dt_field, '') if dt_field else ''
@@ -215,7 +237,7 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '', report_config: di
                     'metric_title':  f"CUIC_{hdrs[ci]}",
                     'report_name':   report_label,
                     'category':      cat,
-                    'sub_category':  '',
+                    'sub_category':  sub_cat,
                     'data_datetime': data_datetime,
                     'value':         str(val)
                 })

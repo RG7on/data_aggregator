@@ -1,0 +1,48 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e5]:
+      - img [ref=e6]
+      - generic [ref=e8]: Cisco Unified Intelligence Center
+    - iframe [ref=e11]:
+      - navigation [ref=f13e2]:
+        - generic [ref=f13e3]:
+          - generic [ref=f13e4] [cursor=pointer]:
+            - generic [ref=f13e6]: 
+            - list [ref=f13e7]:
+              - listitem "Khalid Albusaidi" [ref=f13e8]
+              - listitem "System Configuration Administrator, Security Administrator, Dashboard Designer, Report Designer, Report Definition Designer, Valuelist and Collection Designer" [ref=f13e9]: Administrator
+          - menu
+  - generic [ref=e12]:
+    - navigation "Menu bar" [ref=e14]:
+      - menubar "Menu bar" [ref=e16]:
+        - listitem [ref=e17]:
+          - menuitem "Home" [ref=e18] [cursor=pointer]:
+            - img [ref=e20]
+            - generic [ref=e22]: Home
+        - listitem [ref=e23]:
+          - menuitem "Dashboards" [ref=e24] [cursor=pointer]:
+            - img [ref=e26]
+            - generic [ref=e28]: Dashboards
+        - listitem [ref=e29]:
+          - menuitem "Reports" [ref=e30] [cursor=pointer]:
+            - img [ref=e32]
+            - generic [ref=e34]: Reports
+        - listitem [ref=e35]:
+          - menuitem "Report Definitions" [ref=e36] [cursor=pointer]:
+            - img [ref=e38]
+            - generic [ref=e49]: Report Definitions
+        - listitem [ref=e50]:
+          - menuitem "Value Lists" [ref=e51] [cursor=pointer]:
+            - img [ref=e53]
+            - generic [ref=e55]: Value Lists
+        - listitem [ref=e56]:
+          - button "Configure" [ref=e57] [cursor=pointer]:
+            - img [ref=e59]
+            - generic [ref=e61]: Configure
+        - listitem [ref=e62]:
+          - menuitem "Schedules" [ref=e63] [cursor=pointer]:
+            - img [ref=e65]
+            - generic [ref=e67]: Schedules
+      - text: ...
+    - iframe [ref=e78]:
+      - main [ref=f16e2]

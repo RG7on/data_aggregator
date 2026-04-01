@@ -60,6 +60,7 @@ class Worker(BaseWorker):
         self.timeout_short  = cfg.get('timeout_short_ms',  1500)
         self.timeout_medium = cfg.get('timeout_medium_ms', 2500)
         self.timeout_long   = cfg.get('timeout_long_ms',   8000)
+        self.use_system_chrome = cfg.get('use_system_chrome', False)
         self._autodetect_data_types()
 
     def _autodetect_data_types(self):
@@ -102,7 +103,7 @@ class Worker(BaseWorker):
 
         self.logger.info(f"Starting CUIC scraper -> {self.url} ({len(enabled)} report(s))")
         try:
-            self.setup_browser(ignore_https_errors=True)
+            self.setup_browser(ignore_https_errors=True, use_system_chrome=self.use_system_chrome)
             self.logger.info("Browser ready, starting scrape...")
             return self.scrape()
         except Exception as e:

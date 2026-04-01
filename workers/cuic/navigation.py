@@ -8,7 +8,45 @@ Navigation helpers for CUIC reports, including:
 """
 
 import re
+import time
 from . import selectors
+
+
+def _reports_url(worker) -> str:
+    return f"{worker.url}#/reports"
+
+
+def _find_reports_frame(worker):
+    """Find the reports gadget frame by name or by grid content."""
+    frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
+    if frame:
+        return frame
+
+    for frame in worker.page.frames:
+        try:
+            if frame.query_selector(selectors.GRID_CONTAINER):
+                return frame
+        except Exception:
+            pass
+    return None
+
+
+def _wait_for_reports_grid(worker, timeout_ms: int):
+    """Poll until the reports grid is visible inside the reports gadget."""
+    end_time = time.monotonic() + (timeout_ms / 1000)
+
+    while time.monotonic() < end_time:
+        frame = _find_reports_frame(worker)
+        if frame:
+            try:
+                grid = frame.query_selector(selectors.GRID_CONTAINER)
+                if grid and grid.is_visible():
+                    return frame
+            except Exception:
+                pass
+        worker.page.wait_for_timeout(500)
+
+    return None
 
 
 def close_report_page(worker):
@@ -31,32 +69,40 @@ def navigate_to_reports_root(worker):
         # Attempt 1: click the Reports tab
         worker.page.click(selectors.REPORTS_TAB_CSS)
 
-        # Wait for the grid to become visible (condition-based, not fixed timeout)
-        frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
+        frame = _wait_for_reports_grid(worker, min(worker.timeout_nav, 15000))
         if frame:
-            try:
-                frame.wait_for_selector(selectors.GRID_CONTAINER, timeout=worker.timeout_nav)
-            except Exception:
-                pass
+            worker.logger.info("Reports grid visible after tab click")
+            return
 
-        # Check if the ngGrid is visible in the reports iframe
-        frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
+        # Attempt 2: navigate directly to the reports route when the pane mounts blank.
+        worker.logger.info("Reports grid not ready after tab click - navigating directly to #/reports")
+        worker.page.goto(_reports_url(worker), wait_until='domcontentloaded', timeout=worker.timeout_nav)
+        frame = _wait_for_reports_grid(worker, worker.timeout_nav)
         if frame:
-            try:
-                grid = frame.query_selector(selectors.GRID_CONTAINER)
-                if grid and grid.is_visible():
-                    worker.logger.info("Reports grid visible after tab click")
-                    return
-            except Exception:
-                pass
+            worker.logger.info("Reports grid visible after direct #/reports navigation")
+            return
 
-        # Attempt 2: full page reload to reset CUIC UI state
+        # Attempt 3: full page reload on the reports route to reset CUIC UI state
         # (session cookie persists — no re-login needed)
-        worker.logger.info("ngGrid hidden after tab click - reloading page")
-        worker.page.goto(worker.url, wait_until='domcontentloaded',
-                       timeout=worker.timeout_nav)
+        worker.logger.info("Reports grid still unavailable - reloading #/reports")
+        worker.page.goto(_reports_url(worker), wait_until='domcontentloaded',
+                         timeout=worker.timeout_nav)
         worker.page.wait_for_selector(selectors.REPORTS_TAB_CSS,
-                                    timeout=worker.timeout_nav)
+                                      timeout=worker.timeout_nav)
+
+        frame = _wait_for_reports_grid(worker, worker.timeout_nav)
+        if frame:
+            worker.logger.info("Reports grid visible after #/reports reload")
+            return
+
+        worker.logger.info("Reports grid still blank - reloading Main.jsp and reopening Reports")
+        worker.page.goto(worker.url, wait_until='domcontentloaded', timeout=worker.timeout_nav)
+        worker.page.wait_for_selector(selectors.REPORTS_TAB_CSS, timeout=worker.timeout_nav)
+        worker.page.click(selectors.REPORTS_TAB_CSS)
+        frame = _wait_for_reports_grid(worker, worker.timeout_nav)
+        if frame:
+            worker.logger.info("Reports grid visible after Main.jsp reload")
+            return
     except Exception as e:
         worker.logger.warning(f"Navigate to reports root: {e}")
 
@@ -76,39 +122,46 @@ def get_reports_frame(worker):
         except Exception:
             pass  # may already be present; proceed to content checks
 
-        # Fast-path: get the named frame
-        frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
-        if not frame:
-            # Fallback 1: find any frame that already has ng-grid content
-            for f in worker.page.frames:
-                try:
-                    if f.query_selector(selectors.GRID_CONTAINER):
-                        frame = f
-                        break
-                except Exception:
-                    pass
+        frame = _wait_for_reports_grid(worker, min(worker.timeout_nav, 15000))
+        if frame:
+            worker.logger.info("Reports iframe ready after tab click")
+            return frame
 
-        if not frame:
-            # Fallback 2: short extra wait, then retry (slow environments)
-            worker.page.wait_for_timeout(2000)
-            frame = worker.page.frame(name=selectors.REPORTS_IFRAME_NAME)
-            if not frame:
-                for f in worker.page.frames:
-                    try:
-                        if f.query_selector(selectors.GRID_CONTAINER):
-                            frame = f
-                            break
-                    except Exception:
-                        pass
+        worker.logger.warning("Reports grid not visible after tab click - navigating directly to #/reports")
+        worker.page.goto(_reports_url(worker), wait_until='domcontentloaded', timeout=worker.timeout_nav)
 
-        if not frame:
-            worker.logger.error("Reports iframe not found")
-            worker.screenshot("iframe_missing", is_step=False)
-            return None
+        try:
+            worker.page.wait_for_selector(
+                f'iframe[name="{selectors.REPORTS_IFRAME_NAME}"]',
+                timeout=worker.timeout_nav,
+            )
+        except Exception:
+            pass
 
-        frame.wait_for_selector(selectors.GRID_CONTAINER, timeout=worker.timeout_nav)
-        worker.logger.info("Reports iframe ready")
-        return frame
+        frame = _wait_for_reports_grid(worker, worker.timeout_nav)
+        if frame:
+            worker.logger.info("Reports iframe ready after direct #/reports navigation")
+            return frame
+
+        worker.logger.warning("Reports grid still unavailable - reloading #/reports once")
+        worker.page.goto(_reports_url(worker), wait_until='domcontentloaded', timeout=worker.timeout_nav)
+        frame = _wait_for_reports_grid(worker, worker.timeout_nav)
+        if frame:
+            worker.logger.info("Reports iframe ready after #/reports reload")
+            return frame
+
+        worker.logger.warning("Reports grid still blank - reloading Main.jsp before one final retry")
+        worker.page.goto(worker.url, wait_until='domcontentloaded', timeout=worker.timeout_nav)
+        worker.page.wait_for_selector(selectors.REPORTS_TAB_CSS, timeout=worker.timeout_nav)
+        worker.page.click(selectors.REPORTS_TAB_CSS)
+        frame = _wait_for_reports_grid(worker, worker.timeout_nav)
+        if frame:
+            worker.logger.info("Reports iframe ready after Main.jsp reload")
+            return frame
+
+        worker.logger.error("Reports iframe not found or grid never became visible")
+        worker.screenshot("iframe_missing", is_step=False)
+        return None
     except Exception as e:
         worker.logger.error(f"Reports iframe error: {e}")
         worker.screenshot("iframe_error", is_step=False)
