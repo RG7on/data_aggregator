@@ -12,6 +12,14 @@ from playwright.sync_api import sync_playwright, Browser, Page, BrowserContext
 import logging
 import os
 
+
+DEFAULT_HEADLESS_VIEWPORT = {'width': 1920, 'height': 1080}
+DEFAULT_USER_AGENT = (
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/120.0.0.0 Safari/537.36'
+)
+
 try:
     from core.config import get_global_settings, get_log_dir
 except ImportError:
@@ -47,6 +55,99 @@ class BaseWorker(ABC):
         self.context: Optional[BrowserContext] = None
         self.page: Optional[Page] = None
         self._playwright = None
+
+    def _browser_launch_args(self, headed: bool) -> List[str]:
+        args = [
+            '--disable-blink-features=AutomationControlled',
+            '--no-sandbox',
+            '--disable-dev-shm-usage',
+            '--ignore-certificate-errors',
+        ]
+        if headed:
+            args.extend([
+                '--start-maximized',
+                '--force-device-scale-factor=1',
+                '--high-dpi-support=1',
+            ])
+        return args
+
+    def _browser_context_kwargs(
+        self,
+        *,
+        headless: bool,
+        ignore_https_errors: bool,
+        storage_state: str = None,
+    ) -> Dict[str, Any]:
+        kwargs: Dict[str, Any] = {
+            'user_agent': DEFAULT_USER_AGENT,
+            'ignore_https_errors': ignore_https_errors,
+        }
+        if storage_state:
+            kwargs['storage_state'] = storage_state
+        if headless:
+            kwargs['viewport'] = dict(DEFAULT_HEADLESS_VIEWPORT)
+            kwargs['device_scale_factor'] = 1
+        else:
+            kwargs['no_viewport'] = True
+        return kwargs
+
+    def _log_browser_configuration(self, *, headless: bool, use_system_chrome: bool, persistent: bool):
+        mode = 'headless' if headless else 'headed'
+        browser_family = 'system Chrome' if use_system_chrome else 'Playwright Chromium'
+        window_policy = 'fixed 1920x1080 viewport' if headless else 'maximized native window'
+        persistence = 'persistent profile' if persistent else 'ephemeral context'
+        self.logger.info(
+            f"Browser launch policy: mode={mode}, browser={browser_family}, "
+            f"context={persistence}, window={window_policy}"
+        )
+
+    def _normalize_page_layout(self, page: Page, headless: bool):
+        if headless:
+            return
+        try:
+            page.wait_for_load_state('domcontentloaded', timeout=10000)
+        except Exception:
+            pass
+
+        try:
+            page.evaluate(
+                '''() => {
+                    try {
+                        if (typeof document !== 'undefined') {
+                            document.body.style.zoom = '100%';
+                            document.documentElement.style.zoom = '100%';
+                        }
+                    } catch (e) {}
+
+                    try {
+                        if (typeof window !== 'undefined') {
+                            if (window.outerWidth && window.outerHeight) {
+                                window.moveTo(0, 0);
+                                window.resizeTo(window.screen.availWidth, window.screen.availHeight);
+                            }
+                            window.scrollTo(0, 0);
+                        }
+                    } catch (e) {}
+                }'''
+            )
+        except Exception as e:
+            self.logger.debug(f"Window normalization skipped: {e}")
+
+        try:
+            page.bring_to_front()
+            page.keyboard.press('Control+0')
+        except Exception as e:
+            self.logger.debug(f"Browser zoom reset skipped: {e}")
+
+        try:
+            width = page.evaluate('() => window.innerWidth')
+            height = page.evaluate('() => window.innerHeight')
+            pixel_ratio = page.evaluate('() => window.devicePixelRatio || 1')
+            self.logger.info(
+                f"Headed browser viewport ready: inner={width}x{height}, dpr={pixel_ratio}"
+            )
+        except Exception as e:
+            self.logger.debug(f"Viewport logging skipped: {e}")
     
     def setup_browser(self, headless: bool = None, use_system_chrome: bool = None, ignore_https_errors: bool = True, storage_state: str = None) -> Page:
         """
@@ -66,6 +167,8 @@ class BaseWorker(ABC):
         self._screenshot_steps = cfg.get('screenshot_steps', False)
         self._screenshot_errors = cfg.get('screenshot_errors', True)
         self._playwright = sync_playwright().start()
+        headed = not headless
+        launch_args = self._browser_launch_args(headed=headed)
 
         # Try to use system Chrome first (better compatibility)
         if use_system_chrome:
@@ -73,12 +176,7 @@ class BaseWorker(ABC):
                 self.browser = self._playwright.chromium.launch(
                     channel="chrome",  # Use system Chrome
                     headless=headless,
-                    args=[
-                        '--disable-blink-features=AutomationControlled',
-                        '--no-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--ignore-certificate-errors'  # CLI arg for Chrome itself
-                    ]
+                    args=launch_args
                 )
                 self.logger.info("Using system Chrome browser")
             except Exception as e:
@@ -86,32 +184,30 @@ class BaseWorker(ABC):
                 self.logger.info("Falling back to Playwright Chromium")
                 self.browser = self._playwright.chromium.launch(
                     headless=headless,
-                    args=[
-                        '--disable-blink-features=AutomationControlled',
-                        '--no-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--ignore-certificate-errors'
-                    ]
+                    args=launch_args
                 )
+                use_system_chrome = False
         else:
             # Use Playwright's bundled Chromium
             self.browser = self._playwright.chromium.launch(
                 headless=headless,
-                args=[
-                    '--disable-blink-features=AutomationControlled',
-                    '--no-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--ignore-certificate-errors'
-                ]
+                args=launch_args
             )
 
+        self._log_browser_configuration(
+            headless=headless,
+            use_system_chrome=use_system_chrome,
+            persistent=False,
+        )
         self.context = self.browser.new_context(
-            storage_state=storage_state,
-            viewport={'width': 1920, 'height': 1080},
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            ignore_https_errors=ignore_https_errors
+            **self._browser_context_kwargs(
+                headless=headless,
+                ignore_https_errors=ignore_https_errors,
+                storage_state=storage_state,
+            )
         )
         self.page = self.context.new_page()
+        self._normalize_page_layout(self.page, headless=headless)
         self.logger.info("Browser initialized successfully")
         return self.page
     

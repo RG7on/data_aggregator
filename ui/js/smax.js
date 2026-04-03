@@ -5,6 +5,19 @@
 // ── STATE ─────────────────────────────────────────────────────────────────
 let smaxReports = [];
 
+function normalizeSmaxUrl(url) {
+  return (url || '').trim();
+}
+
+function isValidSmaxUrl(url) {
+  try {
+    const parsed = new URL(normalizeSmaxUrl(url));
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch (e) {
+    return false;
+  }
+}
+
 function hasSmaxGeneratedFields(report) {
   const props = report.properties || {};
   return Boolean(report.label || props.report_name || Object.keys(props).length > 0);
@@ -17,7 +30,7 @@ function resetSmaxDiscovery(report) {
 
 function updateSmaxReportUrl(idx, url) {
   const report = smaxReports[idx];
-  const nextUrl = (url || '').trim();
+  const nextUrl = normalizeSmaxUrl(url);
   const previousUrl = (report.url || '').trim();
   report.url = nextUrl;
   if (previousUrl !== nextUrl) resetSmaxDiscovery(report);
@@ -221,8 +234,12 @@ function suggestDataType(props) {
 async function discoverSmaxProperties(idx) {
   const r   = smaxReports[idx];
   const btn = document.getElementById('smax-discover-btn-' + idx);
+  const normalizedUrl = normalizeSmaxUrl(r.url);
 
-  if (!r.url) { showToast('Set the report URL first', 'error'); return; }
+  if (!normalizedUrl) { showToast('Set the report URL first', 'error'); return; }
+  if (!isValidSmaxUrl(normalizedUrl)) { showToast('Enter a valid SMAX report URL first', 'error'); return; }
+
+  r.url = normalizedUrl;
 
   const origHtml = btn.innerHTML;
   btn.innerHTML  = '<span class="spinner"></span> Discovering\u2026';
@@ -232,11 +249,11 @@ async function discoverSmaxProperties(idx) {
   try {
     const res  = await fetch('/api/discover-smax-properties', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ url: r.url })
+      body: JSON.stringify({ url: normalizedUrl })
     });
     const data = await res.json();
 
-    if (data.error) { showToast('Discovery error: ' + data.error, 'error'); return; }
+    if (!res.ok || data.error) { showToast('Discovery error: ' + (data.error || 'Unknown validation error'), 'error'); return; }
 
     r.properties = data;
 

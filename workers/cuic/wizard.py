@@ -582,9 +582,16 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
     """
     worker = worker_class()
     worker._load_config()
-    folder = report_config.get('folder', '')
-    name = report_config.get('name', '')
+    folder = str(report_config.get('folder', '') or '').strip().strip('/')
+    name = str(report_config.get('name', '') or '').strip().strip('/')
     result = {'steps': [], 'error': '', 'type': 'generic'}
+
+    if not name:
+        result['error'] = 'Missing CUIC report name'
+        return result
+    if not folder:
+        result['error'] = 'Invalid CUIC report path. Use the full Folder/Report Name path.'
+        return result
 
     try:
         worker.setup_browser(ignore_https_errors=True)

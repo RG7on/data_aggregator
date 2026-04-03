@@ -14027,150 +14027,150 @@ scrape_timestamp,data_datetime,source,report_name,metric_title,category,sub_cate
 2026-04-03 16:42:15,2026-04-03,cuic,Z Agent Skill Group Historical,CUIC_Transfer Out ,Telcom_SG,"Al-Hosni, Maysa",0
 2026-04-03 16:42:15,2026-04-03,cuic,Z Agent Skill Group Historical,CUIC_Transfer Out ,Telcom_SG,"Albusaidi, Khalid",0
 2026-04-03 16:42:15,2026-04-03,cuic,Z Agent Skill Group Historical,CUIC_Transfer Out ,Telcom_SG,"Alnasseri, Abdulnasser",0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,,,3.54%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,,,3.54%
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,AgentTransfer_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,General_IT_CT,,3.57%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,RTPS_CT,,33.33%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,SAP_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,Subsurface_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,Telcom_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,,,0.52%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,General_IT_CT,,3.57%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,RTPS_CT,,33.33%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,SAP_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,Subsurface_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Aban,Telcom_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,,,0.52%
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,AgentTransfer_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,General_IT_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,RTPS_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,SAP_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,Subsurface_CT,,14.29%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,Telcom_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,,,7
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,General_IT_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,RTPS_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,SAP_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,Subsurface_CT,,14.29%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_% Queued,Telcom_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,,,7
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,General_IT_CT,,6
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,RTPS_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,,,6
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,General_IT_CT,,6
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,RTPS_CT,,1
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,,,6
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,General_IT_CT,,6
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,,,00:57:00
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,General_IT_CT,,6
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,,,00:57:00
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,AgentTransfer_CT,,00:03:03
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,General_IT_CT,,00:44:32
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,RTPS_CT,,00:01:31
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,SAP_CT,,00:04:44
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,Subsurface_CT,,00:05:08
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,Telcom_CT,,00:01:05
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,,,191
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,General_IT_CT,,00:44:32
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,RTPS_CT,,00:01:31
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,SAP_CT,,00:04:44
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,Subsurface_CT,,00:05:08
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answer Wait Time,Telcom_CT,,00:01:05
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,,,191
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,AgentTransfer_CT,,7
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,General_IT_CT,,162
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,RTPS_CT,,2
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,SAP_CT,,16
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,Subsurface_CT,,7
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,Telcom_CT,,4
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,,,2
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,General_IT_CT,,162
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,RTPS_CT,,2
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,SAP_CT,,16
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,Subsurface_CT,,7
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Answered,Telcom_CT,,4
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,,,2
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,AgentTransfer_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,General_IT_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,Subsurface_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,,,00:01:08
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,General_IT_CT,,1
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,Subsurface_CT,,1
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Assigned From Queue,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,,,00:01:08
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,AgentTransfer_CT,,--
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,General_IT_CT,,00:00:59
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,RTPS_CT,,00:01:58
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,SAP_CT,,--
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,Subsurface_CT,,--
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,Telcom_CT,,--
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,,,00:00:18
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,General_IT_CT,,00:00:59
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,RTPS_CT,,00:01:58
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,SAP_CT,,--
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,Subsurface_CT,,--
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,Telcom_CT,,--
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,,,00:00:18
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,AgentTransfer_CT,,00:00:26
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,General_IT_CT,,00:00:16
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,RTPS_CT,,00:00:46
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,SAP_CT,,00:00:18
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,Subsurface_CT,,00:00:44
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,Telcom_CT,,00:00:16
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,General_IT_CT,,00:00:16
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,RTPS_CT,,00:00:46
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,SAP_CT,,00:00:18
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,Subsurface_CT,,00:00:44
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,Telcom_CT,,00:00:16
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,AgentTransfer_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Calls Error,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Default_Treatment,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,,,191
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Flow Out,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,,,191
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,AgentTransfer_CT,,7
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,General_IT_CT,,162
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,RTPS_CT,,2
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,SAP_CT,,16
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,Subsurface_CT,,7
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,Telcom_CT,,4
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,,,00:04:01
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,General_IT_CT,,162
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,RTPS_CT,,2
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,SAP_CT,,16
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,Subsurface_CT,,7
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Handled,Telcom_CT,,4
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,,,00:04:01
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,AgentTransfer_CT,,00:01:16
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,General_IT_CT,,00:01:12
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,RTPS_CT,,00:00:56
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,SAP_CT,,00:00:49
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,Subsurface_CT,,00:04:01
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,Telcom_CT,,00:00:28
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,,,1
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,General_IT_CT,,00:01:12
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,RTPS_CT,,00:00:56
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,SAP_CT,,00:00:49
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,Subsurface_CT,,00:04:01
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Longest Queued,Telcom_CT,,00:00:28
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,,,1
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,AgentTransfer_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,General_IT_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,Subsurface_CT,,1
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,General_IT_CT,,1
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,Subsurface_CT,,1
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Max Queued,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,,,198
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Network Routed,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,,,198
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,AgentTransfer_CT,,8
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,General_IT_CT,,168
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,RTPS_CT,,3
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,SAP_CT,,16
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,Subsurface_CT,,7
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,Telcom_CT,,4
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,General_IT_CT,,168
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,RTPS_CT,,3
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,SAP_CT,,16
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,Subsurface_CT,,7
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Offered,Telcom_CT,,4
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Other,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,Telcom_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,,,93.23%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Return,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,,,93.23%
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,AgentTransfer_CT,,62.50%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,General_IT_CT,,95.68%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,RTPS_CT,,0.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,SAP_CT,,87.50%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,Subsurface_CT,,85.71%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,Telcom_CT,,100.00%
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,General_IT_CT,,95.68%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,RTPS_CT,,0.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,SAP_CT,,87.50%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,Subsurface_CT,,85.71%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Service Level,Telcom_CT,,100.00%
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,,,0
 2026-04-03 16:53:14,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,AgentTransfer_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,General_IT_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,RTPS_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,SAP_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,Subsurface_CT,,0
-2026-04-03 21:48:12,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,Telcom_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,General_IT_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,RTPS_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,SAP_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,Subsurface_CT,,0
+2026-04-03 22:26:58,2026-04-03,cuic,z_call_type_historical_all_fields,CUIC_Short Calls,Telcom_CT,,0

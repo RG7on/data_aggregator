@@ -6,6 +6,21 @@
 let cuicReports = [];
 let scrapeStatus = {};
 
+function normalizeCuicReportPath(path) {
+  return (path || '').replace(/\\+/g, '/').replace(/\/+/g, '/').trim().replace(/^\/+|\/+$/g, '');
+}
+
+function splitCuicReportPath(path) {
+  const normalized = normalizeCuicReportPath(path);
+  const lastSlash = normalized.lastIndexOf('/');
+  if (lastSlash === -1) return { path: normalized, folder: '', name: normalized };
+  return {
+    path: normalized,
+    folder: normalized.substring(0, lastSlash),
+    name: normalized.substring(lastSlash + 1)
+  };
+}
+
 function getCuicReportPath(report) {
   return (report.folder ? report.folder + '/' : '') + (report.name || '');
 }
@@ -131,16 +146,11 @@ function generateLabelFromName(name) {
 
 function updateCuicReportPath(idx, path) {
   const report = cuicReports[idx];
-  const nextPath = (path || '').trim();
+  const nextPath = normalizeCuicReportPath(path);
   const previousPath = getCuicReportPath(report);
-  const lastSlash = nextPath.lastIndexOf('/');
-  if (lastSlash === -1) {
-    report.folder = '';
-    report.name = nextPath;
-  } else {
-    report.folder = nextPath.substring(0, lastSlash);
-    report.name = nextPath.substring(lastSlash + 1);
-  }
+  const parsed = splitCuicReportPath(nextPath);
+  report.folder = parsed.folder;
+  report.name = parsed.name;
   if (previousPath !== getCuicReportPath(report)) resetCuicDiscovery(report);
   renderCuicReports();
   markDirty();
@@ -1028,8 +1038,13 @@ function clearFilters(reportIdx) {
 async function discoverFilters(reportIdx) {
   const r   = cuicReports[reportIdx];
   const btn = document.getElementById('discover-btn-' + reportIdx);
+  const parsedPath = splitCuicReportPath(getCuicReportPath(r));
 
-  if (!r.folder || !r.name) { showToast('Set folder and report name first', 'error'); return; }
+  if (!parsedPath.name) { showToast('Set the CUIC report path first', 'error'); return; }
+  if (!parsedPath.folder) { showToast('Use the full CUIC report path, for example Folder/Report Name', 'error'); return; }
+
+  r.folder = parsedPath.folder;
+  r.name = parsedPath.name;
 
   const origHtml = btn.innerHTML;
   btn.innerHTML  = '<span class="spinner"></span> Discovering\u2026';
@@ -1039,11 +1054,11 @@ async function discoverFilters(reportIdx) {
   try {
     const res  = await fetch('/api/discover-filters', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ folder: r.folder, name: r.name })
+      body: JSON.stringify({ folder: r.folder, name: r.name, path: parsedPath.path })
     });
     const data = await res.json();
 
-    if (data.error) { showToast('Discovery error: ' + data.error, 'error'); return; }
+    if (!res.ok || data.error) { showToast('Discovery error: ' + (data.error || 'Unknown validation error'), 'error'); return; }
     if (!data.steps || data.steps.length === 0) { showToast('No wizard steps found', 'error'); return; }
 
     const isCuic      = data.type === 'cuic_spab';

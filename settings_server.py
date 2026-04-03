@@ -57,6 +57,40 @@ _scrape_running = False
 _scrape_thread = None
 
 
+def _normalize_cuic_report_config(report_config):
+    folder = str(report_config.get('folder', '') or '').replace('\\', '/').strip().strip('/')
+    name = str(report_config.get('name', '') or '').strip().strip('/')
+    raw_path = str(report_config.get('path', '') or '').replace('\\', '/').strip().strip('/')
+
+    if raw_path and (not folder or not name):
+        parts = [part.strip() for part in raw_path.split('/') if part.strip()]
+        if len(parts) >= 2:
+            folder = '/'.join(parts[:-1])
+            name = parts[-1]
+
+    return {
+        'folder': folder,
+        'name': name,
+        'path': f"{folder}/{name}" if folder and name else name,
+    }
+
+
+def _validate_cuic_report_config(report_config):
+    normalized = _normalize_cuic_report_config(report_config)
+    if not normalized['name']:
+        raise ValueError('Missing report name. Enter the full CUIC report path before validation.')
+    if not normalized['folder']:
+        raise ValueError('Invalid report path. Use the full CUIC report path, for example Folder/Report Name.')
+    return normalized
+
+
+def _validate_web_url(value, *, field_name):
+    parsed = urlparse(str(value or '').strip())
+    if parsed.scheme not in ('http', 'https') or not parsed.netloc:
+        raise ValueError(f'Invalid {field_name}. Enter a full http(s) URL.')
+    return parsed.geturl()
+
+
 class SettingsHandler(BaseHTTPRequestHandler):
     """Handle API requests and serve the control panel HTML."""
 
@@ -132,7 +166,7 @@ class SettingsHandler(BaseHTTPRequestHandler):
         try:
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
-            report_config = json.loads(body)
+            report_config = _validate_cuic_report_config(json.loads(body))
 
             with _discovery_lock:
                 if _discovery_running:
@@ -151,6 +185,8 @@ class SettingsHandler(BaseHTTPRequestHandler):
 
         except json.JSONDecodeError as e:
             self._send_json({'error': f'Invalid JSON: {e}'}, status=400)
+        except ValueError as e:
+            self._send_json({'error': str(e)}, status=400)
         except Exception as e:
             with _discovery_lock:
                 _discovery_running = False
@@ -165,6 +201,7 @@ class SettingsHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
             report_config = json.loads(body)
+            report_config['url'] = _validate_web_url(report_config.get('url', ''), field_name='report URL')
 
             with _discovery_lock:
                 if _discovery_running:
@@ -182,6 +219,8 @@ class SettingsHandler(BaseHTTPRequestHandler):
 
         except json.JSONDecodeError as e:
             self._send_json({'error': f'Invalid JSON: {e}'}, status=400)
+        except ValueError as e:
+            self._send_json({'error': str(e)}, status=400)
         except Exception as e:
             with _discovery_lock:
                 _discovery_running = False

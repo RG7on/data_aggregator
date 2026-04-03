@@ -224,4 +224,15 @@ class Worker(BaseWorker):
     def discover_wizard(cls, report_config: dict) -> dict:
         """Open a report and read all wizard steps' fields.
         Delegates to wizard module."""
+        path = str(report_config.get('path', '') or '').replace('\\', '/').strip().strip('/')
+        folder = str(report_config.get('folder', '') or '').replace('\\', '/').strip().strip('/')
+        name = str(report_config.get('name', '') or '').strip().strip('/')
+        if path and (not folder or not name):
+            parts = [part.strip() for part in path.split('/') if part.strip()]
+            if len(parts) >= 2:
+                folder = '/'.join(parts[:-1])
+                name = parts[-1]
+        report_config = dict(report_config)
+        report_config['folder'] = folder
+        report_config['name'] = name
         return wizard.discover_wizard(cls, report_config)

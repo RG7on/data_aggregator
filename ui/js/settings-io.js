@@ -8,7 +8,7 @@ function syncReportInputs() {
     const pathInput = card.querySelector('input[data-report-field="path"]');
     const labelInput = card.querySelector('input[data-report-field="label"]');
     if (pathInput) {
-      const path = pathInput.value.trim();
+      const path = (pathInput.value || '').replace(/\\+/g, '/').replace(/\/+/g, '/').trim().replace(/^\/+|\/+$/g, '');
       const lastSlash = path.lastIndexOf('/');
       if (lastSlash === -1) {
         cuicReports[i].folder = '';

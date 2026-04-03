@@ -945,7 +945,13 @@ class Worker(BaseWorker):
     def _profile_dir(self) -> str:
         """Absolute path to Chrome user data directory. Created on first run."""
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        return os.path.join(project_root, 'config', self.CHROME_PROFILE_DIR)
+        profile_dir = os.path.join(project_root, 'config', self.CHROME_PROFILE_DIR)
+        parent_dir = os.path.dirname(profile_dir)
+        if not os.path.isdir(parent_dir):
+            raise RuntimeError(f"Chrome profile parent directory missing: {parent_dir}")
+        if not os.access(parent_dir, os.W_OK):
+            raise RuntimeError(f"Chrome profile parent directory is not writable: {parent_dir}")
+        return profile_dir
 
     def setup_browser(self, headless: bool = None, storage_state: str = None, **kwargs):
         """Override base class to use a persistent Chrome profile.
@@ -964,7 +970,14 @@ class Worker(BaseWorker):
         self._screenshot_errors = cfg.get('screenshot_errors', True)
 
         profile_dir = self._profile_dir()
-        os.makedirs(profile_dir, exist_ok=True)
+        try:
+            os.makedirs(profile_dir, exist_ok=True)
+        except Exception as e:
+            raise RuntimeError(f"Failed to create Chrome profile directory: {profile_dir} ({e})") from e
+        if not os.path.isdir(profile_dir):
+            raise RuntimeError(f"Chrome profile directory is unavailable: {profile_dir}")
+        if not os.access(profile_dir, os.W_OK):
+            raise RuntimeError(f"Chrome profile directory is not writable: {profile_dir}")
         self.logger.info(f"Chrome profile: {profile_dir}")
 
         # Remove stale Chrome lock files that can cause ERR_ABORTED on launch.
@@ -975,29 +988,29 @@ class Worker(BaseWorker):
                 try:
                     os.remove(lock_path)
                     self.logger.debug(f"Removed stale lock: {lock}")
-                except Exception:
-                    pass
+                except Exception as e:
+                    raise RuntimeError(
+                        f"Failed to remove stale Chrome lock '{lock_path}': {e}"
+                    ) from e
 
         self._playwright = sync_playwright().start()
+        headed = not headless
         # launch_persistent_context returns BrowserContext directly — no Browser object
         self.context = self._playwright.chromium.launch_persistent_context(
             user_data_dir=profile_dir,
             headless=headless,
             channel='chrome',
-            args=[
-                '--disable-blink-features=AutomationControlled',
-                '--no-sandbox',
-                '--disable-dev-shm-usage',
-                '--ignore-certificate-errors',
+            args=self._browser_launch_args(headed=headed) + [
                 '--no-first-run',
                 '--no-default-browser-check',
                 '--disable-infobars',
                 '--disable-session-crashed-bubble',
                 '--restore-last-session=false',
             ],
-            viewport={'width': 1920, 'height': 1080},
-            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            ignore_https_errors=True,
+            **self._browser_context_kwargs(
+                headless=headless,
+                ignore_https_errors=True,
+            ),
         )
         self.browser = None  # No separate Browser object with persistent context
         self.page = self.context.pages[0] if self.context.pages else self.context.new_page()
@@ -1010,6 +1023,12 @@ class Worker(BaseWorker):
                 except Exception:
                     pass
 
+        self._log_browser_configuration(
+            headless=headless,
+            use_system_chrome=True,
+            persistent=True,
+        )
+        self._normalize_page_layout(self.page, headless=headless)
         self.logger.info("Browser initialized successfully")
         return self.page
 
