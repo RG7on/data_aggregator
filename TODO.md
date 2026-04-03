@@ -13,19 +13,9 @@ There's something that bothers me a lot. When I set the hit list mode to off to 
 
 When I enlarge it, the website itself is still stuck to some sort of scale that is chopped off from the bottom right. I cannot see everything. Even if I try to scroll within that page, I couldn't.
 
-It's like it's stuck, even if I maximize the window. So why don't you just open the web browser of the automation in full mode automatically whenever it runs? This way, I cannot debug correctly. It's very hard for me to debug. 
+It's like it's stuck, even if I maximize the window. So why don't you just open the web browser of the automation in full mode automatically whenever it runs? This way, I cannot debug correctly. It's very hard for me to debug.
 
-2. **Bug: Initial State of "Days" Combo Box in Filter Wizard Settings**
-
-In wizard settings, you can select the date and time. You have options like custom, today, yesterday, this week, and use default. When you select "yesterday," the combo box for "days" should not be shown.
-
-This "days" combo box allows you to choose specific days for your selection. If you choose "yesterday," it should be hidden. However, if you select "this week," it should be visible.
-
-The issue occurs when the website loads. It defaults to "yesterday," but incorrectly displays the "days" combo box. When you then change the selection to "last week" and switch back to "yesterday," the "days" combo box correctly disappears.
-
-The logic appears to be in place, but the system fails to recognize that the date time is set to "yesterday" upon initial load. This prevents the "days" combo box from being hidden as intended. Let's investigate and resolve this issue. 
-
-3. **Data Consistency: Add Report Identifier & Replace Outdated Data on Scrape**
+2. **Data Consistency: Add Report Identifier & Replace Outdated Data on Scrape**
 
 We have some reports that we are scrubbing the data from. So those reports have some filter settings. Whether you want the report of today, whether you want the report of yesterday, whether you want the report of a very specific time interval of a day. You can do that in the filter settings.
 
@@ -41,9 +31,9 @@ We are not replacing. So if at some point we change the settings of a filter, it
 
 For example, if we have 100 rows of data that existing on our database and we got only 50 from the new scrap, replace all the 100 with the 50. This way we can ensure data consistency and the integrity of data. They are getting the data that they want without any irrelevant data that they didn't want.
 
-And regarding if they want to get two different type of data from the same source, they can add it twice. They can add the report twice, each with different settings. 
+And regarding if they want to get two different type of data from the same source, they can add it twice. They can add the report twice, each with different settings.
 
-4. **Bug/Refactor: Filter Wizard Settings Not Applying Correctly in CUIC**
+2. **Bug/Refactor: Filter Wizard Settings Not Applying Correctly in CUIC**
 
 Speaking about the filter settings, we have something in our front-end, in the settings front-end, we have something called filter wizard settings. So when you provide a path of a report, and I'm talking about the worker CUIC, okay, it's trying to get the filters from the actual front-end, from the actual website, and giving them here in our website front-end, okay.
 

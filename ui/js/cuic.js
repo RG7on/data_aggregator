@@ -233,7 +233,7 @@ function renderFilterPanel(report, idx) {
 
           {
             const preset      = curPreset;
-            const showDays    = (preset !== 'THISDAY' && preset !== 'LASTDAY' && preset !== '') || (p.hasDays === true);
+            const showDays    = (preset !== 'THISDAY' && preset !== 'LASTDAY' && preset !== '');
             const hideDays    = !showDays ? 'style="display:none"' : '';
             const savedAllDay = cfg.allDayChecked || (p.allDayChecked || 'true');
             const savedDays   = cfg.days || (p.days || {});

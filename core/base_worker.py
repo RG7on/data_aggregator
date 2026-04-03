@@ -66,7 +66,7 @@ class BaseWorker(ABC):
         self._screenshot_steps = cfg.get('screenshot_steps', False)
         self._screenshot_errors = cfg.get('screenshot_errors', True)
         self._playwright = sync_playwright().start()
-        
+
         # Try to use system Chrome first (better compatibility)
         if use_system_chrome:
             try:
@@ -104,7 +104,7 @@ class BaseWorker(ABC):
                     '--ignore-certificate-errors'
                 ]
             )
-        
+
         self.context = self.browser.new_context(
             storage_state=storage_state,
             viewport={'width': 1920, 'height': 1080},
