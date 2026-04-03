@@ -25,7 +25,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from core.common_utils import process_worker_result, process_worker_result_long
+from core.common_utils import process_worker_result, process_worker_result_long, process_worker_report_batches
 from core.config import get_global_settings, get_worker_settings, get_log_dir, PROJECT_ROOT as CFG_ROOT
 from core.database import init_db, export_csv, cleanup_old_data, migrate_csv_to_db
 
@@ -140,6 +140,12 @@ def execute_worker(module) -> Tuple[str, Dict[str, Any], bool]:
             logger.error(f"Worker {module.__name__} has no Worker class or scrape() function")
             return (module.__name__, {}, False)
         
+        if isinstance(data, dict) and 'report_batches' in data:
+            logger.info(
+                f"Worker {source_name} returned {len(data.get('report_batches', []))} report batch(es)"
+            )
+            return (source_name, data, True)
+
         if data:
             logger.info(f"Worker {source_name} returned: {data}")
             return (source_name, data, True)
@@ -220,8 +226,17 @@ def run_all_workers() -> Dict[str, Any]:
             
             if success and data:
                 # Process and save results
+                if isinstance(data, dict) and 'report_batches' in data:
+                    batches = data.get('report_batches', []) or []
+                    statuses = [str(batch.get('status', '') or '').strip().lower() for batch in batches]
+                    if any(status in ('success', 'no_data') for status in statuses):
+                        save_success = process_worker_report_batches(source_name, batches)
+                    elif statuses:
+                        save_success = all(status == 'skipped' for status in statuses)
+                    else:
+                        save_success = bool(data.get('worker_success', False))
                 # Detect format: list = long format, dict = wide format
-                if isinstance(data, list):
+                elif isinstance(data, list):
                     # Long format: List of {metric_title, category, value}
                     save_success = process_worker_result_long(source_name, data)
                 else:

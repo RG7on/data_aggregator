@@ -40,7 +40,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from playwright.sync_api import sync_playwright
 from core.base_worker import BaseWorker
-from core.config import get_worker_settings, get_worker_credentials, get_global_settings
+from core.config import get_worker_settings, get_worker_credentials, get_global_settings, get_report_definition_hash
 from core.database import has_historical_data, log_scrape
 from typing import Dict, Any, List, Tuple
 
@@ -385,7 +385,7 @@ class Worker(BaseWorker):
                     )
                     break
 
-    def run(self) -> List[Dict[str, Any]]:
+    def run(self) -> Dict[str, Any]:
         """Execute the worker. Opens all reports in parallel tabs for speed.
 
         Authentication:
@@ -401,9 +401,9 @@ class Worker(BaseWorker):
         if not enabled:
             self.logger.warning("No enabled SMAX reports configured.")
             log_scrape('smax', '_worker', 'no_data', 0, 0, 'No enabled reports configured')
-            return []
+            return {'report_batches': [], 'worker_success': True}
 
-        result = []
+        result = {'report_batches': [], 'worker_success': False}
         try:
             # ── Step 1: Start browser with persistent profile ──────────
             self.setup_browser()
@@ -436,7 +436,7 @@ class Worker(BaseWorker):
 
         return result
 
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> Dict[str, Any]:
         """
         Scrape all SMAX reports using parallel tabs with staggered opening.
 
@@ -447,8 +447,8 @@ class Worker(BaseWorker):
         4. Scrape grid data from each tab
         5. Clean up extra tabs
         """
-        all_results = []
-        tabs = []  # List of (page, report_cfg) tuples
+        report_batches = []
+        tabs = []  # List of (page, report_cfg, label, report_id, definition_hash) tuples
 
         enabled = [r for r in self.reports if r.get('enabled', True)]
         start_time = time.time()
@@ -459,15 +459,38 @@ class Worker(BaseWorker):
         for i, report in enumerate(enabled):
             url = report.get('url', '')
             label = report.get('label', url.split('/')[-1] if url else f'report_{i}')
+            report_id = report.get('report_id', '')
+            definition_hash = get_report_definition_hash('smax', report)
             if not url:
                 self.logger.warning(f"  Report {i+1}: no URL configured, skipping")
+                log_scrape(
+                    'smax', label, 'error', 0, 0, 'No report URL configured',
+                    report_id=report_id, definition_hash=definition_hash,
+                )
+                report_batches.append({
+                    'report_id': report_id,
+                    'definition_hash': definition_hash,
+                    'report_name': label,
+                    'status': 'error',
+                    'rows': [],
+                })
                 continue
 
             # Skip historical reports that already have data
             if report.get('data_type') == 'historical':
-                if has_historical_data('smax', label):
+                if has_historical_data('smax', report_id, definition_hash):
                     self.logger.info(f"  Report {i+1} '{label}': HISTORICAL - already scraped, skipping")
-                    log_scrape('smax', label, 'skipped', 0, 0, 'Historical data already exists')
+                    log_scrape(
+                        'smax', label, 'skipped', 0, 0, 'Historical data already exists',
+                        report_id=report_id, definition_hash=definition_hash,
+                    )
+                    report_batches.append({
+                        'report_id': report_id,
+                        'definition_hash': definition_hash,
+                        'report_name': label,
+                        'status': 'skipped',
+                        'rows': [],
+                    })
                     continue
 
             try:
@@ -480,12 +503,22 @@ class Worker(BaseWorker):
                     tab = self.context.new_page()
 
                 tab.goto(url, wait_until='commit', timeout=self.PAGE_LOAD_TIMEOUT)
-                tabs.append((tab, report))
+                tabs.append((tab, report, label, report_id, definition_hash))
                 self.logger.info(f"  Tab {i+1}: navigation started -> {label}")
 
             except Exception as e:
                 self.logger.error(f"  Tab {i+1}: failed to open {url}: {e}")
-                log_scrape('smax', label, 'error', 0, 0, f'Tab open failed: {e}')
+                log_scrape(
+                    'smax', label, 'error', 0, 0, f'Tab open failed: {e}',
+                    report_id=report_id, definition_hash=definition_hash,
+                )
+                report_batches.append({
+                    'report_id': report_id,
+                    'definition_hash': definition_hash,
+                    'report_name': label,
+                    'status': 'error',
+                    'rows': [],
+                })
 
         self.logger.info(f"All {len(tabs)} tabs opened in {time.time() - start_time:.1f}s")
         
@@ -494,7 +527,7 @@ class Worker(BaseWorker):
 
         failed_tabs = []
 
-        for i, (tab, report) in enumerate(tabs):
+        for i, (tab, report, label, report_id, definition_hash) in enumerate(tabs):
             try:
                 self._switch_to_table_view(tab)
                 self.logger.info(f"  Tab {i+1}: grid ready")
@@ -511,7 +544,7 @@ class Worker(BaseWorker):
             still_failed = []
 
             for idx in failed_tabs:
-                tab, report = tabs[idx]
+                tab, report, label, report_id, definition_hash = tabs[idx]
                 url = report.get('url', '')
                 try:
                     self.logger.info(f"  Tab {idx+1}: reloading {report.get('label', url.split('/')[-1])}...")
@@ -532,10 +565,23 @@ class Worker(BaseWorker):
         if failed_tabs:
             failed_labels = []
             for i in failed_tabs:
-                lbl = tabs[i][1].get('label', '?')
+                lbl = tabs[i][2]
+                report_id = tabs[i][3]
+                definition_hash = tabs[i][4]
                 failed_labels.append(lbl)
-                log_scrape('smax', lbl, 'error', 0, 0, 'Tab failed after all retries')
+                log_scrape(
+                    'smax', lbl, 'error', 0, 0, 'Tab failed after all retries',
+                    report_id=report_id, definition_hash=definition_hash,
+                )
+                report_batches.append({
+                    'report_id': report_id,
+                    'definition_hash': definition_hash,
+                    'report_name': lbl,
+                    'status': 'error',
+                    'rows': [],
+                })
             self.logger.warning(f"{len(failed_tabs)} tab(s) still failed: {failed_labels}")
+        failed_tab_set = set(failed_tabs)
         
         # Wait for grid to be ready rather than arbitrary timeout
         try:
@@ -549,25 +595,57 @@ class Worker(BaseWorker):
         # ---- PHASE 3: Scrape data from each tab ----
         self.logger.info("Scraping data from all tabs...")
 
-        for i, (tab, report) in enumerate(tabs):
+        for i, (tab, report, label, report_id, definition_hash) in enumerate(tabs):
+            if i in failed_tab_set:
+                continue
             url = report.get('url', '')
-            label = report.get('label', url.split('/')[-1] if url else f'report_{i}')
             t0 = time.time()
             try:
-                report_data = self._extract_from_page(tab, url, label)
+                report_data = self._extract_from_page(
+                    tab, url, label, report_id=report_id, definition_hash=definition_hash,
+                )
                 elapsed = time.time() - t0
                 if report_data:
-                    all_results.extend(report_data)
-                    log_scrape('smax', label, 'success', len(report_data), elapsed, '')
+                    log_scrape(
+                        'smax', label, 'success', len(report_data), elapsed, '',
+                        report_id=report_id, definition_hash=definition_hash,
+                    )
+                    report_batches.append({
+                        'report_id': report_id,
+                        'definition_hash': definition_hash,
+                        'report_name': label,
+                        'status': 'success',
+                        'rows': report_data,
+                    })
                 else:
-                    log_scrape('smax', label, 'no_data', 0, elapsed, 'No data returned')
+                    log_scrape(
+                        'smax', label, 'no_data', 0, elapsed, 'No data returned',
+                        report_id=report_id, definition_hash=definition_hash,
+                    )
+                    report_batches.append({
+                        'report_id': report_id,
+                        'definition_hash': definition_hash,
+                        'report_name': label,
+                        'status': 'no_data',
+                        'rows': [],
+                    })
             except Exception as e:
                 elapsed = time.time() - t0
                 self.logger.error(f"  Tab {i+1}: scrape failed for {label}: {e}")
-                log_scrape('smax', label, 'error', 0, elapsed, str(e))
+                log_scrape(
+                    'smax', label, 'error', 0, elapsed, str(e),
+                    report_id=report_id, definition_hash=definition_hash,
+                )
+                report_batches.append({
+                    'report_id': report_id,
+                    'definition_hash': definition_hash,
+                    'report_name': label,
+                    'status': 'error',
+                    'rows': [],
+                })
 
         # ---- PHASE 4: Clean up extra tabs ----
-        for i, (tab, report) in enumerate(tabs):
+        for i, (tab, report, label, report_id, definition_hash) in enumerate(tabs):
             if i > 0:
                 try:
                     tab.close()
@@ -583,10 +661,14 @@ class Worker(BaseWorker):
                     pass
 
         total_time = time.time() - start_time
-        self.logger.info(f"Scraping complete: {len(all_results)} metrics from "
+        total_rows = sum(len(batch.get('rows', [])) for batch in report_batches)
+        self.logger.info(f"Scraping complete: {total_rows} metrics from "
                          f"{len(tabs)} reports in {total_time:.1f}s")
 
-        return all_results
+        return {
+            'report_batches': report_batches,
+            'worker_success': bool(report_batches) or not enabled,
+        }
     
     # ============================================================
     # Tab Preparation
@@ -622,7 +704,7 @@ class Worker(BaseWorker):
     # Data Extraction
     # ============================================================
     
-    def _extract_from_page(self, page, url: str, label: str = '') -> List[Dict[str, Any]]:
+    def _extract_from_page(self, page, url: str, label: str = '', report_id: str = '', definition_hash: str = '') -> List[Dict[str, Any]]:
         """
         Extract report title, total, and all table rows from a loaded page.
         
@@ -650,6 +732,8 @@ class Worker(BaseWorker):
 
         # Add the total as its own row
         results.append({
+            'report_id': report_id,
+            'definition_hash': definition_hash,
             'report_name': label,
             'metric_title': report_title,
             'category': 'total',
@@ -691,6 +775,8 @@ class Worker(BaseWorker):
                 value = self._parse_value(row[-1])
             
             results.append({
+                'report_id': report_id,
+                'definition_hash': definition_hash,
                 'report_name': label,
                 'metric_title': report_title,
                 'category': category,

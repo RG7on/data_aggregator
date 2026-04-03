@@ -24,7 +24,7 @@ from urllib.parse import urlparse, parse_qs
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, PROJECT_ROOT)
 
-from core.config import SETTINGS_PATH, CREDENTIALS_PATH
+from core.config import SETTINGS_PATH, CREDENTIALS_PATH, normalize_settings
 from core.database import init_db, get_scrape_log, get_latest_scrape_status
 from core.agent_insights import (
     build_agent_insights,
@@ -300,6 +300,11 @@ class SettingsHandler(BaseHTTPRequestHandler):
             if os.path.exists(filepath):
                 with open(filepath, 'r', encoding='utf-8') as f:
                     data = json.load(f)
+                if filepath == SETTINGS_PATH:
+                    data, changed = normalize_settings(data)
+                    if changed:
+                        with open(filepath, 'w', encoding='utf-8') as f:
+                            json.dump(data, f, indent=2)
             else:
                 data = {}
             self._send_json(data)
@@ -313,6 +318,9 @@ class SettingsHandler(BaseHTTPRequestHandler):
             content_length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(content_length).decode('utf-8')
             data = json.loads(body)
+
+            if filepath == SETTINGS_PATH:
+                data, _ = normalize_settings(data)
 
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
             with open(filepath, 'w', encoding='utf-8') as f:

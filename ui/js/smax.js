@@ -5,6 +5,10 @@
 // ── STATE ─────────────────────────────────────────────────────────────────
 let smaxReports = [];
 
+function getSmaxStatusKey(report) {
+  return 'smax:' + ((report && (report.report_id || report.label)) || '');
+}
+
 function normalizeSmaxUrl(url) {
   return (url || '').trim();
 }
@@ -68,7 +72,7 @@ function renderSmaxReports() {
       </div>`;
     }
 
-    const st = scrapeStatus['smax:' + r.label];
+    const st = scrapeStatus[getSmaxStatusKey(r)];
     let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
     if (st) {
       const icon = st.status === 'success' ? '\u2705' : st.status === 'error' ? '\u274C' : '\u26A0\uFE0F';
@@ -116,7 +120,7 @@ function renderSmaxReports() {
 function addSmaxReport() {
   const hasEmpty = smaxReports.some(r => !r.label && !r.url);
   if (hasEmpty) { showToast('Please fill in the existing empty report first', 'warning'); return; }
-  smaxReports.unshift({ label: '', url: '', enabled: true, data_type: 'ongoing', properties: {} });
+  smaxReports.unshift({ report_id: '', label: '', url: '', enabled: true, data_type: 'ongoing', properties: {} });
   renderSmaxReports();
   markDirty();
   setTimeout(() => {

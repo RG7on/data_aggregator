@@ -199,6 +199,53 @@ def process_worker_result_long(
         return False
 
 
+def process_worker_report_batches(
+    source_name: str,
+    report_batches: List[Dict[str, Any]],
+    output_dir: str = None
+) -> bool:
+    """Persist per-report scrape batches with replace-on-completion semantics."""
+    try:
+        init_db()
+        processed_any = False
+        current_metrics: Set[str] = set()
+
+        for batch in report_batches or []:
+            status = str(batch.get('status', '') or '').strip().lower()
+            if status not in ('success', 'no_data'):
+                continue
+
+            report_id = str(batch.get('report_id', '') or '').strip()
+            if not report_id:
+                logger.warning(f"Skipping batch without report_id for source '{source_name}'")
+                continue
+
+            rows = batch.get('rows') or []
+            upsert_metrics(
+                source_name,
+                rows,
+                replace_report=True,
+                report_id=report_id,
+                definition_hash=str(batch.get('definition_hash', '') or ''),
+                report_name=str(batch.get('report_name', '') or ''),
+            )
+            current_metrics.update(
+                item.get('metric_title', '') for item in rows if item.get('metric_title')
+            )
+            processed_any = True
+
+        if current_metrics:
+            update_data_dictionary_long(current_metrics, source_name, output_dir)
+
+        return processed_any
+
+    except Exception as e:
+        logger.error(f"Error processing worker report batches: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return False
+
+
 def update_data_dictionary_long(
     metrics_to_check: Set[str],
     source_name: str,

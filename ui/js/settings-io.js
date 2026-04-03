@@ -72,6 +72,7 @@ function buildSettings() {
             });
           }
           return {
+            report_id: r.report_id || '',
             label: r.label, folder: r.folder, name: r.name,
             enabled: r.enabled !== false, data_type: r.data_type || 'ongoing',
             row_mode: r.row_mode || 'consolidated_only',
@@ -89,6 +90,7 @@ function buildSettings() {
         enabled:                 document.getElementById('smax-enabled').checked,
         base_url:                document.getElementById('smax-url').value,
         reports:                 smaxReports.map(r => ({
+          report_id: r.report_id || '',
           label: r.label, url: r.url, enabled: r.enabled !== false,
           data_type: r.data_type || 'ongoing',
           properties: r.properties || {}
@@ -128,6 +130,7 @@ function populateSettings(s) {
   setVal('cuic-url', cuic.url || 'https://148.151.32.77:8444/cuicui/Main.jsp');
   cuicReports = (cuic.reports || []).map(r => {
     const rep = {
+      report_id: r.report_id || '',
       label: r.label||'', folder: r.folder||'', name: r.name||'',
       enabled: r.enabled !== false, data_type: r.data_type || 'ongoing',
       row_mode: r.row_mode || 'consolidated_only',
@@ -148,6 +151,7 @@ function populateSettings(s) {
   setBool('smax-enabled', smax.enabled, false);
   setVal('smax-url', smax.base_url || 'https://smax.corp.pdo.om');
   smaxReports = (smax.reports || []).map(r => ({
+    report_id: r.report_id || '',
     label: r.label||'', url: r.url||'', enabled: r.enabled !== false,
     data_type: r.data_type || 'ongoing', properties: r.properties || {}
   }));
@@ -219,8 +223,8 @@ function resetDefaults() {
       cuic: {
         enabled: true, url: 'https://148.151.32.77:8444/cuicui/Main.jsp',
         reports: [
-          { label:'call_type_hist', folder:'Test', name:'Z Call Type Historical All Fields', enabled:true, data_type:'ongoing', filters:{} },
-          { label:'agent_hist', folder:'Stock/CCE/CCE_AF_Historical', name:'Agent Historical All Fields', enabled:true, data_type:'ongoing', filters:{} }
+          { report_id:'', label:'call_type_hist', folder:'Test', name:'Z Call Type Historical All Fields', enabled:true, data_type:'ongoing', filters:{} },
+          { report_id:'', label:'agent_hist', folder:'Stock/CCE/CCE_AF_Historical', name:'Agent Historical All Fields', enabled:true, data_type:'ongoing', filters:{} }
         ],
         timeout_nav_ms: 30000, timeout_short_ms: 1500, timeout_medium_ms: 2500, timeout_long_ms: 8000
       },

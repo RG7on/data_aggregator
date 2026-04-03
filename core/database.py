@@ -14,11 +14,19 @@ The CSV is a *projection* of the database, not the other way around.
 import os
 import sqlite3
 import logging
+import hashlib
 import pandas as pd
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 
-from core.config import get_output_dir, get_global_settings, PROJECT_ROOT
+from core.config import (
+    get_output_dir,
+    get_global_settings,
+    get_settings,
+    get_report_definition_hash,
+    PROJECT_ROOT,
+    REPORT_ID_KEY,
+)
 
 logger = logging.getLogger('database')
 
@@ -51,6 +59,8 @@ CREATE TABLE IF NOT EXISTS kpi_snapshots (
     scrape_timestamp TEXT    NOT NULL,           -- when the scrape ran
     data_datetime    TEXT    NOT NULL DEFAULT '', -- report DateTime: 'YYYY-MM-DD HH:MM:SS' (interval) or 'YYYY-MM-DD' (consolidated)
     source           TEXT    NOT NULL,
+    report_id        TEXT    NOT NULL DEFAULT '', -- stable ID of the configured report entry
+    definition_hash  TEXT    NOT NULL DEFAULT '', -- hash of scrape-affecting report settings
     report_name      TEXT    NOT NULL DEFAULT '', -- settings label of the report
     metric_title     TEXT    NOT NULL,
     category         TEXT    NOT NULL DEFAULT '', -- call type / group key
@@ -61,7 +71,7 @@ CREATE TABLE IF NOT EXISTS kpi_snapshots (
 
 _CREATE_INDEX = """
 CREATE UNIQUE INDEX IF NOT EXISTS idx_kpi_dedup
-    ON kpi_snapshots (data_datetime, source, report_name, metric_title, category, sub_category);
+    ON kpi_snapshots (data_datetime, source, report_id, metric_title, category, sub_category);
 """
 
 _CREATE_SCRAPE_LOG = """
@@ -69,6 +79,8 @@ CREATE TABLE IF NOT EXISTS scrape_log (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp     TEXT    NOT NULL,
     source        TEXT    NOT NULL,
+    report_id     TEXT    NOT NULL DEFAULT '',
+    definition_hash TEXT  NOT NULL DEFAULT '',
     report_label  TEXT    NOT NULL DEFAULT '',
     status        TEXT    NOT NULL,
     row_count     INTEGER DEFAULT 0,
@@ -78,21 +90,111 @@ CREATE TABLE IF NOT EXISTS scrape_log (
 """
 
 
+def _get_table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
+    return {row[1] for row in conn.execute(f"PRAGMA table_info({table_name})").fetchall()}
+
+
+def _ensure_column(conn: sqlite3.Connection, table_name: str, column_name: str, column_sql: str):
+    columns = _get_table_columns(conn, table_name)
+    if column_name not in columns:
+        conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {column_sql}")
+
+
+def _legacy_report_id(source: str, label: str) -> str:
+    raw = f"{source.strip().lower()}|{label.strip()}".encode('utf-8')
+    return f"legacy:{hashlib.sha1(raw).hexdigest()}"
+
+
+def _sync_report_identity_from_settings(conn: sqlite3.Connection):
+    settings = get_settings() or {}
+    workers = settings.get('workers', {})
+
+    for source_name in ('cuic', 'smax'):
+        for report in (workers.get(source_name) or {}).get('reports', []):
+            label = str((report or {}).get('label', '') or '').strip()
+            report_id = str((report or {}).get(REPORT_ID_KEY, '') or '').strip()
+            definition_hash = get_report_definition_hash(source_name, report or {})
+
+            if not label or not report_id:
+                continue
+
+            conn.execute(
+                "UPDATE kpi_snapshots SET report_id = ?, definition_hash = ? "
+                "WHERE source = ? AND report_name = ? AND (report_id = '' OR definition_hash = '')",
+                (report_id, definition_hash, source_name, label),
+            )
+            conn.execute(
+                "UPDATE scrape_log SET report_id = ?, definition_hash = ? "
+                "WHERE source = ? AND report_label = ? AND (report_id = '' OR definition_hash = '')",
+                (report_id, definition_hash, source_name, label),
+            )
+
+
+def _backfill_legacy_report_identity(conn: sqlite3.Connection):
+    snap_rows = conn.execute(
+        "SELECT DISTINCT source, report_name FROM kpi_snapshots WHERE COALESCE(report_id, '') = ''"
+    ).fetchall()
+    for source, report_name in snap_rows:
+        if not report_name:
+            continue
+        conn.execute(
+            "UPDATE kpi_snapshots SET report_id = ? WHERE source = ? AND report_name = ? AND COALESCE(report_id, '') = ''",
+            (_legacy_report_id(str(source or ''), str(report_name or '')), source, report_name),
+        )
+
+    log_rows = conn.execute(
+        "SELECT DISTINCT source, report_label FROM scrape_log WHERE COALESCE(report_id, '') = ''"
+    ).fetchall()
+    for source, report_label in log_rows:
+        if not report_label:
+            continue
+        conn.execute(
+            "UPDATE scrape_log SET report_id = ? WHERE source = ? AND report_label = ? AND COALESCE(report_id, '') = ''",
+            (_legacy_report_id(str(source or ''), str(report_label or '')), source, report_label),
+        )
+
+
+def _dedupe_kpi_snapshots(conn: sqlite3.Connection) -> int:
+    cur = conn.execute(
+        "DELETE FROM kpi_snapshots WHERE id NOT IN ("
+        "  SELECT MAX(id) FROM kpi_snapshots "
+        "  GROUP BY data_datetime, source, report_id, metric_title, category, sub_category"
+        ")"
+    )
+    return cur.rowcount or 0
+
+
 def init_db():
     """Create table + dedup index if they don't exist."""
     conn = _get_conn()
     try:
         conn.execute(_CREATE_TABLE)
         conn.execute(_CREATE_SCRAPE_LOG)
-        # Schema migrations for existing databases (safe to run repeatedly)
-        # Detect old schema: if either data_date or interval columns exist,
-        # drop and recreate the table (development data only — no production loss).
-        cols = {row[1] for row in conn.execute("PRAGMA table_info(kpi_snapshots)").fetchall()}
-        if 'data_date' in cols or 'interval' in cols or 'report_name' not in cols:
-            conn.execute("DROP TABLE IF EXISTS kpi_snapshots")
-            conn.execute(_CREATE_TABLE)
-            conn.commit()
-            logger.info("Schema migrated: rebuilt kpi_snapshots with current schema")
+        # Schema migrations for existing databases (safe to run repeatedly).
+        cols = _get_table_columns(conn, 'kpi_snapshots')
+        if 'data_date' in cols and 'data_datetime' not in cols:
+            conn.execute("ALTER TABLE kpi_snapshots ADD COLUMN data_datetime TEXT NOT NULL DEFAULT ''")
+            if 'interval' in cols:
+                conn.execute(
+                    "UPDATE kpi_snapshots SET data_datetime = "
+                    "CASE WHEN COALESCE(interval, '') <> '' THEN TRIM(data_date || ' ' || interval) ELSE COALESCE(data_date, '') END "
+                    "WHERE COALESCE(data_datetime, '') = ''"
+                )
+            else:
+                conn.execute(
+                    "UPDATE kpi_snapshots SET data_datetime = COALESCE(data_date, '') "
+                    "WHERE COALESCE(data_datetime, '') = ''"
+                )
+        _ensure_column(conn, 'kpi_snapshots', 'report_name', "report_name TEXT NOT NULL DEFAULT ''")
+        _ensure_column(conn, 'kpi_snapshots', 'report_id', "report_id TEXT NOT NULL DEFAULT ''")
+        _ensure_column(conn, 'kpi_snapshots', 'definition_hash', "definition_hash TEXT NOT NULL DEFAULT ''")
+        _ensure_column(conn, 'scrape_log', 'report_id', "report_id TEXT NOT NULL DEFAULT ''")
+        _ensure_column(conn, 'scrape_log', 'definition_hash', "definition_hash TEXT NOT NULL DEFAULT ''")
+        _sync_report_identity_from_settings(conn)
+        _backfill_legacy_report_identity(conn)
+        deleted_duplicates = _dedupe_kpi_snapshots(conn)
+        if deleted_duplicates:
+            logger.warning(f"Removed {deleted_duplicates} duplicate KPI snapshot rows during schema migration")
         # Rebuild dedup index
         conn.execute("DROP INDEX IF EXISTS idx_kpi_dedup")
         conn.execute(_CREATE_INDEX)
@@ -108,17 +210,52 @@ def init_db():
 # ══════════════════════════════════════════════════════════════════════════
 
 _UPSERT_SQL = """
-INSERT INTO kpi_snapshots (scrape_timestamp, data_datetime, source, report_name, metric_title, category, sub_category, value)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-ON CONFLICT (data_datetime, source, report_name, metric_title, category, sub_category)
+INSERT INTO kpi_snapshots (scrape_timestamp, data_datetime, source, report_id, definition_hash, report_name, metric_title, category, sub_category, value)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT (data_datetime, source, report_id, metric_title, category, sub_category)
 DO UPDATE SET
     scrape_timestamp = excluded.scrape_timestamp,
+    definition_hash  = excluded.definition_hash,
+    report_name      = excluded.report_name,
     value            = excluded.value;
 """
 
 
+def _build_metric_rows(
+    source_name: str,
+    data: List[Dict[str, Any]],
+    *,
+    scraped_at: str,
+    current_date: str,
+    report_id: str = '',
+    definition_hash: str = '',
+    report_name: str = '',
+) -> List[tuple]:
+    rows = []
+    for item in data:
+        data_datetime = item.get('data_datetime', '') or current_date
+        rows.append((
+            scraped_at,
+            data_datetime,
+            source_name,
+            item.get('report_id', report_id or ''),
+            item.get('definition_hash', definition_hash or ''),
+            item.get('report_name', report_name or ''),
+            item.get('metric_title', ''),
+            item.get('category', ''),
+            item.get('sub_category', ''),
+            str(item.get('value', '')),
+        ))
+    return rows
+
+
 def upsert_metrics(source_name: str, data: List[Dict[str, Any]],
-                   current_date: str = None):
+                   current_date: str = None,
+                   *,
+                   replace_report: bool = False,
+                   report_id: str = '',
+                   definition_hash: str = '',
+                   report_name: str = ''):
     """
     Insert or update a batch of metrics in one transaction.
 
@@ -126,34 +263,40 @@ def upsert_metrics(source_name: str, data: List[Dict[str, Any]],
         metric_title, category (opt), sub_category (opt), interval (opt),
         data_date (opt — date the metrics are FOR), value
     """
-    if not data:
+    if not data and not (replace_report and report_id):
         return
 
     if current_date is None:
         current_date = datetime.now().strftime('%Y-%m-%d')
     scraped_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    rows = []
-    for item in data:
-        # data_datetime: use the datetime embedded in the record (from the report's
-        # DateTime column). Consolidated rows have no DateTime, fall back to today.
-        data_datetime = item.get('data_datetime', '') or current_date
-        rows.append((
-            scraped_at,
-            data_datetime,
-            source_name,
-            item.get('report_name', ''),
-            item.get('metric_title', ''),
-            item.get('category', ''),
-            item.get('sub_category', ''),
-            str(item.get('value', '')),
-        ))
+    rows = _build_metric_rows(
+        source_name,
+        data,
+        scraped_at=scraped_at,
+        current_date=current_date,
+        report_id=report_id,
+        definition_hash=definition_hash,
+        report_name=report_name,
+    )
 
     conn = _get_conn()
     try:
+        conn.execute('BEGIN')
+        if replace_report and report_id:
+            conn.execute(
+                "DELETE FROM kpi_snapshots WHERE source = ? AND report_id = ?",
+                (source_name, report_id),
+            )
         conn.executemany(_UPSERT_SQL, rows)
         conn.commit()
-        logger.info(f"Upserted {len(rows)} metrics for '{source_name}' on {current_date}")
+        logger.info(
+            f"Persisted {len(rows)} metrics for '{source_name}' on {current_date}"
+            + (f" (replaced report_id={report_id})" if replace_report and report_id else '')
+        )
+    except Exception:
+        conn.rollback()
+        raise
     finally:
         conn.close()
 
@@ -167,7 +310,7 @@ def query_all() -> pd.DataFrame:
     conn = _get_conn()
     try:
         df = pd.read_sql_query(
-            "SELECT scrape_timestamp, data_datetime, source, report_name, metric_title, category, sub_category, value "
+            "SELECT scrape_timestamp, data_datetime, source, report_id, report_name, metric_title, category, sub_category, value "
             "FROM kpi_snapshots ORDER BY data_datetime, source, report_name, metric_title, category",
             conn
         )
@@ -183,7 +326,7 @@ def query_by_date(start_date: str, end_date: str = None) -> pd.DataFrame:
     conn = _get_conn()
     try:
         df = pd.read_sql_query(
-            "SELECT scrape_timestamp, data_datetime, source, report_name, metric_title, category, sub_category, value "
+            "SELECT scrape_timestamp, data_datetime, source, report_id, report_name, metric_title, category, sub_category, value "
             "FROM kpi_snapshots WHERE substr(data_datetime, 1, 10) BETWEEN ? AND ? "
             "ORDER BY data_datetime, source, report_name, metric_title, category",
             conn, params=(start_date, end_date)
@@ -300,13 +443,13 @@ def migrate_csv_to_db(csv_path: str = None):
         return 0
 
     # Ensure expected columns
-    required = {'date', 'timestamp', 'source', 'metric_title', 'value'}
+    required = {'scrape_timestamp', 'data_datetime', 'source', 'metric_title', 'value'}
     if not required.issubset(set(df.columns)):
         logger.warning(f"CSV columns {list(df.columns)} don't match expected schema - skipping migration")
         return 0
 
     # Fill missing optional columns
-    for col in ('category', 'sub_category'):
+    for col in ('report_id', 'report_name', 'category', 'sub_category', 'definition_hash'):
         if col not in df.columns:
             df[col] = ''
     df = df.fillna('')
@@ -318,9 +461,12 @@ def migrate_csv_to_db(csv_path: str = None):
         for _, row in df.iterrows():
             try:
                 conn.execute(_UPSERT_SQL, (
-                    str(row['date']),
-                    str(row['timestamp']),
+                    str(row['scrape_timestamp']),
+                    str(row['data_datetime']),
                     str(row['source']),
+                    str(row.get('report_id', '')),
+                    str(row.get('definition_hash', '')),
+                    str(row.get('report_name', '')),
                     str(row['metric_title']),
                     str(row.get('category', '')),
                     str(row.get('sub_category', '')),
@@ -342,15 +488,16 @@ def migrate_csv_to_db(csv_path: str = None):
 # ══════════════════════════════════════════════════════════════════════════
 
 def log_scrape(source: str, report_label: str, status: str,
-               row_count: int = 0, duration_s: float = 0, message: str = ''):
+               row_count: int = 0, duration_s: float = 0, message: str = '',
+               report_id: str = '', definition_hash: str = ''):
     """Record a scrape attempt (success/error/no_data)."""
     ts = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     conn = _get_conn()
     try:
         conn.execute(
-            "INSERT INTO scrape_log (timestamp, source, report_label, status, row_count, duration_s, message) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (ts, source, report_label, status, row_count, round(duration_s, 2), message)
+            "INSERT INTO scrape_log (timestamp, source, report_id, definition_hash, report_label, status, row_count, duration_s, message) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (ts, source, report_id, definition_hash, report_label, status, row_count, round(duration_s, 2), message)
         )
         conn.commit()
     except Exception as e:
@@ -364,7 +511,7 @@ def get_scrape_log(limit: int = 100) -> List[Dict[str, Any]]:
     conn = _get_conn()
     try:
         cur = conn.execute(
-            "SELECT id, timestamp, source, report_label, status, row_count, duration_s, message "
+            "SELECT id, timestamp, source, report_id, definition_hash, report_label, status, row_count, duration_s, message "
             "FROM scrape_log ORDER BY id DESC LIMIT ?",
             (limit,)
         )
@@ -383,8 +530,11 @@ def get_latest_scrape_status() -> List[Dict[str, Any]]:
         cur = conn.execute("""
             SELECT s.* FROM scrape_log s
             INNER JOIN (
-                SELECT source, report_label, MAX(id) as max_id
-                FROM scrape_log GROUP BY source, report_label
+                SELECT source,
+                       CASE WHEN COALESCE(report_id, '') <> '' THEN report_id ELSE report_label END AS report_identity,
+                       MAX(id) as max_id
+                FROM scrape_log
+                GROUP BY source, report_identity
             ) latest ON s.id = latest.max_id
             ORDER BY s.timestamp DESC
         """)
@@ -396,23 +546,21 @@ def get_latest_scrape_status() -> List[Dict[str, Any]]:
         conn.close()
 
 
-def has_historical_data(source: str, label: str) -> bool:
+def has_historical_data(source: str, report_id: str, definition_hash: str) -> bool:
     """
     Check if we already have a successful scrape logged for a historical report.
 
     Returns True when scrape_log contains a 'success' entry with row_count > 0
-    for the given source + report_label.  This is the authoritative check:
-    scrape_log.report_label always stores the config label string, which is
-    consistent across runs — unlike kpi_snapshots.metric_title which stores the
-    DOM page title and can differ from the config label.
+    for the given source + report_id + definition_hash.
     """
     conn = _get_conn()
     try:
         cur = conn.execute(
             "SELECT 1 FROM scrape_log "
-            "WHERE source = ? AND report_label = ? AND status = 'success' AND row_count > 0 "
+            "WHERE source = ? AND report_id = ? AND definition_hash = ? "
+            "AND status = 'success' AND row_count >= 0 "
             "ORDER BY id DESC LIMIT 1",
-            (source, label)
+            (source, report_id, definition_hash)
         )
         return cur.fetchone() is not None
     except Exception:

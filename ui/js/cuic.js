@@ -6,6 +6,10 @@
 let cuicReports = [];
 let scrapeStatus = {};
 
+function getCuicStatusKey(report) {
+  return 'cuic:' + ((report && (report.report_id || report.label)) || '');
+}
+
 function normalizeCuicReportPath(path) {
   return (path || '').replace(/\\+/g, '/').replace(/\/+/g, '/').trim().replace(/^\/+|\/+$/g, '');
 }
@@ -68,7 +72,7 @@ function renderCuicReports() {
       </div>`;
     }
 
-    const st = scrapeStatus['cuic:' + r.label];
+    const st = scrapeStatus[getCuicStatusKey(r)];
     let statusHtml = '<div class="status-bar"><span class="status-dot pending"></span> Never scraped</div>';
     if (st) {
       const icon = st.status === 'success' ? '\u2705' : st.status === 'error' ? '\u274C' : '\u26A0\uFE0F';
@@ -123,7 +127,7 @@ function renderCuicReports() {
 function addCuicReport() {
   const hasEmpty = cuicReports.some(r => !r.folder && !r.name);
   if (hasEmpty) { showToast('Please fill in the existing empty report first', 'warning'); return; }
-  cuicReports.unshift({ label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', filters: {} });
+  cuicReports.unshift({ report_id: '', label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', filters: {} });
   renderCuicReports();
   markDirty();
   setTimeout(() => {

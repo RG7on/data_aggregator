@@ -161,7 +161,10 @@ async function loadFromServer() {
     if (statusRes?.ok) {
       const data = await statusRes.json();
       scrapeStatus = {};
-      (data || []).forEach(s => { scrapeStatus[s.source + ':' + s.report_label] = s; });
+      (data || []).forEach(s => {
+        const identity = (s.report_id || s.report_label || '').trim();
+        scrapeStatus[s.source + ':' + identity] = s;
+      });
       renderCuicReports();
       renderSmaxReports();
       updateDashboard(data);

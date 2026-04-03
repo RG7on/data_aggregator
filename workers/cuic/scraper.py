@@ -91,7 +91,7 @@ def scrape_data(worker, report_label: str = '', report_config: dict = None) -> L
                 worker.screenshot("04_done")
                 return data
 
-            data = _scrape_html_tables(worker, frame, report_label)
+            data = _scrape_html_tables(worker, frame, report_label, report_config)
             if data:
                 worker.logger.info(f"Scraped {len(data)} records from HTML tables")
                 worker.screenshot("04_done")
@@ -157,6 +157,8 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '', report_config: di
 
         # ── Row filtering ─────────────────────────────────────────────
         cfg          = report_config or {}
+        report_id    = str(cfg.get('report_id', '') or '').strip()
+        definition_hash = str(cfg.get('definition_hash', '') or '').strip()
         row_mode     = cfg.get('row_mode', 'consolidated_only')
         cols_meta    = cfg.get('_columns_meta') or {}
         dt_field     = cols_meta.get('datetime_field', '')
@@ -235,6 +237,8 @@ def _scrape_ag_grid_api(worker, frame, report_label: str = '', report_config: di
                     val = ''
                 data.append({
                     'metric_title':  f"CUIC_{hdrs[ci]}",
+                    'report_id':     report_id,
+                    'definition_hash': definition_hash,
                     'report_name':   report_label,
                     'category':      cat,
                     'sub_category':  sub_cat,
@@ -261,6 +265,8 @@ def _scrape_ag_grid_dom(worker, frame, report_label: str = '', report_config: di
         worker.logger.info(f"ag-grid DOM columns: {hdrs}")
 
         cfg = report_config or {}
+        report_id = str(cfg.get('report_id', '') or '').strip()
+        definition_hash = str(cfg.get('definition_hash', '') or '').strip()
         row_mode = cfg.get('row_mode', 'consolidated_only')
         if row_mode == 'consolidated_only':
             worker.logger.warning(
@@ -289,6 +295,8 @@ def _scrape_ag_grid_dom(worker, frame, report_label: str = '', report_config: di
                 if ci < len(hdrs) and ci < len(vals):
                     data.append({
                         'metric_title': f"CUIC_{hdrs[ci]}",
+                        'report_id': report_id,
+                        'definition_hash': definition_hash,
                         'report_name': report_label,
                         'category': cat, 'sub_category': '', 'value': vals[ci]
                     })
@@ -297,9 +305,12 @@ def _scrape_ag_grid_dom(worker, frame, report_label: str = '', report_config: di
         return []
 
 
-def _scrape_html_tables(worker, frame, report_label: str = '') -> List[Dict[str, Any]]:
+def _scrape_html_tables(worker, frame, report_label: str = '', report_config: dict = None) -> List[Dict[str, Any]]:
     """Fallback: scrape plain HTML tables."""
     try:
+        cfg = report_config or {}
+        report_id = str(cfg.get('report_id', '') or '').strip()
+        definition_hash = str(cfg.get('definition_hash', '') or '').strip()
         data = []
         for table in frame.query_selector_all('table'):
             rows = table.query_selector_all('tr')
@@ -317,6 +328,8 @@ def _scrape_html_tables(worker, frame, report_label: str = '') -> List[Dict[str,
                 for ci in range(1, min(len(hdrs), len(vals))):
                     data.append({
                         'metric_title': f"CUIC_{hdrs[ci]}",
+                        'report_id': report_id,
+                        'definition_hash': definition_hash,
                         'report_name': report_label,
                         'category': cat, 'sub_category': '', 'value': vals[ci]
                     })

@@ -30,8 +30,13 @@ def _parse_bool(value: Any, default: bool = False) -> bool:
     return str(value).strip().lower() in ("1", "true", "yes", "y", "on")
 
 
+def _report_key(source: str, report_id: str, label: str) -> Tuple[str, str]:
+    ident = (report_id or '').strip() or f"label:{(label or '').strip()}"
+    return (source, ident)
+
+
 def _config_index() -> Dict[Tuple[str, str], Dict[str, Any]]:
-    """Return {(source, label): report_cfg} for known workers."""
+    """Return {(source, report_identity): report_cfg} for known workers."""
     settings = get_settings() or {}
     workers = settings.get("workers", {})
     idx: Dict[Tuple[str, str], Dict[str, Any]] = {}
@@ -40,9 +45,10 @@ def _config_index() -> Dict[Tuple[str, str], Dict[str, Any]]:
         reports = (workers.get(source) or {}).get("reports", [])
         for rep in reports:
             label = (rep or {}).get("label", "")
-            if not label:
+            report_id = (rep or {}).get("report_id", "")
+            if not label and not report_id:
                 continue
-            idx[(source, label)] = rep or {}
+            idx[_report_key(source, str(report_id or ''), str(label or ''))] = rep or {}
 
     return idx
 
@@ -62,7 +68,7 @@ def _contains_any(text: str, needles: List[str]) -> bool:
     return any(n in t for n in needles)
 
 
-def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: Dict[str, Any]) -> Dict[str, Any] | None:
+def _rule_diagnose(source: str, report_id: str, label: str, events: List[Dict[str, Any]], cfg: Dict[str, Any]) -> Dict[str, Any] | None:
     """Return one top insight for a report key or None when healthy/insufficient."""
     if not events:
         return None
@@ -77,6 +83,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
     skipped_streak = _status_streak(events, "skipped")
 
     evidence = {
+        "report_id": report_id,
         "last_status": last_status,
         "last_message": msg,
         "last_row_count": last.get("row_count", 0),
@@ -92,6 +99,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
         if _contains_any(msg_l, ["sso", "microsoft", "login", "mfa", "session expired", "auth"]):
             return {
                 "source": source,
+                "report_id": report_id,
                 "report_label": label,
                 "severity": "high",
                 "confidence": 0.92,
@@ -108,6 +116,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
         if _contains_any(msg_l, ["timeout", "timed out", "navigation", "wait_for", "selector", "iframe", "table view"]):
             return {
                 "source": source,
+                "report_id": report_id,
                 "report_label": label,
                 "severity": "high" if error_streak >= 2 else "medium",
                 "confidence": 0.86,
@@ -124,6 +133,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
         if _contains_any(msg_l, ["could not open", "filter wizard failed", "reports iframe not found", "tab failed"]):
             return {
                 "source": source,
+                "report_id": report_id,
                 "report_label": label,
                 "severity": "medium",
                 "confidence": 0.8,
@@ -139,6 +149,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
 
         return {
             "source": source,
+            "report_id": report_id,
             "report_label": label,
             "severity": "high" if error_streak >= 2 else "medium",
             "confidence": 0.65,
@@ -155,6 +166,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
     if last_status == "no_data" and no_data_streak >= 3:
         return {
             "source": source,
+            "report_id": report_id,
             "report_label": label,
             "severity": "medium",
             "confidence": 0.84,
@@ -171,6 +183,7 @@ def _rule_diagnose(source: str, label: str, events: List[Dict[str, Any]], cfg: D
     if last_status == "skipped" and (cfg or {}).get("data_type") == "historical" and skipped_streak >= 2:
         return {
             "source": source,
+            "report_id": report_id,
             "report_label": label,
             "severity": "low",
             "confidence": 0.9,
@@ -207,16 +220,19 @@ def build_agent_insights(
     for e in events:
         source = (e.get("source") or "").strip().lower()
         label = (e.get("report_label") or "").strip()
+        report_id = (e.get("report_id") or "").strip()
         if not source or not label or label == "_worker":
             continue
-        by_key[(source, label)].append(e)
+        by_key[_report_key(source, report_id, label)].append(e)
 
     cfg_idx = _config_index()
     insights: List[Dict[str, Any]] = []
 
     for key, key_events in by_key.items():
-        source, label = key
-        insight = _rule_diagnose(source, label, key_events, cfg_idx.get(key, {}))
+        source, identity = key
+        label = (key_events[0].get("report_label") or "").strip()
+        report_id = (key_events[0].get("report_id") or "").strip()
+        insight = _rule_diagnose(source, report_id, label, key_events, cfg_idx.get(key, {}))
         if not insight:
             continue
         if not include_evidence:
@@ -271,27 +287,41 @@ def build_report_insight(
 
     lookback = max(50, min(_parse_int(lookback, 500), 5000))
     events = get_scrape_log(lookback)
+    cfg_idx = _config_index()
+    cfg_by_label = {
+        ((rep or {}).get('label') or '').strip(): rep
+        for rep in cfg_idx.values()
+    }
+    requested_cfg = cfg_by_label.get(report_label)
+    requested_id = ((requested_cfg or {}).get('report_id') or '').strip()
     scoped = [
         e for e in events
         if (e.get("source") or "").strip().lower() == source
-        and (e.get("report_label") or "").strip() == report_label
+        and (
+            (requested_id and (e.get("report_id") or "").strip() == requested_id)
+            or (e.get("report_label") or "").strip() == report_label
+        )
     ]
 
     if not scoped:
         return {
             "source": source,
+            "report_id": requested_id,
             "report_label": report_label,
             "insight": None,
             "message": "No recent scrape events found for this report.",
         }
 
-    insight = _rule_diagnose(source, report_label, scoped, _config_index().get((source, report_label), {}))
+    report_id = (scoped[0].get('report_id') or requested_id or '').strip()
+    display_label = (scoped[0].get('report_label') or report_label).strip()
+    insight = _rule_diagnose(source, report_id, display_label, scoped, cfg_idx.get(_report_key(source, report_id, display_label), {}))
     if insight and not include_evidence:
         insight.pop("evidence", None)
 
     return {
         "source": source,
-        "report_label": report_label,
+        "report_id": report_id,
+        "report_label": display_label,
         "events_considered": len(scoped),
         "insight": insight,
         "recent_events": scoped[:25] if include_evidence else scoped[:10],
