@@ -6,6 +6,22 @@
 let cuicReports = [];
 let scrapeStatus = {};
 
+function getCuicReportPath(report) {
+  return (report.folder ? report.folder + '/' : '') + (report.name || '');
+}
+
+function hasCuicGeneratedFields(report) {
+  const filters = report.filters || {};
+  return Boolean(report.label || report._wizard_meta || report._columns_meta || Object.keys(filters).length > 0);
+}
+
+function resetCuicDiscovery(report) {
+  report.label = '';
+  report.filters = {};
+  delete report._wizard_meta;
+  delete report._columns_meta;
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //  CUIC REPORT CARDS
 // ══════════════════════════════════════════════════════════════════════════
@@ -18,15 +34,16 @@ function renderCuicReports() {
     return;
   }
   container.innerHTML = cuicReports.map((r, i) => {
-    const isEmpty = !r.folder && !r.name && (!r.filters || Object.keys(r.filters).length === 0);
+    const isPendingValidation = !hasCuicGeneratedFields(r);
+    const reportPath = getCuicReportPath(r);
 
-    if (isEmpty) {
+    if (isPendingValidation) {
       return `<div class="report-card">
         <div class="report-card-header">
           <span class="label-tag" style="color:var(--muted);font-style:italic">New Report</span>
           <button class="btn btn-icon" onclick="removeCuicReport(${i})" title="Remove"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/><path d='M9 6V4h6v2'/></svg></button>
         </div>
-        <div class="inline-row"><label>Report Path</label><input value="${attr((r.folder ? r.folder + '/' : '') + (r.name || ''))}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields" style="grid-column:2"></div>
+        <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields" style="grid-column:2"></div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
           <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
             \u25B6 Validate Path
@@ -55,24 +72,24 @@ function renderCuicReports() {
         <div style="display:flex;gap:6px;align-items:center">
           <div class="toggle-switch" style="margin:0">
             <input type="checkbox" id="rpt-en-${i}" ${r.enabled ? 'checked' : ''}
-              onchange="cuicReports[${i}].enabled=this.checked;renderCuicReports()">
+              onchange="cuicReports[${i}].enabled=this.checked;renderCuicReports();markDirty()">
             <label for="rpt-en-${i}" style="font-size:12px">Enabled</label>
           </div>
           <button class="btn btn-icon" onclick="removeCuicReport(${i})" title="Remove"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/><path d='M9 6V4h6v2'/></svg></button>
         </div>
       </div>
-      <div class="inline-row"><label>Report Path</label><input value="${attr((r.folder ? r.folder + '/' : '') + (r.name || ''))}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields"></div>
-      <div class="inline-row"><label>Label</label><input value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value" placeholder="Auto-generated from report name"></div>
+      <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields"></div>
+      <div class="inline-row"><label>Label</label><input data-report-field="label" value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value;markDirty()" placeholder="Auto-generated from report name"></div>
       <div class="inline-row"><label>Data Type</label>
-        <select onchange="cuicReports[${i}].data_type=this.value;renderCuicReports()">
+        <select onchange="cuicReports[${i}].data_type=this.value;renderCuicReports();markDirty()">
           <option value="ongoing" ${(r.data_type||'ongoing')==='ongoing'?'selected':''}>📡 Ongoing (re-scrape every run)</option>
           <option value="historical" ${r.data_type==='historical'?'selected':''}>📦 Historical (scrape once)</option>
         </select>
       </div>
       <div class="inline-row"><label>Row Mode</label>
         <div class="row-mode-seg">
-          <button type="button" class="${(r.row_mode||'consolidated_only')==='consolidated_only'?'active':''}" onclick="cuicReports[${i}].row_mode='consolidated_only';renderCuicReports()">📊 Consolidated only</button>
-          <button type="button" class="${r.row_mode==='all'?'active':''}" onclick="cuicReports[${i}].row_mode='all';renderCuicReports()">🔢 All rows</button>
+          <button type="button" class="${(r.row_mode||'consolidated_only')==='consolidated_only'?'active':''}" onclick="cuicReports[${i}].row_mode='consolidated_only';renderCuicReports();markDirty()">📊 Consolidated only</button>
+          <button type="button" class="${r.row_mode==='all'?'active':''}" onclick="cuicReports[${i}].row_mode='all';renderCuicReports();markDirty()">🔢 All rows</button>
         </div>
       </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
@@ -93,6 +110,7 @@ function addCuicReport() {
   if (hasEmpty) { showToast('Please fill in the existing empty report first', 'warning'); return; }
   cuicReports.unshift({ label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', filters: {} });
   renderCuicReports();
+  markDirty();
   setTimeout(() => {
     const first = document.getElementById('cuic-reports-list').firstElementChild;
     if (first) { first.classList.add('highlight-new'); setTimeout(() => first.classList.remove('highlight-new'), 1000); }
@@ -100,9 +118,10 @@ function addCuicReport() {
 }
 
 function removeCuicReport(i) {
-  if (cuicReports.length <= 1) { showToast('Keep at least one report', 'error'); return; }
+  if (i < 0 || i >= cuicReports.length) return;
   cuicReports.splice(i, 1);
   renderCuicReports();
+  markDirty();
 }
 
 function generateLabelFromName(name) {
@@ -111,16 +130,20 @@ function generateLabelFromName(name) {
 }
 
 function updateCuicReportPath(idx, path) {
-  const lastSlash = path.lastIndexOf('/');
+  const report = cuicReports[idx];
+  const nextPath = (path || '').trim();
+  const previousPath = getCuicReportPath(report);
+  const lastSlash = nextPath.lastIndexOf('/');
   if (lastSlash === -1) {
-    cuicReports[idx].folder = '';
-    cuicReports[idx].name = path;
+    report.folder = '';
+    report.name = nextPath;
   } else {
-    cuicReports[idx].folder = path.substring(0, lastSlash);
-    cuicReports[idx].name = path.substring(lastSlash + 1);
+    report.folder = nextPath.substring(0, lastSlash);
+    report.name = nextPath.substring(lastSlash + 1);
   }
-  if (!cuicReports[idx].label) cuicReports[idx].label = generateLabelFromName(cuicReports[idx].name);
+  if (previousPath !== getCuicReportPath(report)) resetCuicDiscovery(report);
   renderCuicReports();
+  markDirty();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -580,6 +603,7 @@ function updateCuicFilter(reportIdx, paramName, value) {
   if (!r.filters) r.filters = {};
   if (value === '' || value === undefined) delete r.filters[paramName];
   else r.filters[paramName] = value;
+  markDirty();
 }
 
 function updateCuicDatetime(reportIdx, paramName, field, value) {
@@ -601,6 +625,7 @@ function updateCuicDatetime(reportIdx, paramName, field, value) {
   } else {
     r.filters[paramName] = cur;
   }
+  markDirty();
 }
 
 function vlToggleItem(reportIdx, paramName, vlId) {
@@ -615,6 +640,7 @@ function vlToggleItem(reportIdx, paramName, vlId) {
   if (ce) ce.textContent = checked.length + ' / ' + total;
   vlUpdateGroupButtons(vlId, reportIdx, paramName);
   _refreshSummaryTags(vlId);
+  markDirty();
 }
 
 function vlCheckAll(reportIdx, paramName, vlId) {
@@ -691,6 +717,7 @@ function updateMsFilter(reportIdx, stepKey, paramName, value) {
   if (!r.filters[stepKey]) r.filters[stepKey] = {};
   if (value === '' || value === undefined) delete r.filters[stepKey][paramName];
   else r.filters[stepKey][paramName] = value;
+  markDirty();
 }
 
 function updateMsDatetime(reportIdx, stepKey, paramName, field, value) {
@@ -716,6 +743,7 @@ function updateMsDatetime(reportIdx, stepKey, paramName, field, value) {
   } else {
     r.filters[stepKey][paramName] = cur;
   }
+  markDirty();
 }
 
 function toggleDayBtn(reportIdx, stepKey, paramName, dtId, day, btn) {
@@ -729,6 +757,7 @@ function toggleDayBtn(reportIdx, stepKey, paramName, dtId, day, btn) {
   if (!cur.days) cur.days = {};
   cur.days[day] = btn.classList.contains('active') ? 'checked' : '';
   r.filters[stepKey][paramName] = cur;
+  markDirty();
 }
 
 function vlMsToggleItem(reportIdx, stepKey, paramName, vlId) {
@@ -744,6 +773,7 @@ function vlMsToggleItem(reportIdx, stepKey, paramName, vlId) {
   if (ce) ce.textContent = checked.length + ' / ' + total;
   vlMsUpdateGroupButtons(vlId, reportIdx, stepKey, paramName);
   _refreshSummaryTags(vlId);
+  markDirty();
 }
 
 function vlMsCheckAll(reportIdx, stepKey, paramName, vlId) {
@@ -839,6 +869,7 @@ function ffToggleItem(reportIdx, stepKey, paramName, ffId, event) {
   else configs = configs.filter(c => c.id !== cb.value);
   r.filters[stepKey][paramName] = configs;
   _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
+  markDirty();
 }
 
 function ffMsCheckAll(reportIdx, stepKey, paramName, ffId) {
@@ -858,6 +889,7 @@ function ffMsCheckAll(reportIdx, stepKey, paramName, ffId) {
   });
   r.filters[stepKey][paramName] = configs;
   _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
+  markDirty();
 }
 
 function ffMsUncheckAll(reportIdx, stepKey, paramName, ffId) {
@@ -873,6 +905,7 @@ function ffMsUncheckAll(reportIdx, stepKey, paramName, ffId) {
   });
   r.filters[stepKey][paramName] = configs.filter(c => !visIds.includes(c.id));
   _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
+  markDirty();
 }
 
 function ffRemoveField(reportIdx, stepKey, paramName, fieldId) {
@@ -884,6 +917,7 @@ function ffRemoveField(reportIdx, stepKey, paramName, fieldId) {
   const listEl = document.getElementById(ffId + '-list');
   if (listEl) { const cb = listEl.querySelector(`input[value="${fieldId}"]`); if (cb) cb.checked = false; }
   _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
+  markDirty();
 }
 
 function ffUpdateField(reportIdx, stepKey, paramName, fieldId, prop, val) {
@@ -898,6 +932,7 @@ function ffUpdateField(reportIdx, stepKey, paramName, fieldId, prop, val) {
       const ffId = `ff-${reportIdx}-s${stepKey.replace('step_','')}-${paramName.replace(/[^a-zA-Z0-9]/g,'_')}`;
       _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
     }
+    markDirty();
   }
 }
 
@@ -942,6 +977,7 @@ function ffSpabToggleItem(reportIdx, paramName, ffId) {
   const ce = document.getElementById(ffId + '-count');
   if (ce) ce.textContent = checked.length + ' / ' + total;
   _refreshSummaryTags(ffId);
+  markDirty();
 }
 
 function ffCheckAll(reportIdx, paramName, ffId) {
@@ -972,6 +1008,7 @@ function updateFilterValue(reportIdx, stepKey, fieldKey, el) {
   if (el.type === 'checkbox') r.filters[stepKey][fieldKey] = el.checked;
   else if (el.tagName === 'SELECT' && el.multiple) r.filters[stepKey][fieldKey] = Array.from(el.selectedOptions).map(o => o.value);
   else r.filters[stepKey][fieldKey] = el.value;
+  markDirty();
 }
 
 function clearFilters(reportIdx) {
@@ -980,6 +1017,7 @@ function clearFilters(reportIdx) {
   r.filters  = {};
   if (meta) r.filters._meta = meta;
   renderCuicReports();
+  markDirty();
   showToast('Filters cleared for ' + (r.label || 'report'), 'info');
 }
 
@@ -1068,8 +1106,9 @@ async function discoverFilters(reportIdx) {
       }
     }
 
+    if (!r.label && r.name) r.label = generateLabelFromName(r.name);
     renderCuicReports();
-    if (!r.label && r.name) { r.label = generateLabelFromName(r.name); renderCuicReports(); }
+    markDirty();
 
   } catch(e) {
     showToast('Discovery failed: ' + e.message, 'error');
@@ -1156,6 +1195,7 @@ function columnsToggleItem(reportIdx, cpId) {
   r.columns = checked.length === all.length ? null : checked;
   const ce = document.getElementById(cpId + '-count');
   if (ce) ce.textContent = checked.length + ' / ' + all.length;
+  markDirty();
 }
 
 function columnsSelectAll(reportIdx, cpId) {
@@ -1170,6 +1210,7 @@ function columnsSelectAll(reportIdx, cpId) {
   const all   = listEl ? listEl.querySelectorAll('input[type=checkbox]').length : 0;
   const ce    = document.getElementById(cpId + '-count');
   if (ce) ce.textContent = all + ' / ' + all;
+  markDirty();
 }
 
 function columnsSelectNone(reportIdx, cpId) {
@@ -1184,6 +1225,7 @@ function columnsSelectNone(reportIdx, cpId) {
   const all   = listEl ? listEl.querySelectorAll('input[type=checkbox]').length : 0;
   const ce    = document.getElementById(cpId + '-count');
   if (ce) ce.textContent = '0 / ' + all;
+  markDirty();
 }
 
 function filterCpChecklist(cpId, query) {

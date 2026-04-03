@@ -26,6 +26,43 @@ function switchPage(pageId) {
   });
 }
 
+function setWorkerSettingsExpanded(workerId, expanded) {
+  const card = document.getElementById(workerId + '-connection-card');
+  const toggle = document.getElementById(workerId + '-settings-toggle');
+  if (!card || !toggle) return;
+
+  card.classList.toggle('settings-card-hidden', !expanded);
+  toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  toggle.setAttribute('title', expanded ? 'Hide settings' : 'Show settings');
+
+  const text = toggle.querySelector('.worker-settings-toggle-text');
+  if (text) text.textContent = expanded ? 'Hide settings' : 'Settings';
+
+  try {
+    localStorage.setItem('worker-settings:' + workerId, expanded ? 'expanded' : 'collapsed');
+  } catch (e) {
+    // Ignore storage failures; visibility still works for the current session.
+  }
+}
+
+function toggleWorkerSettings(workerId) {
+  const card = document.getElementById(workerId + '-connection-card');
+  if (!card) return;
+  setWorkerSettingsExpanded(workerId, card.classList.contains('settings-card-hidden'));
+}
+
+function initWorkerSettingsPanels() {
+  ['cuic', 'smax'].forEach(workerId => {
+    let expanded = false;
+    try {
+      expanded = localStorage.getItem('worker-settings:' + workerId) === 'expanded';
+    } catch (e) {
+      expanded = false;
+    }
+    setWorkerSettingsExpanded(workerId, expanded);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-item[data-page]').forEach(item => {
     item.addEventListener('click', e => {
@@ -36,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchPage(item.dataset.page); }
     });
   });
+
+  initWorkerSettingsPanels();
 
   // Initial load
   loadFromServer();

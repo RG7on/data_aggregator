@@ -5,6 +5,24 @@ Format: each entry has a **date**, **summary**, **files changed**, and **root ca
 
 ---
 
+## [2026-04-03] — UI/UX + Fix: Worker Settings Validation, Auto-Save, and Hidden Connection Panels
+
+**Files changed:** `ui/index.html`, `ui/css/main.css`, `ui/js/app.js`, `ui/js/settings-io.js`, `ui/js/cuic.js`, `ui/js/smax.js`
+
+**Overview:**
+Completed the worker settings improvements tracked in TODO items 3, 4, and 5.
+
+- **Add Report moved to top:** Both CUIC and SMAX now show the Add Report action above the report list instead of at the bottom.
+- **Validation-first report creation:** New CUIC and SMAX reports now stay minimal until the user explicitly clicks Validate. Generated metadata is no longer applied just by typing a path or URL.
+- **Delete all reports allowed:** CUIC and SMAX can now persist an empty reports list without restoring deleted entries on reload.
+- **Auto-save fixed for report mutations:** Report add, delete, toggle, discovery, filter edits, and column-selection changes now flow through the existing auto-save mechanism.
+- **Connection settings hidden by default:** Each worker page now exposes connection/settings controls behind a settings button in the page header.
+
+**Root cause / fix:**
+- Report deletion and several other report mutations changed only in-memory UI state and did not mark settings dirty, so the existing autosave pipeline never persisted them.
+- CUIC also injected a default report on load when the list was empty, which prevented a true zero-report state from surviving reload.
+- The worker settings layout exposed infrequently used connection controls permanently, so the UI was updated to collapse them behind an explicit toggle.
+
 ## [2026-04-03] — Feature: CUIC Worker Data Extraction & Field Selection
 
 **Files changed:** `workers/cuic/scraper.py`, `ui/js/cuic.js`, `settings_server.py`, `config/settings.json`

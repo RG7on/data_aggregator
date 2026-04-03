@@ -6,37 +6,8 @@ Move items to `CHANGELOG.md` when completed.
 ---
 
 ## In Progress
-1. studing if the curunt CSV file that suppose to store evrything can holdup or we need to change the way we store the data ?
 
-2. we bring clomns and rows slection to SMAX worker as well, and we need to study how to do that in a way that is user friendly and easy to use.
-
-3. **UI/UX: Move "Add Report" Button & Require "Validate Path"**
-
-In the CUIC worker settings, if you want to add a new report, you currently have to go to the bottom of the web screen. It would be much easier to add the report if the "Add Report" button were moved to the top.
-
-When adding a report, the system currently prompts for a new report path. Once the path is entered, it automatically generates and fills in the label, data type, row mode, and other fields. This should not happen automatically.
-
-Instead, when adding a new report, there is a "Validate Path" button. After the user enters the path, they need to click "Validate Path" for these fields to be generated. The fields should only be generated if the entered path is valid. 
-
-4. **Bug/Logic: Allow Deleting All Reports & Fix Auto-Save for Deletions**
-
-When attempting to remove a report from the CUIC worker, I'm unable to delete the last report. The system states that at least one report must be kept, but I wish to delete all reports and do not want to be blocked from doing so.
-
-The same issue occurs with the SMAX worker; it should not prevent me from deleting all existing reports. Additionally, even with automatic settings save enabled, the settings are not always being saved. For instance, after deleting all SMAX reports shown in the settings, the changes are not reflected.
-
-Upon reloading and returning to the SMAX worker, all the deleted reports reappear, seemingly loaded from the settings JSON file. This needs immediate correction. Any deletion should be saved directly and reflected in the JSON file.
-
-This behavior is unacceptable. When I try to delete all reports in the CUIC worker, it blocks me, even though I have deleted reports previously.
-
-It is now blocking deletions and not saving automatically as expected. It should save automatically, and there is no save button available. I do not want a save button; I want the changes to save automatically. However, when I reload the page, everything reverts as if no deletions occurred. This needs to be fixed.
-
-5. **UI/UX: Hide Worker Connection Settings Behind a Settings Icon**
-
-Regarding the worker settings, I can see you've placed a section for each worker's settings at the top of the worker webpage. I don't want this to be shown. Instead, please add a settings icon on the worker page itself. When the user clicks on it, then display the settings or connection options.
-
-Don't show the settings directly. The user won't need to interact with them frequently, so there's no need for them to be visible all the time. 
-
-6. **Debugging: Open Playwright Browser in Maximized/Full Screen Mode**
+1. **Debugging: Open Playwright Browser in Maximized/Full Screen Mode**
 
 There's something that bothers me a lot. When I set the hit list mode to off to see what's happening in the automation, the browser opens in a very weird window size.
 
@@ -44,7 +15,7 @@ When I enlarge it, the website itself is still stuck to some sort of scale that 
 
 It's like it's stuck, even if I maximize the window. So why don't you just open the web browser of the automation in full mode automatically whenever it runs? This way, I cannot debug correctly. It's very hard for me to debug. 
 
-7. **Bug: Initial State of "Days" Combo Box in Filter Wizard Settings**
+2. **Bug: Initial State of "Days" Combo Box in Filter Wizard Settings**
 
 In wizard settings, you can select the date and time. You have options like custom, today, yesterday, this week, and use default. When you select "yesterday," the combo box for "days" should not be shown.
 
@@ -54,7 +25,7 @@ The issue occurs when the website loads. It defaults to "yesterday," but incorre
 
 The logic appears to be in place, but the system fails to recognize that the date time is set to "yesterday" upon initial load. This prevents the "days" combo box from being hidden as intended. Let's investigate and resolve this issue. 
 
-8. **Data Consistency: Add Report Identifier & Replace Outdated Data on Scrape**
+3. **Data Consistency: Add Report Identifier & Replace Outdated Data on Scrape**
 
 We have some reports that we are scrubbing the data from. So those reports have some filter settings. Whether you want the report of today, whether you want the report of yesterday, whether you want the report of a very specific time interval of a day. You can do that in the filter settings.
 
@@ -72,7 +43,7 @@ For example, if we have 100 rows of data that existing on our database and we go
 
 And regarding if they want to get two different type of data from the same source, they can add it twice. They can add the report twice, each with different settings. 
 
-9. **Bug/Refactor: Filter Wizard Settings Not Applying Correctly in CUIC**
+4. **Bug/Refactor: Filter Wizard Settings Not Applying Correctly in CUIC**
 
 Speaking about the filter settings, we have something in our front-end, in the settings front-end, we have something called filter wizard settings. So when you provide a path of a report, and I'm talking about the worker CUIC, okay, it's trying to get the filters from the actual front-end, from the actual website, and giving them here in our website front-end, okay.
 

@@ -5,9 +5,10 @@
 // ── syncReportInputs: flush DOM values into state arrays ─────────────────
 function syncReportInputs() {
   document.querySelectorAll('#cuic-reports-list .report-card').forEach((card, i) => {
-    const inputs = card.querySelectorAll('.inline-row input');
-    if (inputs[0]) {
-      const path = inputs[0].value.trim();
+    const pathInput = card.querySelector('input[data-report-field="path"]');
+    const labelInput = card.querySelector('input[data-report-field="label"]');
+    if (pathInput) {
+      const path = pathInput.value.trim();
       const lastSlash = path.lastIndexOf('/');
       if (lastSlash === -1) {
         cuicReports[i].folder = '';
@@ -17,12 +18,13 @@ function syncReportInputs() {
         cuicReports[i].name = path.substring(lastSlash + 1);
       }
     }
-    if (inputs[1]) cuicReports[i].label = inputs[1].value;
+    if (labelInput) cuicReports[i].label = labelInput.value;
   });
   document.querySelectorAll('#smax-reports-list .report-card').forEach((card, i) => {
-    const inputs = card.querySelectorAll('.inline-row input');
-    if (inputs[0]) smaxReports[i].label = inputs[0].value;
-    if (inputs[1]) smaxReports[i].url   = inputs[1].value;
+    const labelInput = card.querySelector('input[data-report-field="label"]');
+    const urlInput = card.querySelector('input[data-report-field="url"]');
+    if (labelInput) smaxReports[i].label = labelInput.value;
+    if (urlInput) smaxReports[i].url = urlInput.value;
   });
 }
 
@@ -136,9 +138,6 @@ function populateSettings(s) {
     if (r._columns_meta) rep._columns_meta = r._columns_meta;
     return rep;
   });
-  if (!cuicReports.length) {
-    cuicReports.push({ label:'call_type_hist', folder:'Test', name:'Z Call Type Historical All Fields', enabled:true, data_type:'ongoing', filters:{} });
-  }
   renderCuicReports();
   setVal('cuic-t-nav',    cuic.timeout_nav_ms    || 30000);
   setVal('cuic-t-short',  cuic.timeout_short_ms  || 1500);

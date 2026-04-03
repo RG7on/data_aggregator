@@ -5,6 +5,26 @@
 // ── STATE ─────────────────────────────────────────────────────────────────
 let smaxReports = [];
 
+function hasSmaxGeneratedFields(report) {
+  const props = report.properties || {};
+  return Boolean(report.label || props.report_name || Object.keys(props).length > 0);
+}
+
+function resetSmaxDiscovery(report) {
+  report.label = '';
+  report.properties = {};
+}
+
+function updateSmaxReportUrl(idx, url) {
+  const report = smaxReports[idx];
+  const nextUrl = (url || '').trim();
+  const previousUrl = (report.url || '').trim();
+  report.url = nextUrl;
+  if (previousUrl !== nextUrl) resetSmaxDiscovery(report);
+  renderSmaxReports();
+  markDirty();
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //  SMAX REPORT CARDS
 // ══════════════════════════════════════════════════════════════════════════
@@ -17,15 +37,15 @@ function renderSmaxReports() {
     return;
   }
   container.innerHTML = smaxReports.map((r, i) => {
-    const isEmpty = !r.label && !r.properties?.report_name;
+    const isPendingValidation = !hasSmaxGeneratedFields(r);
 
-    if (isEmpty) {
+    if (isPendingValidation) {
       return `<div class="report-card">
         <div class="report-card-header">
           <span class="label-tag" style="color:var(--muted);font-style:italic">New Report</span>
           <button class="btn btn-icon" onclick="removeSmaxReport(${i})" title="Remove"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/><path d='M9 6V4h6v2'/></svg></button>
         </div>
-        <div class="inline-row"><label>Report URL</label><input value="${attr(r.url||'')}" onchange="smaxReports[${i}].url=this.value" placeholder="https://smax.corp.pdo.om/reports/report/\u2026" style="grid-column:2"></div>
+        <div class="inline-row"><label>Report URL</label><input data-report-field="url" value="${attr(r.url||'')}" onchange="updateSmaxReportUrl(${i}, this.value)" placeholder="https://smax.corp.pdo.om/reports/report/\u2026" style="grid-column:2"></div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
           <button class="btn-discover" id="smax-discover-btn-${i}" onclick="discoverSmaxProperties(${i})">
             \u25B6 Validate Link
@@ -54,16 +74,16 @@ function renderSmaxReports() {
         <div style="display:flex;gap:6px;align-items:center">
           <div class="toggle-switch" style="margin:0">
             <input type="checkbox" id="smax-rpt-en-${i}" ${r.enabled ? 'checked' : ''}
-              onchange="smaxReports[${i}].enabled=this.checked;renderSmaxReports()">
+              onchange="smaxReports[${i}].enabled=this.checked;renderSmaxReports();markDirty()">
             <label for="smax-rpt-en-${i}" style="font-size:12px">Enabled</label>
           </div>
           <button class="btn btn-icon" onclick="removeSmaxReport(${i})" title="Remove"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/><path d='M9 6V4h6v2'/></svg></button>
         </div>
       </div>
-      <div class="inline-row"><label>Label</label><input value="${attr(r.label||'')}" onchange="smaxReports[${i}].label=this.value" placeholder="e.g. sla_fcr_month"></div>
-      <div class="inline-row"><label>Report URL</label><input value="${attr(r.url||'')}" onchange="smaxReports[${i}].url=this.value" placeholder="https://smax.corp.pdo.om/reports/report/\u2026"></div>
+      <div class="inline-row"><label>Label</label><input data-report-field="label" value="${attr(r.label||'')}" onchange="smaxReports[${i}].label=this.value;markDirty()" placeholder="e.g. sla_fcr_month"></div>
+      <div class="inline-row"><label>Report URL</label><input data-report-field="url" value="${attr(r.url||'')}" onchange="updateSmaxReportUrl(${i}, this.value)" placeholder="https://smax.corp.pdo.om/reports/report/\u2026"></div>
       <div class="inline-row"><label>Data Type</label>
-        <select onchange="smaxReports[${i}].data_type=this.value;renderSmaxReports()">
+        <select onchange="smaxReports[${i}].data_type=this.value;renderSmaxReports();markDirty()">
           <option value="ongoing" ${(r.data_type||'ongoing')==='ongoing'?'selected':''}>📡 Ongoing (re-scrape every run)</option>
           <option value="historical" ${r.data_type==='historical'?'selected':''}>📦 Historical (scrape once)</option>
         </select>
@@ -85,6 +105,7 @@ function addSmaxReport() {
   if (hasEmpty) { showToast('Please fill in the existing empty report first', 'warning'); return; }
   smaxReports.unshift({ label: '', url: '', enabled: true, data_type: 'ongoing', properties: {} });
   renderSmaxReports();
+  markDirty();
   setTimeout(() => {
     const first = document.getElementById('smax-reports-list').firstElementChild;
     if (first) { first.classList.add('highlight-new'); setTimeout(() => first.classList.remove('highlight-new'), 1000); }
@@ -92,8 +113,10 @@ function addSmaxReport() {
 }
 
 function removeSmaxReport(i) {
+  if (i < 0 || i >= smaxReports.length) return;
   smaxReports.splice(i, 1);
   renderSmaxReports();
+  markDirty();
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -169,6 +192,7 @@ function renderSmaxPropertiesPanel(report, idx) {
 function clearSmaxProperties(idx) {
   smaxReports[idx].properties = {};
   renderSmaxReports();
+  markDirty();
   showToast('Properties cleared', 'info');
 }
 
@@ -225,6 +249,7 @@ async function discoverSmaxProperties(idx) {
     const typeLabel   = r.data_type === 'historical' ? ' (auto-detected: historical)' : ' (auto-detected: ongoing)';
     showToast(`Discovered: "${data.report_name || 'report'}" with ${filterCount} filter(s)${suggested ? typeLabel : ''}!`, 'success');
     renderSmaxReports();
+    markDirty();
 
   } catch(e) {
     showToast('Discovery failed: ' + e.message, 'error');

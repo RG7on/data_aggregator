@@ -52,3 +52,22 @@ Use the table below to find the exact name of the metric you want to display.
 | **CUIC_Service Level** | cuic | Report from cuic. [Add description] | 2026-02-09 10:47:39 |
 | **CUIC_Short Calls** | cuic | Report from cuic. [Add description] | 2026-02-09 10:47:39 |
 | **Unknown Report** | smax | Report from smax. [Add description] | 2026-03-22 19:56:02 |
+| **CUIC_%Active** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_%Hold** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_%Not Active** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_%Not Ready** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_%Reserved** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_%Wrap Up** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Abandon Hold** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Abandon Rings** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Agent Terminated Calls** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Avg Handle Time** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Avg Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_External Out** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_FullName** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Held** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Logged On Time** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Media** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_RONA** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Transfer In ** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_Transfer Out ** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
