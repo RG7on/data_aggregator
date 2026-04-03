@@ -41,6 +41,110 @@ function resetCuicDiscovery(report) {
   delete report._columns_meta;
 }
 
+function cloneCuicData(value) {
+  if (value === undefined) return undefined;
+  return JSON.parse(JSON.stringify(value));
+}
+
+function uniqueCuicStrings(values) {
+  const seen = new Set();
+  const out = [];
+  (values || []).forEach(value => {
+    const normalized = String(value || '').trim();
+    if (!normalized || seen.has(normalized)) return;
+    seen.add(normalized);
+    out.push(normalized);
+  });
+  return out;
+}
+
+function getCuicParamKey(param) {
+  return uniqueCuicStrings([
+    param && param.storageKey,
+    param && param.paramName,
+    param && param.label
+  ])[0] || '';
+}
+
+function getCuicParamAliases(param) {
+  return uniqueCuicStrings([
+    getCuicParamKey(param),
+    ...(Array.isArray(param && param.aliases) ? param.aliases : []),
+    param && param.paramName,
+    param && param.paramName2,
+    param && param.label
+  ]);
+}
+
+function getCuicSavedValue(container, param) {
+  const source = container || {};
+  for (const alias of getCuicParamAliases(param)) {
+    if (Object.prototype.hasOwnProperty.call(source, alias)) return source[alias];
+  }
+  return undefined;
+}
+
+function normalizeFieldFilterConfigs(value, fallbackFields) {
+  const fields = Array.isArray(fallbackFields) ? fallbackFields : [];
+  const toFieldId = item => {
+    if (!item || typeof item !== 'object') return '';
+    return String(item.fieldId || item.id || item.label || '').trim();
+  };
+
+  if (value === 'all') {
+    return fields
+      .map(field => {
+        const id = toFieldId(field);
+        if (!id) return null;
+        return {
+          id,
+          fieldId: id,
+          label: field.label || id,
+          operator: '',
+          value1: '',
+          value2: '',
+          showInput2: false
+        };
+      })
+      .filter(Boolean);
+  }
+
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map(item => {
+      if (typeof item === 'string') {
+        const id = item.trim();
+        if (!id) return null;
+        const field = fields.find(f => toFieldId(f) === id);
+        return {
+          id,
+          fieldId: id,
+          label: field?.label || id,
+          operator: '',
+          value1: '',
+          value2: '',
+          showInput2: false
+        };
+      }
+      if (!item || typeof item !== 'object') return null;
+      const id = toFieldId(item);
+      if (!id) return null;
+      const field = fields.find(f => toFieldId(f) === id);
+      return {
+        ...cloneCuicData(item),
+        id,
+        fieldId: id,
+        label: item.label || field?.label || id,
+        operator: item.operator || '',
+        value1: item.value1 !== undefined ? String(item.value1) : '',
+        value2: item.value2 !== undefined ? String(item.value2) : '',
+        showInput2: !!item.showInput2
+      };
+    })
+    .filter(Boolean);
+}
+
 // ══════════════════════════════════════════════════════════════════════════
 //  CUIC REPORT CARDS
 // ══════════════════════════════════════════════════════════════════════════
@@ -203,28 +307,28 @@ function renderFilterPanel(report, idx) {
       html += `<div class="wizard-step-body${si === 0 ? ' active' : ''}" id="wsb-${idx}-${si}">`;
 
       (step.params || []).forEach(p => {
-        const pn      = p.paramName || '';
-        const label   = p.label || pn;
-        const savedVal = savedStep[pn];
+        const paramKey = getCuicParamKey(p);
+        const label = p.label || p.paramName || paramKey;
+        const savedVal = getCuicSavedValue(savedStep, p);
 
         if (p.type === 'cuic_datetime') {
           const cfg       = typeof savedVal === 'string' ? {preset: savedVal} : (savedVal && typeof savedVal === 'object' ? savedVal : {});
           const curPreset = cfg.preset || '';
-          const presets   = p.datePresets || meta.datePresets || [];
+          const presets   = p.datePresets || [];
           let opts = `<option value="" ${!curPreset?'selected':''}>\u2014 use default \u2014</option>`;
           opts += presets.map(o => `<option value="${attr(o.value)}"${curPreset===o.value?' selected':''}>${esc(o.label)}</option>`).join('');
-          const dtId = 'dt-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+          const dtId = 'dt-' + idx + '-s' + step.step + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
 
-          html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)}</label>
-            <select id="${dtId}-preset" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','preset',this.value)">${opts}</select></div>`;
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+            <select id="${dtId}-preset" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','preset',this.value)">${opts}</select></div>`;
 
           if (p.hasDateRange) {
             const showDates = curPreset === 'CUSTOM' ? '' : 'style="display:none"';
             html += `<div class="filter-sub" id="${dtId}-dates" ${showDates}><div class="sub-row">
               <label>From</label>
-              <input type="date" value="${attr(cfg.date1||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','date1',this.value)">
+              <input type="date" value="${attr(cfg.date1||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','date1',this.value)">
               <span class="to">to</span>
-              <input type="date" value="${attr(cfg.date2||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','date2',this.value)">
+              <input type="date" value="${attr(cfg.date2||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','date2',this.value)">
             </div></div>`;
           }
 
@@ -232,16 +336,16 @@ function renderFilterPanel(report, idx) {
             const allTime  = cfg.allTime || 1;
             const showTimes = allTime === 2 ? '' : 'style="display:none"';
             html += `<div class="filter-sub"><div class="sub-row"><label>Time</label>
-              <select onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','allTime',parseInt(this.value));
+              <select onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','allTime',parseInt(this.value));
                 document.getElementById('${dtId}-times').style.display=this.value==='2'?'':'none'">
                 <option value="1" ${allTime===1?'selected':''}>All Day</option>
                 <option value="2" ${allTime===2?'selected':''}>Custom</option>
               </select></div>
               <div class="sub-row" id="${dtId}-times" ${showTimes}>
                 <label>From</label>
-                <input type="time" step="1" value="${attr(cfg.time1||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','time1',this.value)">
+                <input type="time" step="1" value="${attr(cfg.time1||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','time1',this.value)">
                 <span class="to">to</span>
-                <input type="time" step="1" value="${attr(cfg.time2||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','time2',this.value)">
+                <input type="time" step="1" value="${attr(cfg.time2||'')}" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','time2',this.value)">
               </div></div>`;
           }
 
@@ -256,10 +360,10 @@ function renderFilterPanel(report, idx) {
             const btnHtml     = dayDefs.map(([d,lbl]) => {
               const act = (savedDays[d] === 'checked' || savedDays[d] === undefined) ? ' active' : '';
               return `<button type="button" class="day-btn${act}" data-day="${d}"
-                onclick="toggleDayBtn(${idx},'${attr(stepKey)}','${attr(pn)}','${dtId}','${d}',this)">${lbl}</button>`;
+                onclick="toggleDayBtn(${idx},'${attr(stepKey)}','${attr(paramKey)}','${dtId}','${d}',this)">${lbl}</button>`;
             }).join('');
             html += `<div class="filter-sub" id="${dtId}-days" ${hideDays}><div class="sub-row"><label>Days</label>
-              <select onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(pn)}','allDayChecked',this.value);
+              <select onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','allDayChecked',this.value);
                 document.getElementById('${dtId}-daypick').style.display=this.value==='false'?'':'none'">
                 <option value="true"  ${savedAllDay!=='false'?'selected':''}>All Days</option>
                 <option value="false" ${savedAllDay==='false'?'selected':''}>Custom</option>
@@ -271,28 +375,25 @@ function renderFilterPanel(report, idx) {
 
         } else if (p.type === 'cuic_field_filter') {
           const fields   = p.availableFields || [];
-          const isAll    = savedVal === 'all';
-          let selectedConfigs = [];
-          if (isAll) {
-            selectedConfigs = fields.map(f => ({id: f.fieldId || f.label}));
-          } else if (Array.isArray(savedVal)) {
-            selectedConfigs = savedVal.map(v => typeof v === 'string' ? {id:v} : (v?.id ? v : null)).filter(Boolean);
-          } else if (savedVal === undefined && p.selectedFieldIds?.length) {
-            selectedConfigs = p.selectedFieldIds.map(id => ({id}));
+          let selectedConfigs = normalizeFieldFilterConfigs(savedVal, fields);
+          if (selectedConfigs.length === 0 && savedVal === undefined && p.selectedFields?.length) {
+            selectedConfigs = normalizeFieldFilterConfigs(p.selectedFields, fields);
+          } else if (selectedConfigs.length === 0 && savedVal === undefined && p.selectedFieldIds?.length) {
+            selectedConfigs = normalizeFieldFilterConfigs(p.selectedFieldIds, fields);
           }
-          const ffId  = 'ff-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+          const ffId  = 'ff-' + idx + '-s' + step.step + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
           const badge = `<span class="vl-badge">${fields.length} fields</span>`;
 
-          html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)} ${badge}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
             <span id="${ffId}-selcount" style="font-size:12px;color:${selectedConfigs.length>0?'var(--green)':'var(--muted)'}">${selectedConfigs.length} selected</span></div>`;
 
-          html += `<div class="ff-selected-list" id="${ffId}-selected" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(pn)}">`;
+          html += `<div class="ff-selected-list" id="${ffId}-selected" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(paramKey)}">`;
           if (selectedConfigs.length > 0) {
             selectedConfigs.forEach(cfg => {
               const field  = fields.find(f => (f.fieldId||f.label) === cfg.id);
               if (!field) return;
               const op = cfg.operator||'', v1 = cfg.value1||'', v2 = cfg.value2||'';
-              html += _ffSelectedItemHtml(idx, stepKey, pn, cfg.id, field.label||cfg.id, op, v1, v2, false);
+              html += _ffSelectedItemHtml(idx, stepKey, paramKey, cfg.id, field.label||cfg.id, op, v1, v2, false);
             });
           } else {
             html += '<p class="ff-empty-msg">No fields selected. Choose fields below to add criteria.</p>';
@@ -301,9 +402,9 @@ function renderFilterPanel(report, idx) {
 
           html += `<div class="ff-section" id="${ffId}-section"><div class="ff-toolbar">
             <input type="text" id="${ffId}-search" placeholder="\uD83D\uDD0D Filter fields..." oninput="filterFfChecklist('${ffId}',this.value)">
-            <button onclick="ffMsCheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">\u2611 All</button>
-            <button onclick="ffMsUncheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}')">\u2610 None</button>
-          </div><div class="ff-checklist" id="${ffId}-list" onchange="ffToggleItem(${idx},'${attr(stepKey)}','${attr(pn)}','${ffId}',event)">`;
+            <button onclick="ffMsCheckAll(${idx},'${attr(stepKey)}','${attr(paramKey)}','${ffId}')">\u2611 All</button>
+            <button onclick="ffMsUncheckAll(${idx},'${attr(stepKey)}','${attr(paramKey)}','${ffId}')">\u2610 None</button>
+          </div><div class="ff-checklist" id="${ffId}-list" onchange="ffToggleItem(${idx},'${attr(stepKey)}','${attr(paramKey)}','${ffId}',event)">`;
           fields.forEach(f => {
             const fid     = f.fieldId || f.label;
             const checked = selectedConfigs.some(c => c.id === fid) ? 'checked' : '';
@@ -318,14 +419,14 @@ function renderFilterPanel(report, idx) {
           const isSpec    = Array.isArray(savedVal);
           const selNames  = isSpec ? savedVal : (savedVal === undefined && p.selectedValues?.length ? p.selectedValues : []);
           const allNames  = p.availableNames || [];
-          const vlId      = 'vl-' + idx + '-s' + step.step + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+          const vlId      = 'vl-' + idx + '-s' + step.step + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
           const selCount  = isAll ? allNames.length : selNames.length;
           const badge     = `<span class="vl-badge">${allNames.length} available</span>`;
 
-          html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)} ${badge}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
             <span id="${vlId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
-          html += `<div class="vl-selected-summary" id="${vlId}-summary" data-type="vl-ms" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(pn)}" data-baseid="${vlId}">`;
+          html += `<div class="vl-selected-summary" id="${vlId}-summary" data-type="vl-ms" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(paramKey)}" data-baseid="${vlId}">`;
           const showNames = isAll ? allNames : selNames;
           if (showNames.length > 0) {
             html += `<span class="vl-sel-label">\u2705 Selected:</span>`;
@@ -343,15 +444,15 @@ function renderFilterPanel(report, idx) {
             groups.forEach((g, gi) => {
               const allC = g.members?.length > 0 && g.members.every(m => isAll || selNames.includes(m));
               html += `<button class="vl-group-btn${allC?' active':''}" data-gidx="${gi}"
-                onclick="vlMsToggleGroup(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}',${gi})">
+                onclick="vlMsToggleGroup(${idx},'${attr(stepKey)}','${attr(paramKey)}','${vlId}',${gi})">
                 ${esc(g.name)} <span class="vl-g-count">(${g.count})</span></button>`;
             });
             html += `</div>`;
           }
           html += `<div class="vl-toolbar">
             <input type="text" id="${vlId}-search" placeholder="\uD83D\uDD0D Filter names..." oninput="filterVlChecklist('${vlId}',this.value)">
-            <button onclick="vlMsCheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}')">\u2611 All</button>
-            <button onclick="vlMsUncheckAll(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}')">\u2610 None</button>
+            <button onclick="vlMsCheckAll(${idx},'${attr(stepKey)}','${attr(paramKey)}','${vlId}')">\u2611 All</button>
+            <button onclick="vlMsUncheckAll(${idx},'${attr(stepKey)}','${attr(paramKey)}','${vlId}')">\u2610 None</button>
             <span class="vl-count" id="${vlId}-count">${selCount} / ${allNames.length}</span>
           </div><div class="vl-checklist" id="${vlId}-list">`;
           allNames.forEach(n => {
@@ -359,21 +460,21 @@ function renderFilterPanel(report, idx) {
             const memberOf = groups.filter(g => (g.members||[]).includes(n)).map(g => g.name).join(',');
             html += `<label data-name="${attr(n.toLowerCase())}" data-groups="${attr(memberOf)}">
               <input type="checkbox" value="${attr(n)}" ${checked}
-                onchange="vlMsToggleItem(${idx},'${attr(stepKey)}','${attr(pn)}','${vlId}')">
+                onchange="vlMsToggleItem(${idx},'${attr(stepKey)}','${attr(paramKey)}','${vlId}')">
               <span>${esc(n)}</span></label>`;
           });
           html += `</div></div>`;
 
         } else if (p.type === 'checkbox') {
           const checked = savedVal !== undefined ? savedVal : (p.currentValue || false);
-          html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
             <input type="checkbox" ${checked?'checked':''} style="width:auto;"
-              onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(pn)}',this.checked)"></div>`;
+              onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(paramKey)}',this.checked)"></div>`;
         } else {
           const val = savedVal !== undefined ? savedVal : (p.currentValue || '');
-          html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
             <input type="${p.type==='number'?'number':'text'}" value="${attr(String(val))}"
-              onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(pn)}',this.value)"></div>`;
+              onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(paramKey)}',this.value)"></div>`;
         }
       });
       html += `</div>`;
@@ -385,7 +486,9 @@ function renderFilterPanel(report, idx) {
   if (isCuic) {
     const params = meta.params || [];
     params.forEach(p => {
-      const pn = p.paramName || '', label = p.label || pn, savedVal = filters[pn];
+      const paramKey = getCuicParamKey(p);
+      const label = p.label || p.paramName || paramKey;
+      const savedVal = getCuicSavedValue(filters, p);
 
       if (p.type === 'cuic_datetime') {
         const cfg       = typeof savedVal === 'string' ? {preset:savedVal} : (savedVal && typeof savedVal === 'object' ? savedVal : {});
@@ -393,18 +496,18 @@ function renderFilterPanel(report, idx) {
         const presets   = p.datePresets || [];
         let opts = `<option value="" ${!curPreset?'selected':''}>\u2014 use default \u2014</option>`;
         opts += presets.map(o => `<option value="${attr(o.value)}"${curPreset===o.value?' selected':''}>${esc(o.label)}</option>`).join('');
-        const dtId = 'dt-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+        const dtId = 'dt-' + idx + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
 
-        html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)}</label>
-          <select id="${dtId}-preset" onchange="updateCuicDatetime(${idx},'${attr(pn)}','preset',this.value)">${opts}</select></div>`;
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+          <select id="${dtId}-preset" onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','preset',this.value)">${opts}</select></div>`;
 
         if (p.hasDateRange) {
           const showDates = curPreset === 'CUSTOM' ? '' : 'style="display:none"';
           html += `<div class="filter-sub" id="${dtId}-dates" ${showDates}><div class="sub-row">
             <label>From</label>
-            <input type="date" value="${attr(cfg.date1||'')}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','date1',this.value)">
+            <input type="date" value="${attr(cfg.date1||'')}" onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','date1',this.value)">
             <span class="to">to</span>
-            <input type="date" value="${attr(cfg.date2||'')}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','date2',this.value)">
+            <input type="date" value="${attr(cfg.date2||'')}" onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','date2',this.value)">
           </div></div>`;
         }
 
@@ -412,36 +515,38 @@ function renderFilterPanel(report, idx) {
           const allTime   = cfg.allTime || 1;
           const showTimes = allTime === 2 ? '' : 'style="display:none"';
           html += `<div class="filter-sub"><div class="sub-row"><label>Time</label>
-            <select onchange="updateCuicDatetime(${idx},'${attr(pn)}','allTime',parseInt(this.value));
+            <select onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','allTime',parseInt(this.value));
               document.getElementById('${dtId}-times').style.display=this.value==='2'?'':'none'">
               <option value="1" ${allTime===1?'selected':''}>All Day</option>
               <option value="2" ${allTime===2?'selected':''}>Custom</option>
             </select></div>
             <div class="sub-row" id="${dtId}-times" ${showTimes}>
               <label>From</label>
-              <input type="time" step="1" value="${attr(cfg.time1||'')}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','time1',this.value)">
+              <input type="time" step="1" value="${attr(cfg.time1||'')}" onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','time1',this.value)">
               <span class="to">to</span>
-              <input type="time" step="1" value="${attr(cfg.time2||'')}" onchange="updateCuicDatetime(${idx},'${attr(pn)}','time2',this.value)">
+              <input type="time" step="1" value="${attr(cfg.time2||'')}" onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','time2',this.value)">
             </div></div>`;
         }
 
       } else if (p.type === 'cuic_field_filter') {
         const fields    = p.availableFields || [];
-        const isAll     = savedVal === 'all';
-        const isSpec    = Array.isArray(savedVal);
-        const selIds    = isSpec ? savedVal : (savedVal === undefined && p.selectedFieldIds?.length ? p.selectedFieldIds : []);
-        const ffId      = 'ff-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
-        const selCount  = isAll ? fields.length : selIds.length;
+        const selectedConfigs = normalizeFieldFilterConfigs(
+          savedVal !== undefined ? savedVal : (p.selectedFields?.length ? p.selectedFields : p.selectedFieldIds),
+          fields
+        );
+        const selIds    = selectedConfigs.map(cfg => cfg.id);
+        const ffId      = 'ff-' + idx + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
+        const selCount  = selIds.length;
         const badge     = `<span class="vl-badge">${fields.length} fields</span>`;
         const labelMap  = {};
         fields.forEach(f => { labelMap[f.fieldId||f.label] = f.label; });
 
-        html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)} ${badge}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
           <span id="${ffId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
-        html += `<div class="vl-selected-summary" id="${ffId}-summary" data-type="ff" data-ridx="${idx}" data-pn="${attr(pn)}" data-baseid="${ffId}"
+        html += `<div class="vl-selected-summary" id="${ffId}-summary" data-type="ff" data-ridx="${idx}" data-pn="${attr(paramKey)}" data-baseid="${ffId}"
           data-labelmap='${JSON.stringify(labelMap).replace(/'/g,"&#39;")}'>`;
-        const showFields = isAll ? fields : fields.filter(f => selIds.includes(f.fieldId||f.label));
+        const showFields = fields.filter(f => selIds.includes(f.fieldId||f.label));
         if (showFields.length > 0) {
           html += `<span class="vl-sel-label">\u2705 Selected:</span>`;
           showFields.slice(0,20).forEach(f => {
@@ -454,15 +559,15 @@ function renderFilterPanel(report, idx) {
 
         html += `<div class="ff-section" id="${ffId}-section"><div class="ff-toolbar">
           <input type="text" id="${ffId}-search" placeholder="\uD83D\uDD0D Filter fields..." oninput="filterFfChecklist('${ffId}',this.value)">
-          <button onclick="ffCheckAll(${idx},'${attr(pn)}','${ffId}')">\u2611 All</button>
-          <button onclick="ffUncheckAll(${idx},'${attr(pn)}','${ffId}')">\u2610 None</button>
+          <button onclick="ffCheckAll(${idx},'${attr(paramKey)}','${ffId}')">\u2611 All</button>
+          <button onclick="ffUncheckAll(${idx},'${attr(paramKey)}','${ffId}')">\u2610 None</button>
           <span class="ff-count" id="${ffId}-count">${selCount} / ${fields.length}</span>
         </div><div class="ff-checklist" id="${ffId}-list">`;
         fields.forEach(f => {
           const fid     = f.fieldId||f.label;
-          const checked = isAll || selIds.includes(fid) ? 'checked' : '';
+          const checked = selIds.includes(fid) ? 'checked' : '';
           html += `<label data-name="${attr((f.combined||f.label||'').toLowerCase())}" data-label="${attr(f.label)}">
-            <input type="checkbox" value="${attr(fid)}" ${checked} onchange="ffSpabToggleItem(${idx},'${attr(pn)}','${ffId}')">
+            <input type="checkbox" value="${attr(fid)}" ${checked} onchange="ffSpabToggleItem(${idx},'${attr(paramKey)}','${ffId}')">
             <span>${esc(f.label)}</span><span class="ff-field-id">${esc(f.fieldId)}</span></label>`;
         });
         html += `</div></div>`;
@@ -472,14 +577,14 @@ function renderFilterPanel(report, idx) {
         const isSpec   = Array.isArray(savedVal);
         const selNames = isSpec ? savedVal : (savedVal === undefined && p.selectedValues?.length ? p.selectedValues : []);
         const allNames = p.availableNames || [];
-        const vlId     = 'vl-' + idx + '-' + pn.replace(/[^a-zA-Z0-9]/g,'_');
+        const vlId     = 'vl-' + idx + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
         const selCount = isAll ? allNames.length : selNames.length;
         const badge    = `<span class="vl-badge">${allNames.length} available</span>`;
 
-        html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)} ${badge}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
           <span id="${vlId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
-        html += `<div class="vl-selected-summary" id="${vlId}-summary" data-type="vl" data-ridx="${idx}" data-pn="${attr(pn)}" data-baseid="${vlId}">`;
+        html += `<div class="vl-selected-summary" id="${vlId}-summary" data-type="vl" data-ridx="${idx}" data-pn="${attr(paramKey)}" data-baseid="${vlId}">`;
         const showNamesSp = isAll ? allNames : selNames;
         if (showNamesSp.length > 0) {
           html += `<span class="vl-sel-label">\u2705 Selected:</span>`;
@@ -497,36 +602,36 @@ function renderFilterPanel(report, idx) {
           groups.forEach((g, gi) => {
             const allC = g.members?.length > 0 && g.members.every(m => isAll || selNames.includes(m));
             html += `<button class="vl-group-btn${allC?' active':''}" data-gidx="${gi}"
-              onclick="vlToggleGroup(${idx},'${attr(pn)}','${vlId}',${gi})">
+              onclick="vlToggleGroup(${idx},'${attr(paramKey)}','${vlId}',${gi})">
               ${esc(g.name)} <span class="vl-g-count">(${g.count})</span></button>`;
           });
           html += `</div>`;
         }
         html += `<div class="vl-toolbar">
           <input type="text" id="${vlId}-search" placeholder="\uD83D\uDD0D Filter names..." oninput="filterVlChecklist('${vlId}',this.value)">
-          <button onclick="vlCheckAll(${idx},'${attr(pn)}','${vlId}')">\u2611 All</button>
-          <button onclick="vlUncheckAll(${idx},'${attr(pn)}','${vlId}')">\u2610 None</button>
+          <button onclick="vlCheckAll(${idx},'${attr(paramKey)}','${vlId}')">\u2611 All</button>
+          <button onclick="vlUncheckAll(${idx},'${attr(paramKey)}','${vlId}')">\u2610 None</button>
           <span class="vl-count" id="${vlId}-count">${selCount} / ${allNames.length}</span>
         </div><div class="vl-checklist" id="${vlId}-list">`;
         allNames.forEach(n => {
           const checked  = isAll || selNames.includes(n) ? 'checked' : '';
           const memberOf = groups.filter(g => (g.members||[]).includes(n)).map(g => g.name).join(',');
           html += `<label data-name="${attr(n.toLowerCase())}" data-groups="${attr(memberOf)}">
-            <input type="checkbox" value="${attr(n)}" ${checked} onchange="vlToggleItem(${idx},'${attr(pn)}','${vlId}')">
+            <input type="checkbox" value="${attr(n)}" ${checked} onchange="vlToggleItem(${idx},'${attr(paramKey)}','${vlId}')">
             <span>${esc(n)}</span></label>`;
         });
         html += `</div></div>`;
 
       } else if (p.type === 'checkbox') {
         const checked = savedVal !== undefined ? savedVal : (p.currentValue || false);
-        html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
           <input type="checkbox" ${checked?'checked':''} style="width:auto;"
-            onchange="updateCuicFilter(${idx},'${attr(pn)}',this.checked)"></div>`;
+            onchange="updateCuicFilter(${idx},'${attr(paramKey)}',this.checked)"></div>`;
       } else {
         const val = savedVal !== undefined ? savedVal : (p.currentValue || '');
-        html += `<div class="filter-field"><label title="${attr(pn)}">${esc(label)}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
           <input type="${p.type==='number'?'number':'text'}" value="${attr(String(val))}"
-            onchange="updateCuicFilter(${idx},'${attr(pn)}',this.value)"></div>`;
+            onchange="updateCuicFilter(${idx},'${attr(paramKey)}',this.value)"></div>`;
       }
     });
     html += '</div>';
@@ -681,7 +786,7 @@ function filterVlChecklist(vlId, query) {
 function vlToggleGroup(reportIdx, paramName, vlId, groupIdx) {
   const r    = cuicReports[reportIdx];
   const meta = r._wizard_meta || (r.filters && r.filters._meta) || {};
-  const p    = (meta.params || []).find(pp => pp.paramName === paramName);
+  const p    = (meta.params || []).find(pp => getCuicParamAliases(pp).includes(paramName));
   if (!p) return;
   const group = (p.availableGroups || [])[groupIdx];
   if (!group?.members) return;
@@ -699,7 +804,7 @@ function vlUpdateGroupButtons(vlId, reportIdx, paramName) {
   if (!groupsEl) return;
   const r    = cuicReports[reportIdx];
   const meta = r._wizard_meta || (r.filters && r.filters._meta) || {};
-  const p    = (meta.params || []).find(pp => pp.paramName === paramName);
+  const p    = (meta.params || []).find(pp => getCuicParamAliases(pp).includes(paramName));
   if (!p) return;
   const listEl    = document.getElementById(vlId + '-list');
   if (!listEl) return;
@@ -714,7 +819,7 @@ function vlUpdateGroupButtons(vlId, reportIdx, paramName) {
 function _findMsParam(meta, stepKey, paramName) {
   const step = (meta.steps || []).find(s => s.step === parseInt(stepKey.replace('step_','')));
   if (!step) return null;
-  return (step.params || []).find(p => p.paramName === paramName) || null;
+  return (step.params || []).find(p => getCuicParamAliases(p).includes(paramName)) || null;
 }
 
 function switchWizardTab(idx, tabIdx) {
@@ -1069,7 +1174,7 @@ async function discoverFilters(reportIdx) {
     const isMultiStep = data.type === 'cuic_multistep';
 
     if (isMultiStep) {
-      const metaObj = { type: 'cuic_multistep', steps: data.steps, stepTitles: data.stepTitles || data.steps.map(s => s.title || 'Step ' + s.step), datePresets: data.datePresets || [] };
+      const metaObj = { schemaVersion: data.schemaVersion || 2, type: 'cuic_multistep', steps: data.steps, stepTitles: data.stepTitles || data.steps.map(s => s.title || 'Step ' + s.step) };
       r._wizard_meta = metaObj;
       r.filters = { _meta: metaObj };
       let total = 0;
@@ -1078,11 +1183,15 @@ async function discoverFilters(reportIdx) {
         r.filters[sk] = {};
         (step.params || []).forEach(p => {
           total++;
-          const pn = p.paramName;
-          if (!pn) return;
-          if (p.type === 'cuic_datetime' && p.currentPreset) r.filters[sk][pn] = p.currentPreset;
-          if (p.type === 'cuic_valuelist' && p.selectedValues?.length) r.filters[sk][pn] = p.selectedValues;
-          if (p.type === 'cuic_field_filter' && p.selectedFieldIds?.length) r.filters[sk][pn] = p.selectedFieldIds;
+          const paramKey = getCuicParamKey(p);
+          if (!paramKey) return;
+          if (p.type === 'cuic_datetime' && p.currentPreset) r.filters[sk][paramKey] = p.currentPreset;
+          if (p.type === 'cuic_valuelist' && p.selectedValues?.length) r.filters[sk][paramKey] = cloneCuicData(p.selectedValues);
+          if (p.type === 'cuic_field_filter' && p.selectedFields?.length) {
+            r.filters[sk][paramKey] = normalizeFieldFilterConfigs(p.selectedFields, p.availableFields);
+          } else if (p.type === 'cuic_field_filter' && p.selectedFieldIds?.length) {
+            r.filters[sk][paramKey] = normalizeFieldFilterConfigs(p.selectedFieldIds, p.availableFields);
+          }
         });
       });
       // Store column metadata if discovered
@@ -1094,13 +1203,17 @@ async function discoverFilters(reportIdx) {
       }
 
     } else if (isCuic) {
-      const metaObj = { type: 'cuic_spab', params: data.params || [], datePresets: data.datePresets || [] };
+      const metaObj = { schemaVersion: data.schemaVersion || 2, type: 'cuic_spab', params: data.params || [] };
       r._wizard_meta = metaObj;
       r.filters = { _meta: metaObj };
       (data.params || []).forEach(p => {
-        const pn = p.paramName; if (!pn) return;
-        if (p.type === 'cuic_datetime' && p.currentPreset) r.filters[pn] = p.currentPreset;
-        if (p.type === 'cuic_valuelist' && p.selectedValues?.length) r.filters[pn] = p.selectedValues;
+        const paramKey = getCuicParamKey(p);
+        if (!paramKey) return;
+        if (p.type === 'cuic_datetime' && p.currentPreset) r.filters[paramKey] = p.currentPreset;
+        if (p.type === 'cuic_valuelist' && p.selectedValues?.length) r.filters[paramKey] = cloneCuicData(p.selectedValues);
+        if (p.type === 'cuic_field_filter' && p.selectedFields?.length) {
+          r.filters[paramKey] = normalizeFieldFilterConfigs(p.selectedFields, p.availableFields);
+        }
       });
       if (data._columns_meta && (data._columns_meta.available || []).length > 0) {
         r._columns_meta = data._columns_meta;

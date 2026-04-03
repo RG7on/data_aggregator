@@ -31,6 +31,7 @@ function syncReportInputs() {
 // ── buildSettings ────────────────────────────────────────────────────────
 function buildSettings() {
   syncReportInputs();
+  const cloneJson = value => JSON.parse(JSON.stringify(value === undefined ? null : value));
   return {
     global: {
       headless:             document.getElementById('g-headless').checked,
@@ -48,36 +49,15 @@ function buildSettings() {
         enabled:            document.getElementById('cuic-enabled').checked,
         url:                document.getElementById('cuic-url').value,
         reports:            cuicReports.map(r => {
-          const f = Object.assign({}, r.filters || {});
-          if (r._wizard_meta) f._meta = r._wizard_meta;
-          const meta = r._wizard_meta || f._meta;
-          const steps = meta && meta.steps;
-          if (steps && Array.isArray(steps)) {
-            steps.forEach((stepMeta, i) => {
-              const stepKey = 'step_' + (i + 1);
-              const stepVals = f[stepKey];
-              if (!stepVals || typeof stepVals !== 'object') return;
-              const params = stepMeta.params || [];
-              const normalized = {};
-              params.forEach(p => {
-                const pn = (p.paramName || '').trim();
-                const label = (p.label || '').trim();
-                if (!pn) return;
-                let val = stepVals[pn];
-                if (val === undefined && label) val = stepVals[label];
-                if (val !== undefined) normalized[pn] = val;
-              });
-              ['_field_filters'].forEach(k => { if (stepVals[k] !== undefined) normalized[k] = stepVals[k]; });
-              if (Object.keys(normalized).length) f[stepKey] = normalized;
-            });
-          }
+          const f = cloneJson(r.filters || {}) || {};
+          if (r._wizard_meta) f._meta = cloneJson(r._wizard_meta);
           return {
             report_id: r.report_id || '',
             label: r.label, folder: r.folder, name: r.name,
             enabled: r.enabled !== false, data_type: r.data_type || 'ongoing',
             row_mode: r.row_mode || 'consolidated_only',
             columns: r.columns !== undefined ? r.columns : null,
-            ...(r._columns_meta ? { _columns_meta: r._columns_meta } : {}),
+            ...(r._columns_meta ? { _columns_meta: cloneJson(r._columns_meta) } : {}),
             filters: f
           };
         }),

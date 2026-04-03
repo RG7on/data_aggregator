@@ -151,6 +151,208 @@ def _scroll_collect_valuelist(worker, frame, param: dict):
         worker.logger.warning(f"  Scroll collection failed: {e}")
 
 
+_MISSING = object()
+
+
+def _unique_nonempty(values: List[Any]) -> List[str]:
+    seen = set()
+    result: List[str] = []
+    for value in values or []:
+        normalized = str(value or '').strip()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        result.append(normalized)
+    return result
+
+
+def _cuic_param_aliases(param: dict) -> List[str]:
+    return _unique_nonempty([
+        param.get('storageKey'),
+        *(param.get('aliases') or []),
+        param.get('paramName'),
+        param.get('paramName2'),
+        param.get('label'),
+    ])
+
+
+def _cuic_param_key(param: dict) -> str:
+    aliases = _cuic_param_aliases(param)
+    return aliases[0] if aliases else ''
+
+
+def _resolve_saved_cuic_value(saved_values: dict, param: dict, default=_MISSING):
+    source = saved_values or {}
+    for alias in _cuic_param_aliases(param):
+        if alias in source:
+            return source[alias]
+    return default
+
+
+def _normalize_field_filter_entries(value: Any) -> List[dict]:
+    if not isinstance(value, list):
+        return []
+    normalized: List[dict] = []
+    for item in value:
+        if isinstance(item, str):
+            field_id = item.strip()
+            if not field_id:
+                continue
+            normalized.append({
+                'id': field_id,
+                'fieldId': field_id,
+                'operator': '',
+                'value1': '',
+                'value2': '',
+                'showInput2': False,
+            })
+            continue
+        if not isinstance(item, dict):
+            continue
+        field_id = str(item.get('fieldId') or item.get('id') or item.get('label') or '').strip()
+        if not field_id:
+            continue
+        normalized.append({
+            **item,
+            'id': field_id,
+            'fieldId': field_id,
+            'operator': str(item.get('operator') or ''),
+            'value1': str(item.get('value1')) if item.get('value1') is not None else '',
+            'value2': str(item.get('value2')) if item.get('value2') is not None else '',
+            'showInput2': bool(item.get('showInput2')),
+        })
+    return normalized
+
+
+def _normalize_datetime_expected(value: Any) -> dict:
+    if isinstance(value, str):
+        return {'preset': value}
+    if not isinstance(value, dict):
+        return {}
+    normalized = dict(value)
+    if 'preset' not in normalized and normalized.get('currentPreset'):
+        normalized['preset'] = normalized.get('currentPreset')
+    return normalized
+
+
+def _compare_cuic_datetime(expected: Any, observed: dict) -> tuple[bool, str]:
+    expected_cfg = _normalize_datetime_expected(expected)
+    observed_cfg = observed or {}
+    if 'allTime' in expected_cfg and 'allTimeChecked' not in expected_cfg:
+        expected_cfg['allTimeChecked'] = 'false' if expected_cfg.get('allTime') == 2 else 'true'
+
+    field_map = {
+        'preset': 'currentPreset',
+        'date1': 'currentDate1',
+        'date2': 'currentDate2',
+        'time1': 'currentTime1',
+        'time2': 'currentTime2',
+        'allTimeChecked': 'allTimeChecked',
+        'allDayChecked': 'allDayChecked',
+    }
+    for expected_key, observed_key in field_map.items():
+        if expected_key not in expected_cfg:
+            continue
+        expected_value = str(expected_cfg.get(expected_key) or '')
+        observed_value = str(observed_cfg.get(observed_key) or '')
+        if expected_value != observed_value:
+            return False, f"{expected_key} expected {expected_value!r}, observed {observed_value!r}"
+
+    if 'days' in expected_cfg and isinstance(expected_cfg.get('days'), dict):
+        observed_days = observed_cfg.get('days') or {}
+        for day_key, expected_value in expected_cfg['days'].items():
+            observed_value = str(observed_days.get(day_key) or '')
+            if str(expected_value or '') != observed_value:
+                return False, f"day {day_key} expected {expected_value!r}, observed {observed_value!r}"
+
+    return True, ''
+
+
+def _compare_cuic_valuelist(expected: Any, observed: dict) -> tuple[bool, str]:
+    observed_values = set((observed or {}).get('selectedValues') or [])
+    if expected == 'all':
+        total_available = int((observed or {}).get('totalAvailable') or 0)
+        selected_count = len(observed_values)
+        if total_available and selected_count != total_available:
+            return False, f"expected all values, observed {selected_count}/{total_available} selected"
+        return True, ''
+
+    if isinstance(expected, list):
+        expected_values = set(str(v) for v in expected)
+        if expected_values != observed_values:
+            return False, f"expected {sorted(expected_values)!r}, observed {sorted(observed_values)!r}"
+    return True, ''
+
+
+def _compare_cuic_field_filter(expected: Any, observed: dict) -> tuple[bool, str]:
+    expected_fields = _normalize_field_filter_entries(expected)
+    observed_fields = {
+        entry.get('fieldId') or entry.get('id'): entry
+        for entry in _normalize_field_filter_entries((observed or {}).get('selectedFields'))
+    }
+    observed_ids = set((observed or {}).get('selectedFieldIds') or [])
+
+    for expected_field in expected_fields:
+        field_id = expected_field.get('fieldId') or expected_field.get('id')
+        if not field_id:
+            continue
+        if field_id not in observed_ids and field_id not in observed_fields:
+            return False, f"missing field {field_id!r}"
+        observed_field = observed_fields.get(field_id, {})
+        for key in ('operator', 'value1', 'value2'):
+            expected_value = expected_field.get(key)
+            if expected_value in (None, ''):
+                continue
+            observed_value = str(observed_field.get(key) or '')
+            if str(expected_value) != observed_value:
+                return False, f"field {field_id!r} {key} expected {expected_value!r}, observed {observed_value!r}"
+
+    return True, ''
+
+
+def _verify_cuic_step_state(worker, expected_step_info: dict, saved_values: dict):
+    observed_step = read_wizard_step_fields(worker)
+    if not observed_step or observed_step.get('type') != expected_step_info.get('type'):
+        raise ValueError('Could not re-read the current CUIC wizard step for verification')
+
+    observed_params = {}
+    for observed_param in observed_step.get('params', []):
+        for alias in _cuic_param_aliases(observed_param):
+            observed_params[alias] = observed_param
+
+    mismatches = []
+    for param in expected_step_info.get('params', []):
+        expected_value = _resolve_saved_cuic_value(saved_values, param)
+        if expected_value is _MISSING:
+            continue
+        observed_param = None
+        for alias in _cuic_param_aliases(param):
+            if alias in observed_params:
+                observed_param = observed_params[alias]
+                break
+        if not observed_param:
+            mismatches.append(f"{_cuic_param_key(param) or param.get('label')}: not found during verification")
+            continue
+
+        param_type = param.get('type', '')
+        if param_type == 'cuic_datetime':
+            ok, detail = _compare_cuic_datetime(expected_value, observed_param)
+        elif param_type == 'cuic_valuelist':
+            ok, detail = _compare_cuic_valuelist(expected_value, observed_param)
+        elif param_type == 'cuic_field_filter':
+            ok, detail = _compare_cuic_field_filter(expected_value, observed_param)
+        else:
+            observed_value = observed_param.get('currentValue')
+            ok = observed_value == expected_value
+            detail = f"expected {expected_value!r}, observed {observed_value!r}" if not ok else ''
+
+        if not ok:
+            mismatches.append(f"{_cuic_param_key(param) or param.get('label')}: {detail}")
+
+    if mismatches:
+        raise ValueError('CUIC step verification failed: ' + '; '.join(mismatches))
+
+
 def find_wizard_frame(worker):
     """Find the frame containing the wizard Next/Run buttons."""
     for f in worker.page.frames:
@@ -327,7 +529,17 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
 
     if stype == 'cuic_spab':
         # ── CUIC SPAB: apply via Angular scope ──
-        cuic_params = {k: v for k, v in saved_values.items() if not k.startswith('_')}
+        cuic_params = {}
+        for param in step_info.get('params', []):
+            resolved = _resolve_saved_cuic_value(saved_values, param)
+            if resolved is _MISSING:
+                continue
+            param_name = str(param.get('paramName') or _cuic_param_key(param) or '').strip()
+            if not param_name:
+                continue
+            if param.get('type') == 'cuic_field_filter':
+                resolved = _normalize_field_filter_entries(resolved)
+            cuic_params[param_name] = resolved
         if not cuic_params:
             return
         for f in worker.page.frames:
@@ -337,6 +549,7 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                     for r in result['applied']:
                         status = 'OK' if r.get('ok') else 'FAIL'
                         worker.logger.info(f"    {r.get('param')}: {status} → {r.get('value','')}")
+                    _verify_cuic_step_state(worker, step_info, saved_values)
                     return
             except Exception:
                 pass
@@ -346,14 +559,15 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
         # Routes each param type (datetime / valuelist / field_filter) through
         # the centralised Angular-scope JS snippet in javascript.py.
         params = step_info.get('params', [])
+        applied_any = False
         for p in params:
             pn    = p.get('paramName', '')
             ptype = p.get('type', '')
-            val   = saved_values.get(pn)
-            if val is None:
+            val   = _resolve_saved_cuic_value(saved_values, p)
+            if val is _MISSING:
                 continue
 
-            worker.logger.info(f"    {pn} ({ptype}): applying {val!r}")
+            worker.logger.info(f"    {_cuic_param_key(p) or pn} ({ptype}): applying {val!r}")
 
             # Build the cfg dict that CUIC_MULTISTEP_APPLY_JS expects
             if ptype == 'cuic_datetime':
@@ -367,15 +581,16 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                     'values': {'selectedValues': val}
                 }
             elif ptype == 'cuic_field_filter':
-                if not isinstance(val, list) or not val:
-                    worker.logger.info(f"    {pn}: no field filters to apply")
+                normalized_fields = _normalize_field_filter_entries(val)
+                if not normalized_fields:
+                    worker.logger.info(f"    {_cuic_param_key(p) or pn}: no field filters to apply")
                     continue
                 cfg = {
                     'stepType': 'field_filter',
-                    'values': {'fields': val}
+                    'values': {'fields': normalized_fields}
                 }
             else:
-                worker.logger.warning(f"    {pn}: unknown type '{ptype}', skipping")
+                worker.logger.warning(f"    {_cuic_param_key(p) or pn}: unknown type '{ptype}', skipping")
                 continue
 
             # Try every frame until the JS applies successfully
@@ -391,16 +606,17 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                                 f"      {status} {a.get('field','')}: "
                                 f"{a.get('matchedNames', a.get('value', a.get('error', '')))}")
                         applied = True
+                        applied_any = True
                         applied_frame = f
                         if ptype != 'cuic_field_filter':
                             worker.page.wait_for_timeout(300)
                         break
                     elif result and result.get('error'):
-                        worker.logger.debug(f"    {pn}: frame skip: {result.get('error','')}")
+                        worker.logger.debug(f"    {_cuic_param_key(p) or pn}: frame skip: {result.get('error','')}")
                 except Exception as e:
-                    worker.logger.debug(f"    {pn}: frame error: {e}")
+                    worker.logger.debug(f"    {_cuic_param_key(p) or pn}: frame error: {e}")
             if not applied:
-                worker.logger.warning(f"    {pn}: could NOT be applied")
+                worker.logger.warning(f"    {_cuic_param_key(p) or pn}: could NOT be applied")
 
             # Field filter Pass 2: set operators/values after cuic-filter elements render
             if applied and ptype == 'cuic_field_filter':
@@ -411,7 +627,7 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                         '#cuic-iff-fields cuic-filter', state='attached', timeout=3000)
 
                     result2 = applied_frame.evaluate(
-                        javascript.CUIC_FIELD_FILTER_PASS2_JS, val)
+                        javascript.CUIC_FIELD_FILTER_PASS2_JS, normalized_fields)
                     if result2 and result2.get('ok'):
                         for a in result2.get('actions', []):
                             status = 'v' if a.get('ok') else 'x'
@@ -420,10 +636,13 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                                 f"{a.get('value', a.get('error', ''))}")
                     elif result2:
                         worker.logger.warning(
-                            f"    {pn} pass2: {result2.get('error','')} "
+                            f"    {_cuic_param_key(p) or pn} pass2: {result2.get('error','')} "
                             f"(count={result2.get('count', '?')})")
                 except Exception as e:
-                    worker.logger.warning(f"    {pn} pass2 error: {e}")
+                    worker.logger.warning(f"    {_cuic_param_key(p) or pn} pass2 error: {e}")
+
+        if applied_any:
+            _verify_cuic_step_state(worker, step_info, saved_values)
 
     else:
         # ── Generic: DOM-based ──
@@ -584,7 +803,7 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
     worker._load_config()
     folder = str(report_config.get('folder', '') or '').strip().strip('/')
     name = str(report_config.get('name', '') or '').strip().strip('/')
-    result = {'steps': [], 'error': '', 'type': 'generic'}
+    result = {'schemaVersion': 2, 'steps': [], 'error': '', 'type': 'generic'}
 
     if not name:
         result['error'] = 'Missing CUIC report name'

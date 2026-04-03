@@ -16,10 +16,10 @@
       "url": "https://148.151.32.77:8444/cuicui/Main.jsp",
       "reports": [
         {
-          "report_id": "fc19dd919d4a4a948f1e28ba5ca77018",
-          "label": "z_call_type_historical_all_fields",
+          "report_id": "752edfea5b934d8e92f2542a664e1ad2",
+          "label": "z_agent_skill_group_historical",
           "folder": "Test",
-          "name": "Z Call Type Historical All Fields",
+          "name": "Z Agent Skill Group Historical",
           "enabled": true,
           "data_type": "ongoing",
           "row_mode": "consolidated_only",
@@ -28,1162 +28,310 @@
             "available": [
               {
                 "field": "",
-                "headerName": "Call Type"
+                "headerName": "Skill Group Name"
               },
               {
-                "field": "DateTime",
+                "field": "",
+                "headerName": "Agent"
+              },
+              {
+                "field": "Media",
+                "headerName": "Media"
+              },
+              {
+                "field": "Interval",
                 "headerName": "DateTime"
-              },
-              {
-                "field": "servicelLevel",
-                "headerName": "Service Level"
-              },
-              {
-                "field": "ServiceLevelAband",
-                "headerName": "Abandoned Within Service Level"
-              },
-              {
-                "field": "asa",
-                "headerName": "Avg Speed of Answer"
-              },
-              {
-                "field": "CallsOffered",
-                "headerName": "Offered"
-              },
-              {
-                "field": "RouterQueueCalls",
-                "headerName": "Assigned From Queue"
-              },
-              {
-                "field": "CallsAnswered",
-                "headerName": "Answered"
-              },
-              {
-                "field": "AnswerWaitTime",
-                "headerName": "Answer Wait Time"
               },
               {
                 "field": "CallsHandled",
                 "headerName": "Handled"
               },
               {
-                "field": "TotalCallsAband",
-                "headerName": "Abandoned"
+                "field": "AHT",
+                "headerName": "Avg Handle Time"
               },
               {
-                "field": "ReturnBR",
-                "headerName": "Return"
+                "field": "InCallsOnHold",
+                "headerName": "Held"
               },
               {
-                "field": "ICRDefaultRouted",
-                "headerName": "Default_Treatment"
+                "field": "AHoldT",
+                "headerName": "Avg Hold Time"
               },
               {
-                "field": "NetworkDefaultRouted",
-                "headerName": "Network Routed"
+                "field": "AbandRingCalls",
+                "headerName": "Abandon Rings"
               },
               {
-                "field": "OverflowOut",
-                "headerName": "Flow Out"
+                "field": "RedirectCalls",
+                "headerName": "RONA"
               },
               {
-                "field": "totalerrorcount",
-                "headerName": "Calls Error"
+                "field": "AbandonHoldCalls",
+                "headerName": "Abandon Hold"
               },
               {
-                "field": "Other",
-                "headerName": "Other"
+                "field": "TransferInCalls",
+                "headerName": "Transfer In "
               },
               {
-                "field": "per_queued",
-                "headerName": "% Queued"
+                "field": "TransferOutCalls",
+                "headerName": "Transfer Out "
               },
               {
-                "field": "per_aban",
-                "headerName": "% Aban"
+                "field": "OutExtnCalls",
+                "headerName": "External Out"
               },
               {
-                "field": "avg_aban_delay",
-                "headerName": "Average Abandon Delay"
+                "field": "AgentLoggedOnTime",
+                "headerName": "Logged On Time"
               },
               {
-                "field": "ShortCalls",
-                "headerName": "Short Calls"
+                "field": "perActiveTime",
+                "headerName": "%Active"
               },
               {
-                "field": "MaxCallsQueued",
-                "headerName": "Max Queued"
+                "field": "perHoldTime",
+                "headerName": "%Hold"
               },
               {
-                "field": "MaxCallWaitTime",
-                "headerName": "Longest Queued"
+                "field": "perNotActive",
+                "headerName": "%Not Active"
+              },
+              {
+                "field": "perNotReady",
+                "headerName": "%Not Ready"
+              },
+              {
+                "field": "perReserved",
+                "headerName": "%Reserved"
+              },
+              {
+                "field": "perWrapup",
+                "headerName": "%Wrap Up"
+              },
+              {
+                "field": "AgentTerminatedCalls",
+                "headerName": "Agent Terminated Calls"
+              },
+              {
+                "field": "AnswerWaitTime",
+                "headerName": "Answer Wait Time"
               }
             ],
-            "datetime_field": "DateTime",
-            "discovered_at": "2026-04-03T23:05:14"
+            "datetime_field": "Interval",
+            "discovered_at": "2026-04-03T23:58:08"
           },
           "filters": {
             "_meta": {
-              "type": "cuic_multistep",
-              "steps": [
+              "schemaVersion": 2,
+              "type": "cuic_spab",
+              "params": [
                 {
-                  "step": 1,
-                  "title": "Date & Time",
-                  "type": "cuic_multistep",
-                  "params": [
+                  "dataType": "DATETIME",
+                  "label": "DateTime",
+                  "paramName": "@start_date",
+                  "paramName2": "@end_date",
+                  "storageKey": "@start_date",
+                  "aliases": [
+                    "@start_date",
+                    "@end_date",
+                    "DateTime"
+                  ],
+                  "isRequired": true,
+                  "type": "cuic_datetime",
+                  "datePresets": [
                     {
-                      "dataType": "DATETIME",
-                      "type": "cuic_datetime",
-                      "label": "DateTime  (DateTime)",
-                      "paramName": "DateTime  (DateTime)",
-                      "datePresets": [
-                        {
-                          "value": "CUSTOM",
-                          "label": "Custom"
-                        },
-                        {
-                          "value": "THISDAY",
-                          "label": "Today"
-                        },
-                        {
-                          "value": "LASTDAY",
-                          "label": "Yesterday"
-                        },
-                        {
-                          "value": "THISWK",
-                          "label": "This Week"
-                        },
-                        {
-                          "value": "LASTWK",
-                          "label": "Last Week"
-                        },
-                        {
-                          "value": "THISMTH",
-                          "label": "This Month"
-                        },
-                        {
-                          "value": "LASTMTH",
-                          "label": "Last Month"
-                        },
-                        {
-                          "value": "THISYR",
-                          "label": "Year to Date"
-                        },
-                        {
-                          "value": "LASTYR",
-                          "label": "Last Year"
-                        }
-                      ],
-                      "currentPreset": "LASTDAY",
-                      "relativeRange": "LASTDAY",
-                      "isRelativeDate": "yes",
-                      "currentDate1": "",
-                      "currentDate2": "",
-                      "hasDateRange": true,
-                      "hasTimeRange": true,
-                      "allTimeChecked": "true",
-                      "currentTime1": "12:00 AM",
-                      "currentTime2": "11:59 PM",
-                      "hasDays": true,
-                      "allDayChecked": "true",
-                      "days": {
-                        "mon": "checked",
-                        "tue": "checked",
-                        "wed": "checked",
-                        "thu": "checked",
-                        "fri": "checked",
-                        "sat": "checked",
-                        "sun": "checked"
-                      },
-                      "isRequired": true,
-                      "isMatchField": false,
-                      "isMatchDateRange": false
-                    }
-                  ]
-                },
-                {
-                  "step": 2,
-                  "title": "Key Criteria",
-                  "type": "cuic_multistep",
-                  "params": [
+                      "value": "CUSTOM",
+                      "label": "Custom"
+                    },
                     {
-                      "dataType": "VALUELIST",
-                      "type": "cuic_valuelist",
-                      "label": "Call Types(CallTypeID)",
-                      "paramName": "Call Types(CallTypeID)",
-                      "isRequired": true,
-                      "totalAvailable": 73,
-                      "availableCount": 73,
-                      "availableNames": [
-                        "AGENT_XFER_CALLTYPE",
-                        "AgentTransfer_CT",
-                        "Anti_Natal_CT",
-                        "ARB_CLINIC_COMMON_CT",
-                        "ARB_GENERAL_CT",
-                        "ARB_LABORATORY_CT",
-                        "ARB_OUTPATIENT_CT",
-                        "ARB_VACCINATION_CT",
-                        "BuiltIn",
-                        "Business_HD_CT",
-                        "CCTV",
-                        "CLINIC_UAT",
-                        "Dialer_Camp",
-                        "EDM_Application_CT",
-                        "EDM_IT_CT",
-                        "EDM_Support_Main_CT",
-                        "EDM_WorkFlow_CT",
-                        "ENG_CLINIC_COMMON_CT",
-                        "ENG_GENERAL_CT",
-                        "ENG_LABORATORY_CT",
-                        "ENG_OUTPATIENT_CT",
-                        "ENG_VACCINATION_CT",
-                        "EOB_CT",
-                        "Flight_Booking_CT",
-                        "General_IT_CT",
-                        "General_OP_CT",
-                        "GenITOB_CT",
-                        "Genral_Apt_CT",
-                        "HelloWorl_CT",
-                        "HR_DEPT_MAIN_CT",
-                        "HR_DEPT_RAMADAN_002",
-                        "HR_Faciility_CT",
-                        "HR_Logistics_App_CT",
-                        "HR_Logistics_CT",
-                        "HR_Logistics_Services_CT",
-                        "HSSE_CT",
-                        "IFMOB_CT",
-                        "IFMS_CT",
-                        "IMMG_CT",
-                        "Interior_Coorprate_CT",
-                        "IT_HelpDesk_CT",
-                        "Laboratory_CT",
-                        "Logistics_CT",
-                        "MAIN_CLINIC_FLOW",
-                        "MED_CT",
-                        "Out_Patient_CT",
-                        "PDO_HR",
-                        "PDO_IFM",
-                        "PDO_TEST",
-                        "PDO_TollFree",
-                        "Pension_Ar_CT",
-                        "Pension_CT",
-                        "Pension_EN_CT",
-                        "Pool_Car_CT",
-                        "RTMOB_CT",
-                        "RTPS_CT",
-                        "SAP_CPL_CT",
-                        "SAP_CT",
-                        "SAP_FIN_CT",
-                        "SAP_SAPHIRE_CT",
-                        "SAP_WM_CT",
-                        "SAPOB_CT",
-                        "Servion_CT",
-                        "SUBOB_CT",
-                        "Subsurface_CT",
-                        "Telcom_CT",
-                        "TelecomOB_CT",
-                        "Test123",
-                        "Test_1145_CT",
-                        "Test_CT",
-                        "Transport_Chauffeur_CT",
-                        "Voice_Mail",
-                        "WIN_CT"
-                      ],
-                      "availableGroups": [],
-                      "selectedCount": 5,
-                      "selectedValues": [
-                        "General_IT_CT",
-                        "RTPS_CT",
-                        "SAP_CT",
-                        "Subsurface_CT",
-                        "Telcom_CT"
-                      ],
-                      "_vlDebug": {
-                        "switcherIsoKeys": [
-                          "leftModel",
-                          "rightModel",
-                          "maxItems",
-                          "leftSearchPlaceholder",
-                          "rightSearchPlaceholder",
-                          "leftCountLabel",
-                          "rightCountLabel",
-                          "maxErrorHandler",
-                          "refreshHandler",
-                          "errorIndicator",
-                          "initialized",
-                          "onChange",
-                          "config",
-                          "i18N",
-                          "rightPaneIDSet",
-                          "showOnlyRightleft",
-                          "callbacks",
-                          "moveRight",
-                          "moveLeft",
-                          "moveAllToRight",
-                          "moveAllToLeft",
-                          "checkInRightIDSet",
-                          "refresh",
-                          "isRightEnabled",
-                          "isLeftEnabled",
-                          "showCardinal",
-                          "styleOnmove",
-                          "removeOnMove"
-                        ],
-                        "source": "switcher.isolateScope.leftModel",
-                        "rawCount": 73,
-                        "selectedSource": "switcher.isolateScope.rightModel"
-                      },
-                      "_needsScroll": false
-                    }
-                  ]
-                },
-                {
-                  "step": 3,
-                  "title": "Field Filters",
-                  "type": "cuic_multistep",
-                  "params": [
+                      "value": "THISDAY",
+                      "label": "Today"
+                    },
                     {
-                      "dataType": "FIELD_FILTER",
-                      "type": "cuic_field_filter",
-                      "label": "Field Filters",
-                      "paramName": "_field_filters",
-                      "availableFields": [
-                        {
-                          "label": "% Abandon (per_aban)",
-                          "fieldId": "% Abandon (per_aban)",
-                          "combined": "% Abandon (per_aban)"
-                        },
-                        {
-                          "label": "% Queued (per_queued)",
-                          "fieldId": "% Queued (per_queued)",
-                          "combined": "% Queued (per_queued)"
-                        },
-                        {
-                          "label": "Abandon Interval 1 (AbandInterval1)",
-                          "fieldId": "Abandon Interval 1 (AbandInterval1)",
-                          "combined": "Abandon Interval 1 (AbandInterval1)"
-                        },
-                        {
-                          "label": "Abandon Interval 10 (AbandInterval10)",
-                          "fieldId": "Abandon Interval 10 (AbandInterval10)",
-                          "combined": "Abandon Interval 10 (AbandInterval10)"
-                        },
-                        {
-                          "label": "Abandon Interval 2 (AbandInterval2)",
-                          "fieldId": "Abandon Interval 2 (AbandInterval2)",
-                          "combined": "Abandon Interval 2 (AbandInterval2)"
-                        },
-                        {
-                          "label": "Abandon Interval 3 (AbandInterval3)",
-                          "fieldId": "Abandon Interval 3 (AbandInterval3)",
-                          "combined": "Abandon Interval 3 (AbandInterval3)"
-                        },
-                        {
-                          "label": "Abandon Interval 4 (AbandInterval4)",
-                          "fieldId": "Abandon Interval 4 (AbandInterval4)",
-                          "combined": "Abandon Interval 4 (AbandInterval4)"
-                        },
-                        {
-                          "label": "Abandon Interval 5 (AbandInterval5)",
-                          "fieldId": "Abandon Interval 5 (AbandInterval5)",
-                          "combined": "Abandon Interval 5 (AbandInterval5)"
-                        },
-                        {
-                          "label": "Abandon Interval 6 (AbandInterval6)",
-                          "fieldId": "Abandon Interval 6 (AbandInterval6)",
-                          "combined": "Abandon Interval 6 (AbandInterval6)"
-                        },
-                        {
-                          "label": "Abandon Interval 7 (AbandInterval7)",
-                          "fieldId": "Abandon Interval 7 (AbandInterval7)",
-                          "combined": "Abandon Interval 7 (AbandInterval7)"
-                        },
-                        {
-                          "label": "Abandon Interval 8 (AbandInterval8)",
-                          "fieldId": "Abandon Interval 8 (AbandInterval8)",
-                          "combined": "Abandon Interval 8 (AbandInterval8)"
-                        },
-                        {
-                          "label": "Abandon Interval 9 (AbandInterval9)",
-                          "fieldId": "Abandon Interval 9 (AbandInterval9)",
-                          "combined": "Abandon Interval 9 (AbandInterval9)"
-                        },
-                        {
-                          "label": "Agent Error Count (AgentErrorCount)",
-                          "fieldId": "Agent Error Count (AgentErrorCount)",
-                          "combined": "Agent Error Count (AgentErrorCount)"
-                        },
-                        {
-                          "label": "Answer Interval 1 (AnsInterval1)",
-                          "fieldId": "Answer Interval 1 (AnsInterval1)",
-                          "combined": "Answer Interval 1 (AnsInterval1)"
-                        },
-                        {
-                          "label": "Answer Interval 10 (AnsInterval10)",
-                          "fieldId": "Answer Interval 10 (AnsInterval10)",
-                          "combined": "Answer Interval 10 (AnsInterval10)"
-                        },
-                        {
-                          "label": "Answer Interval 2 (AnsInterval2)",
-                          "fieldId": "Answer Interval 2 (AnsInterval2)",
-                          "combined": "Answer Interval 2 (AnsInterval2)"
-                        },
-                        {
-                          "label": "Answer Interval 3 (AnsInterval3)",
-                          "fieldId": "Answer Interval 3 (AnsInterval3)",
-                          "combined": "Answer Interval 3 (AnsInterval3)"
-                        },
-                        {
-                          "label": "Answer Interval 4 (AnsInterval4)",
-                          "fieldId": "Answer Interval 4 (AnsInterval4)",
-                          "combined": "Answer Interval 4 (AnsInterval4)"
-                        },
-                        {
-                          "label": "Answer Interval 5 (AnsInterval5)",
-                          "fieldId": "Answer Interval 5 (AnsInterval5)",
-                          "combined": "Answer Interval 5 (AnsInterval5)"
-                        },
-                        {
-                          "label": "Answer Interval 6 (AnsInterval6)",
-                          "fieldId": "Answer Interval 6 (AnsInterval6)",
-                          "combined": "Answer Interval 6 (AnsInterval6)"
-                        },
-                        {
-                          "label": "Answer Interval 7 (AnsInterval7)",
-                          "fieldId": "Answer Interval 7 (AnsInterval7)",
-                          "combined": "Answer Interval 7 (AnsInterval7)"
-                        },
-                        {
-                          "label": "Answer Interval 8 (AnsInterval8)",
-                          "fieldId": "Answer Interval 8 (AnsInterval8)",
-                          "combined": "Answer Interval 8 (AnsInterval8)"
-                        },
-                        {
-                          "label": "Answer Interval 9 (AnsInterval9)",
-                          "fieldId": "Answer Interval 9 (AnsInterval9)",
-                          "combined": "Answer Interval 9 (AnsInterval9)"
-                        },
-                        {
-                          "label": "Answer Wait Time (AnswerWaitTime)",
-                          "fieldId": "Answer Wait Time (AnswerWaitTime)",
-                          "combined": "Answer Wait Time (AnswerWaitTime)"
-                        },
-                        {
-                          "label": "Avg Abandon Delay (avg_aban_delay)",
-                          "fieldId": "Avg Abandon Delay (avg_aban_delay)",
-                          "combined": "Avg Abandon Delay (avg_aban_delay)"
-                        },
-                        {
-                          "label": "Avg Router Delay (AvgRouterDelay)",
-                          "fieldId": "Avg Router Delay (AvgRouterDelay)",
-                          "combined": "Avg Router Delay (AvgRouterDelay)"
-                        },
-                        {
-                          "label": "Avg Speed of Answer (asa)",
-                          "fieldId": "Avg Speed of Answer (asa)",
-                          "combined": "Avg Speed of Answer (asa)"
-                        },
-                        {
-                          "label": "Bucket Interval ID (BucketIntervalID)",
-                          "fieldId": "Bucket Interval ID (BucketIntervalID)",
-                          "combined": "Bucket Interval ID (BucketIntervalID)"
-                        },
-                        {
-                          "label": "Call Delay Abandon Time (CallDelayAbandTime)",
-                          "fieldId": "Call Delay Abandon Time (CallDelayAbandTime)",
-                          "combined": "Call Delay Abandon Time (CallDelayAbandTime)"
-                        },
-                        {
-                          "label": "Call Type Delay Abandon Time (CTDelayAbandTime)",
-                          "fieldId": "Call Type Delay Abandon Time (CTDelayAbandTime)",
-                          "combined": "Call Type Delay Abandon Time (CTDelayAbandTime)"
-                        },
-                        {
-                          "label": "Call Type VRU Time (CTVRUTime)",
-                          "fieldId": "Call Type VRU Time (CTVRUTime)",
-                          "combined": "Call Type VRU Time (CTVRUTime)"
-                        },
-                        {
-                          "label": "Calls Answered (CallsAnswered)",
-                          "fieldId": "Calls Answered (CallsAnswered)",
-                          "combined": "Calls Answered (CallsAnswered)"
-                        },
-                        {
-                          "label": "Calls Handled (CallsHandled)",
-                          "fieldId": "Calls Handled (CallsHandled)",
-                          "combined": "Calls Handled (CallsHandled)"
-                        },
-                        {
-                          "label": "Calls Offered (CallsOffered)",
-                          "fieldId": "Calls Offered (CallsOffered)",
-                          "combined": "Calls Offered (CallsOffered)"
-                        },
-                        {
-                          "label": "Calls Q Handled (CallsQHandled)",
-                          "fieldId": "Calls Q Handled (CallsQHandled)",
-                          "combined": "Calls Q Handled (CallsQHandled)"
-                        },
-                        {
-                          "label": "Calls RONA (CallsRONA)",
-                          "fieldId": "Calls RONA (CallsRONA)",
-                          "combined": "Calls RONA (CallsRONA)"
-                        },
-                        {
-                          "label": "Calls Routed (CallsRouted)",
-                          "fieldId": "Calls Routed (CallsRouted)",
-                          "combined": "Calls Routed (CallsRouted)"
-                        },
-                        {
-                          "label": "Calls Routed Non Agent (CallsRoutedNonAgent)",
-                          "fieldId": "Calls Routed Non Agent (CallsRoutedNonAgent)",
-                          "combined": "Calls Routed Non Agent (CallsRoutedNonAgent)"
-                        },
-                        {
-                          "label": "Completed Tasks (CompletedTasks)",
-                          "fieldId": "Completed Tasks (CompletedTasks)",
-                          "combined": "Completed Tasks (CompletedTasks)"
-                        },
-                        {
-                          "label": "Database DateTime (DbDateTime)",
-                          "fieldId": "Database DateTime (DbDateTime)",
-                          "combined": "Database DateTime (DbDateTime)"
-                        },
-                        {
-                          "label": "Date (Date)",
-                          "fieldId": "Date (Date)",
-                          "combined": "Date (Date)"
-                        },
-                        {
-                          "label": "Delay Agent Abandon Time (DelayAgentAbandTime)",
-                          "fieldId": "Delay Agent Abandon Time (DelayAgentAbandTime)",
-                          "combined": "Delay Agent Abandon Time (DelayAgentAbandTime)"
-                        },
-                        {
-                          "label": "Delay Q Abandon Time (DelayQAbandTime)",
-                          "fieldId": "Delay Q Abandon Time (DelayQAbandTime)",
-                          "combined": "Delay Q Abandon Time (DelayQAbandTime)"
-                        },
-                        {
-                          "label": "Enterprise Name (EnterpriseName)",
-                          "fieldId": "Enterprise Name (EnterpriseName)",
-                          "combined": "Enterprise Name (EnterpriseName)"
-                        },
-                        {
-                          "label": "Error Count (ErrorCount)",
-                          "fieldId": "Error Count (ErrorCount)",
-                          "combined": "Error Count (ErrorCount)"
-                        },
-                        {
-                          "label": "Handle Time (HandleTime)",
-                          "fieldId": "Handle Time (HandleTime)",
-                          "combined": "Handle Time (HandleTime)"
-                        },
-                        {
-                          "label": "Hold Time (HoldTime)",
-                          "fieldId": "Hold Time (HoldTime)",
-                          "combined": "Hold Time (HoldTime)"
-                        },
-                        {
-                          "label": "ICR Default Routed (ICRDefaultRouted)",
-                          "fieldId": "ICR Default Routed (ICRDefaultRouted)",
-                          "combined": "ICR Default Routed (ICRDefaultRouted)"
-                        },
-                        {
-                          "label": "Incomplete Calls (IncompleteCalls)",
-                          "fieldId": "Incomplete Calls (IncompleteCalls)",
-                          "combined": "Incomplete Calls (IncompleteCalls)"
-                        },
-                        {
-                          "label": "Max Call Wait Time (MaxCallWaitTime)",
-                          "fieldId": "Max Call Wait Time (MaxCallWaitTime)",
-                          "combined": "Max Call Wait Time (MaxCallWaitTime)"
-                        },
-                        {
-                          "label": "Max Queued (MaxCallsQueued)",
-                          "fieldId": "Max Queued (MaxCallsQueued)",
-                          "combined": "Max Queued (MaxCallsQueued)"
-                        },
-                        {
-                          "label": "Network Announcement (NetworkAnnouncement)",
-                          "fieldId": "Network Announcement (NetworkAnnouncement)",
-                          "combined": "Network Announcement (NetworkAnnouncement)"
-                        },
-                        {
-                          "label": "Network Default Routed (NetworkDefaultRouted)",
-                          "fieldId": "Network Default Routed (NetworkDefaultRouted)",
-                          "combined": "Network Default Routed (NetworkDefaultRouted)"
-                        },
-                        {
-                          "label": "Other (Other)",
-                          "fieldId": "Other (Other)",
-                          "combined": "Other (Other)"
-                        },
-                        {
-                          "label": "Overflow Out (OverflowOut)",
-                          "fieldId": "Overflow Out (OverflowOut)",
-                          "combined": "Overflow Out (OverflowOut)"
-                        },
-                        {
-                          "label": "Reporting Interval (ReportingInterval)",
-                          "fieldId": "Reporting Interval (ReportingInterval)",
-                          "combined": "Reporting Interval (ReportingInterval)"
-                        },
-                        {
-                          "label": "Return Busy (ReturnBusy)",
-                          "fieldId": "Return Busy (ReturnBusy)",
-                          "combined": "Return Busy (ReturnBusy)"
-                        },
-                        {
-                          "label": "Return Release (ReturnRelease)",
-                          "fieldId": "Return Release (ReturnRelease)",
-                          "combined": "Return Release (ReturnRelease)"
-                        },
-                        {
-                          "label": "Return Ring (ReturnRing)",
-                          "fieldId": "Return Ring (ReturnRing)",
-                          "combined": "Return Ring (ReturnRing)"
-                        },
-                        {
-                          "label": "ReturnBR (ReturnBR)",
-                          "fieldId": "ReturnBR (ReturnBR)",
-                          "combined": "ReturnBR (ReturnBR)"
-                        },
-                        {
-                          "label": "Router Calls Abandon Queue (RouterCallsAbandQ)",
-                          "fieldId": "Router Calls Abandon Queue (RouterCallsAbandQ)",
-                          "combined": "Router Calls Abandon Queue (RouterCallsAbandQ)"
-                        },
-                        {
-                          "label": "Router Calls Abandon To Agent (RouterCallsAbandToAgent)",
-                          "fieldId": "Router Calls Abandon To Agent (RouterCallsAbandToAgent)",
-                          "combined": "Router Calls Abandon To Agent (RouterCallsAbandToAgent)"
-                        },
-                        {
-                          "label": "Router Queue Call Type Limit (RouterQueueCallTypeLimit)",
-                          "fieldId": "Router Queue Call Type Limit (RouterQueueCallTypeLimit)",
-                          "combined": "Router Queue Call Type Limit (RouterQueueCallTypeLimit)"
-                        },
-                        {
-                          "label": "Router Queue Calls (RouterQueueCalls)",
-                          "fieldId": "Router Queue Calls (RouterQueueCalls)",
-                          "combined": "Router Queue Calls (RouterQueueCalls)"
-                        },
-                        {
-                          "label": "Router Queue Global Limit (RouterQueueGlobalLimit)",
-                          "fieldId": "Router Queue Global Limit (RouterQueueGlobalLimit)",
-                          "combined": "Router Queue Global Limit (RouterQueueGlobalLimit)"
-                        },
-                        {
-                          "label": "Router Queue Wait Time (RouterQueueWaitTime)",
-                          "fieldId": "Router Queue Wait Time (RouterQueueWaitTime)",
-                          "combined": "Router Queue Wait Time (RouterQueueWaitTime)"
-                        },
-                        {
-                          "label": "Service Level (servicelLevel)",
-                          "fieldId": "Service Level (servicelLevel)",
-                          "combined": "Service Level (servicelLevel)"
-                        },
-                        {
-                          "label": "Service Level Abandon (ServiceLevelAband)",
-                          "fieldId": "Service Level Abandon (ServiceLevelAband)",
-                          "combined": "Service Level Abandon (ServiceLevelAband)"
-                        },
-                        {
-                          "label": "Service Level Calls (ServiceLevelCalls)",
-                          "fieldId": "Service Level Calls (ServiceLevelCalls)",
-                          "combined": "Service Level Calls (ServiceLevelCalls)"
-                        },
-                        {
-                          "label": "Service Level Calls Offered (ServiceLevelCallsOffered)",
-                          "fieldId": "Service Level Calls Offered (ServiceLevelCallsOffered)",
-                          "combined": "Service Level Calls Offered (ServiceLevelCallsOffered)"
-                        },
-                        {
-                          "label": "Service Level Error (ServiceLevelError)",
-                          "fieldId": "Service Level Error (ServiceLevelError)",
-                          "combined": "Service Level Error (ServiceLevelError)"
-                        },
-                        {
-                          "label": "Service Level RONA (ServiceLevelRONA)",
-                          "fieldId": "Service Level RONA (ServiceLevelRONA)",
-                          "combined": "Service Level RONA (ServiceLevelRONA)"
-                        },
-                        {
-                          "label": "Service Level Type (ServiceLevelType)",
-                          "fieldId": "Service Level Type (ServiceLevelType)",
-                          "combined": "Service Level Type (ServiceLevelType)"
-                        },
-                        {
-                          "label": "Short Calls (ShortCalls)",
-                          "fieldId": "Short Calls (ShortCalls)",
-                          "combined": "Short Calls (ShortCalls)"
-                        },
-                        {
-                          "label": "Talk Time (TalkTime)",
-                          "fieldId": "Talk Time (TalkTime)",
-                          "combined": "Talk Time (TalkTime)"
-                        },
-                        {
-                          "label": "Time Zone (TimeZone)",
-                          "fieldId": "Time Zone (TimeZone)",
-                          "combined": "Time Zone (TimeZone)"
-                        },
-                        {
-                          "label": "Total Calls Abandon (TotalCallsAband)",
-                          "fieldId": "Total Calls Abandon (TotalCallsAband)",
-                          "combined": "Total Calls Abandon (TotalCallsAband)"
-                        },
-                        {
-                          "label": "Total Error Count (totalerrorcount)",
-                          "fieldId": "Total Error Count (totalerrorcount)",
-                          "combined": "Total Error Count (totalerrorcount)"
-                        },
-                        {
-                          "label": "Vru Assisted Calls (VruAssistedCalls)",
-                          "fieldId": "Vru Assisted Calls (VruAssistedCalls)",
-                          "combined": "Vru Assisted Calls (VruAssistedCalls)"
-                        },
-                        {
-                          "label": "Vru Forced Xferred Calls (VruForcedXferredCalls)",
-                          "fieldId": "Vru Forced Xferred Calls (VruForcedXferredCalls)",
-                          "combined": "Vru Forced Xferred Calls (VruForcedXferredCalls)"
-                        },
-                        {
-                          "label": "Vru Handled Calls (VruHandledCalls)",
-                          "fieldId": "Vru Handled Calls (VruHandledCalls)",
-                          "combined": "Vru Handled Calls (VruHandledCalls)"
-                        },
-                        {
-                          "label": "Vru Opt Out Unhandled Calls (VruOptOutUnhandledCalls)",
-                          "fieldId": "Vru Opt Out Unhandled Calls (VruOptOutUnhandledCalls)",
-                          "combined": "Vru Opt Out Unhandled Calls (VruOptOutUnhandledCalls)"
-                        },
-                        {
-                          "label": "Vru Other Calls (VruOtherCalls)",
-                          "fieldId": "Vru Other Calls (VruOtherCalls)",
-                          "combined": "Vru Other Calls (VruOtherCalls)"
-                        },
-                        {
-                          "label": "Vru Scripted Xferred Calls (VruScriptedXferredCalls)",
-                          "fieldId": "Vru Scripted Xferred Calls (VruScriptedXferredCalls)",
-                          "combined": "Vru Scripted Xferred Calls (VruScriptedXferredCalls)"
-                        },
-                        {
-                          "label": "VRU Time (VRUTime)",
-                          "fieldId": "VRU Time (VRUTime)",
-                          "combined": "VRU Time (VRUTime)"
-                        },
-                        {
-                          "label": "Vru Unhandled Calls (VruUnhandledCalls)",
-                          "fieldId": "Vru Unhandled Calls (VruUnhandledCalls)",
-                          "combined": "Vru Unhandled Calls (VruUnhandledCalls)"
-                        }
-                      ],
-                      "availableOperators": [
-                        {
-                          "value": "6A8A7718100001256BE2A5865ED3AEAC",
-                          "label": "per_aban"
-                        },
-                        {
-                          "value": "6A8A771810000125555041D95ED3AEAC",
-                          "label": "per_queued"
-                        },
-                        {
-                          "value": "6A8A7718100001255FB32F095ED3AEAC",
-                          "label": "AbandInterval1"
-                        },
-                        {
-                          "value": "6A8A771810000125785430745ED3AEAC",
-                          "label": "AbandInterval10"
-                        },
-                        {
-                          "value": "6A8A771810000125007FEE085ED3AEAC",
-                          "label": "AbandInterval2"
-                        },
-                        {
-                          "value": "6A8A771810000125300C1D9A5ED3AEAC",
-                          "label": "AbandInterval3"
-                        },
-                        {
-                          "value": "6A8A7718100001252EDBBE805ED3AEAC",
-                          "label": "AbandInterval4"
-                        },
-                        {
-                          "value": "6EEB816C100001305B8E37234067E996",
-                          "label": "AbandInterval5"
-                        },
-                        {
-                          "value": "6A8A7718100001254F167E315ED3AEAC",
-                          "label": "AbandInterval6"
-                        },
-                        {
-                          "value": "6A8A7718100001250BB7B3345ED3AEAC",
-                          "label": "AbandInterval7"
-                        },
-                        {
-                          "value": "6A8A7718100001254EFED37A5ED3AEAC",
-                          "label": "AbandInterval8"
-                        },
-                        {
-                          "value": "6A8A7718100001255D3421EF5ED3AEAC",
-                          "label": "AbandInterval9"
-                        },
-                        {
-                          "value": "6A8A7718100001253161D4365ED3AEAC",
-                          "label": "AgentErrorCount"
-                        },
-                        {
-                          "value": "6A8A7718100001256C848E145ED3AEAC",
-                          "label": "AnsInterval1"
-                        },
-                        {
-                          "value": "6A8A77181000012512FDB9D15ED3AEAC",
-                          "label": "AnsInterval10"
-                        },
-                        {
-                          "value": "6A8A77181000012571A0C55D5ED3AEAC",
-                          "label": "AnsInterval2"
-                        },
-                        {
-                          "value": "6A8A771810000125573CFDBB5ED3AEAC",
-                          "label": "AnsInterval3"
-                        },
-                        {
-                          "value": "6A8A77181000012534B6EB005ED3AEAC",
-                          "label": "AnsInterval4"
-                        },
-                        {
-                          "value": "6A8A7718100001250ACC35D75ED3AEAC",
-                          "label": "AnsInterval5"
-                        },
-                        {
-                          "value": "6A8A7718100001253BA557B75ED3AEAC",
-                          "label": "AnsInterval6"
-                        },
-                        {
-                          "value": "6A8A7718100001251EFDB8915ED3AEAC",
-                          "label": "AnsInterval7"
-                        },
-                        {
-                          "value": "6A8A77181000012560741CAF5ED3AEAC",
-                          "label": "AnsInterval8"
-                        },
-                        {
-                          "value": "6A8A7718100001252363E4E55ED3AEAC",
-                          "label": "AnsInterval9"
-                        },
-                        {
-                          "value": "6A8A7718100001252A9C16935ED3AEAC",
-                          "label": "AnswerWaitTime"
-                        },
-                        {
-                          "value": "6A8A7718100001257FA867DA5ED3AEAC",
-                          "label": "avg_aban_delay"
-                        },
-                        {
-                          "value": "6A8A7718100001255ADBA37B5ED3AEAC",
-                          "label": "AvgRouterDelay"
-                        },
-                        {
-                          "value": "6A8A771810000125421B0E9A5ED3AEAC",
-                          "label": "asa"
-                        },
-                        {
-                          "value": "6A8A7718100001251EB3E2115ED3AEAC",
-                          "label": "BucketIntervalID"
-                        },
-                        {
-                          "value": "6A8A77181000012573510E415ED3AEAC",
-                          "label": "CallDelayAbandTime"
-                        },
-                        {
-                          "value": "6A8A7718100001257E4900B15ED3AEAC",
-                          "label": "CTDelayAbandTime"
-                        },
-                        {
-                          "value": "6A8A771810000125780215685ED3AEAC",
-                          "label": "CTVRUTime"
-                        },
-                        {
-                          "value": "6A8A7718100001256BE55DEF5ED3AEAC",
-                          "label": "CallsAnswered"
-                        },
-                        {
-                          "value": "6A8A771810000125563261015ED3AEAC",
-                          "label": "CallsHandled"
-                        },
-                        {
-                          "value": "6A8A771810000125233FEB815ED3AEAC",
-                          "label": "CallsOffered"
-                        },
-                        {
-                          "value": "6A8A7718100001257B45A9905ED3AEAC",
-                          "label": "CallsQHandled"
-                        },
-                        {
-                          "value": "6A8A7718100001257CEFE1E15ED3AEAC",
-                          "label": "CallsRONA"
-                        },
-                        {
-                          "value": "6A8A7718100001250883575A5ED3AEAC",
-                          "label": "CallsRouted"
-                        },
-                        {
-                          "value": "6A8A7718100001253AC8492F5ED3AEAC",
-                          "label": "CallsRoutedNonAgent"
-                        },
-                        {
-                          "value": "6A8A771810000125180AFCAE5ED3AEAC",
-                          "label": "CompletedTasks"
-                        },
-                        {
-                          "value": "6A8A771810000125669DABBF5ED3AEAC",
-                          "label": "DbDateTime"
-                        },
-                        {
-                          "value": "6A8A77181000012556FB83285ED3AEAC",
-                          "label": "Date"
-                        },
-                        {
-                          "value": "6A8A77181000012555E3FDDE5ED3AEAC",
-                          "label": "DelayAgentAbandTime"
-                        },
-                        {
-                          "value": "6A8A7718100001253756E4195ED3AEAC",
-                          "label": "DelayQAbandTime"
-                        },
-                        {
-                          "value": "6A8A7718100001252636136A5ED3AEAC",
-                          "label": "EnterpriseName"
-                        },
-                        {
-                          "value": "6A8A7718100001251839030B5ED3AEAC",
-                          "label": "ErrorCount"
-                        },
-                        {
-                          "value": "6A8A771810000125506B9BF05ED3AEAC",
-                          "label": "HandleTime"
-                        },
-                        {
-                          "value": "6A8A7718100001250CD145F35ED3AEAC",
-                          "label": "HoldTime"
-                        },
-                        {
-                          "value": "6A8A771810000125007DD6815ED3AEAC",
-                          "label": "ICRDefaultRouted"
-                        },
-                        {
-                          "value": "6A8A77181000012516B9BDD65ED3AEAC",
-                          "label": "IncompleteCalls"
-                        },
-                        {
-                          "value": "6F74CBEF100001307A21565B4067E9AA",
-                          "label": "MaxCallWaitTime"
-                        },
-                        {
-                          "value": "6F74CBEF100001303E06A7464067E9AA",
-                          "label": "MaxCallsQueued"
-                        },
-                        {
-                          "value": "6A8A771810000125071D1A615ED3AEAC",
-                          "label": "NetworkAnnouncement"
-                        },
-                        {
-                          "value": "6A8A7718100001251031D37F5ED3AEAC",
-                          "label": "NetworkDefaultRouted"
-                        },
-                        {
-                          "value": "6A8A7718100001252853AF375ED3AEAC",
-                          "label": "Other"
-                        },
-                        {
-                          "value": "6A8A7718100001256FD246B35ED3AEAC",
-                          "label": "OverflowOut"
-                        },
-                        {
-                          "value": "6A8A77181000012573C250215ED3AEAC",
-                          "label": "ReportingInterval"
-                        },
-                        {
-                          "value": "6A8A7718100001253D2D2F6F5ED3AEAC",
-                          "label": "ReturnBusy"
-                        },
-                        {
-                          "value": "6A8A77181000012572271D4D5ED3AEAC",
-                          "label": "ReturnRelease"
-                        },
-                        {
-                          "value": "6A8A7718100001252C6F3C975ED3AEAC",
-                          "label": "ReturnRing"
-                        },
-                        {
-                          "value": "6A8A7718100001254835B40F5ED3AEAC",
-                          "label": "ReturnBR"
-                        },
-                        {
-                          "value": "6A8A7718100001256519EC275ED3AEAC",
-                          "label": "RouterCallsAbandQ"
-                        },
-                        {
-                          "value": "6A8A77181000012529CFD4565ED3AEAC",
-                          "label": "RouterCallsAbandToAgent"
-                        },
-                        {
-                          "value": "6A8A7718100001257B8BC7B05ED3AEAC",
-                          "label": "RouterQueueCallTypeLimit"
-                        },
-                        {
-                          "value": "6A8A77181000012565DA0D1D5ED3AEAC",
-                          "label": "RouterQueueCalls"
-                        },
-                        {
-                          "value": "6A8A77181000012567F0F5DC5ED3AEAC",
-                          "label": "RouterQueueGlobalLimit"
-                        },
-                        {
-                          "value": "6A8A77181000012568D299105ED3AEAC",
-                          "label": "RouterQueueWaitTime"
-                        },
-                        {
-                          "value": "DC9AFEEE1000014121533D780A00060D",
-                          "label": "servicelLevel"
-                        },
-                        {
-                          "value": "6A8A77181000012546DFCE705ED3AEAC",
-                          "label": "ServiceLevelAband"
-                        },
-                        {
-                          "value": "6A8A77181000012523CD11CF5ED3AEAC",
-                          "label": "ServiceLevelCalls"
-                        },
-                        {
-                          "value": "6A8A7718100001253C970E5E5ED3AEAC",
-                          "label": "ServiceLevelCallsOffered"
-                        },
-                        {
-                          "value": "6A8A7718100001250DD93DF75ED3AEAC",
-                          "label": "ServiceLevelError"
-                        },
-                        {
-                          "value": "6A8A7718100001257C552DBD5ED3AEAC",
-                          "label": "ServiceLevelRONA"
-                        },
-                        {
-                          "value": "6A8A7718100001252850FFFE5ED3AEAC",
-                          "label": "ServiceLevelType"
-                        },
-                        {
-                          "value": "6A8A77181000012552A458155ED3AEAC",
-                          "label": "ShortCalls"
-                        },
-                        {
-                          "value": "6A8A77181000012568DC42015ED3AEAC",
-                          "label": "TalkTime"
-                        },
-                        {
-                          "value": "6A8A771810000125337A13785ED3AEAC",
-                          "label": "TimeZone"
-                        },
-                        {
-                          "value": "6A8A771810000125799A0CDA5ED3AEAC",
-                          "label": "TotalCallsAband"
-                        },
-                        {
-                          "value": "6A8A7718100001252B413A835ED3AEAC",
-                          "label": "totalerrorcount"
-                        },
-                        {
-                          "value": "6A8A7718100001251B05D0315ED3AEAC",
-                          "label": "VruAssistedCalls"
-                        },
-                        {
-                          "value": "6A8A7718100001250B65CFC35ED3AEAC",
-                          "label": "VruForcedXferredCalls"
-                        },
-                        {
-                          "value": "6A8A77181000012528095E605ED3AEAC",
-                          "label": "VruHandledCalls"
-                        },
-                        {
-                          "value": "6A8A771810000125657E4DEF5ED3AEAC",
-                          "label": "VruOptOutUnhandledCalls"
-                        },
-                        {
-                          "value": "6A8A7718100001254541A17E5ED3AEAC",
-                          "label": "VruOtherCalls"
-                        },
-                        {
-                          "value": "6A8A77181000012506B22D8E5ED3AEAC",
-                          "label": "VruScriptedXferredCalls"
-                        },
-                        {
-                          "value": "6A8A7718100001255EBE1AD65ED3AEAC",
-                          "label": "VRUTime"
-                        },
-                        {
-                          "value": "6A8A771810000125336C94AB5ED3AEAC",
-                          "label": "VruUnhandledCalls"
-                        }
-                      ],
-                      "selectedFieldIds": [],
-                      "selectedFields": []
+                      "value": "LASTDAY",
+                      "label": "Yesterday"
+                    },
+                    {
+                      "value": "THISWK",
+                      "label": "This Week"
+                    },
+                    {
+                      "value": "LASTWK",
+                      "label": "Last Week"
+                    },
+                    {
+                      "value": "THISMTH",
+                      "label": "This Month"
+                    },
+                    {
+                      "value": "LASTMTH",
+                      "label": "Last Month"
+                    },
+                    {
+                      "value": "THISYR",
+                      "label": "Year to Date"
+                    },
+                    {
+                      "value": "LASTYR",
+                      "label": "Last Year"
                     }
-                  ]
-                }
-              ],
-              "stepTitles": [
-                "Date & Time",
-                "Key Criteria",
-                "Field Filters"
-              ],
-              "datePresets": [
-                {
-                  "value": "CUSTOM",
-                  "label": "Custom"
+                  ],
+                  "currentPreset": "THISDAY",
+                  "relativeRange": "THISDAY",
+                  "hasDateRange": true,
+                  "enablePicker": false,
+                  "isRelativeDate": "yes",
+                  "displayFormat": "",
+                  "currentDate1": "06/27/2019",
+                  "currentDate2": "06/27/2019",
+                  "allTime": 1,
+                  "hasTimeRange": true,
+                  "allTimeChecked": "true",
+                  "currentTime1": "12:00:00 AM",
+                  "currentTime2": "11:59:59 PM",
+                  "hasDays": false,
+                  "showDays": false,
+                  "allDayChecked": "true",
+                  "days": {
+                    "mon": "checked",
+                    "tue": "checked",
+                    "wed": "checked",
+                    "thu": "checked",
+                    "fri": "checked",
+                    "sat": "checked",
+                    "sun": "checked"
+                  }
                 },
                 {
-                  "value": "THISDAY",
-                  "label": "Today"
+                  "dataType": "VALUELIST",
+                  "label": "Skill Groups",
+                  "paramName": "@SkillGroupID",
+                  "paramName2": "",
+                  "storageKey": "@SkillGroupID",
+                  "aliases": [
+                    "@SkillGroupID",
+                    "Skill Groups"
+                  ],
+                  "isRequired": true,
+                  "type": "cuic_valuelist",
+                  "selectedCount": 5,
+                  "selectedValues": [
+                    "GENIT_SG",
+                    "RTPS_SG",
+                    "SAP_SG",
+                    "Subsurface_SG",
+                    "Telcom_SG"
+                  ],
+                  "availableCount": 61,
+                  "availableNames": [
+                    "ARB_CLINIC_COMMON_SG",
+                    "ARB_GENERAL_SG",
+                    "ARB_LABORATORY_SG",
+                    "ARB_OUTPATIENT_SG",
+                    "ARB_Pension_SG",
+                    "ARB_VACCINATION_SG",
+                    "CCTV",
+                    "EDM_Application_SG",
+                    "EDM_IT_SG",
+                    "EDM_Workflow_SG",
+                    "ENG_CLINIC_COMMON_SG",
+                    "ENG_GENERAL_SG",
+                    "ENG_LABORATORY_SG",
+                    "ENG_OUTPATIENT_SG",
+                    "ENG_Pension_SG",
+                    "ENG_VACCINATION_SG",
+                    "EOB_SG",
+                    "Flight_Booking_SG",
+                    "GENIT_SG",
+                    "GENIT_Sup_SG",
+                    "GENIT_WIN_SG",
+                    "GenITOutbound_SG",
+                    "HR_Facility_SG",
+                    "HR_Logistics_App_SG",
+                    "HR_Logistics_Services_SG",
+                    "IFMOutbound_SG",
+                    "IMMG_SG",
+                    "Interior_Coorprate_SG",
+                    "MED_ANTI_VACCINE_SG",
+                    "MED_GENERAL_APT_SG",
+                    "MED_LABORATORY_SG",
+                    "MED_OUT_PATIENT_SG",
+                    "Medical_HD",
+                    "Outbound.SG",
+                    "PDO_CUCM_PIM1.Cisco_Voice..88101",
+                    "PDO_HR_MAIN_SG",
+                    "PDO_TEST_SG",
+                    "PDOTEST1",
+                    "Pool_Car_SG",
+                    "RTMOutbound_SG",
+                    "RTPS_SG",
+                    "RTPS_Sup_SG",
+                    "SAP_CPL_Sec_SG",
+                    "SAP_CPL_SG",
+                    "SAP_FIN_sec_SG",
+                    "SAP_FIN_SG",
+                    "SAP_SAPHIRE_sec_SG",
+                    "SAP_SAPHIRE_SG",
+                    "SAP_SG",
+                    "SAP_Supervisor_SG",
+                    "SAP_WM_sec_SG",
+                    "SAP_WM_SG",
+                    "SAPoutbound_SG",
+                    "SUBOutbound_SG",
+                    "Subsurface_SG",
+                    "Subsurface_Sup_SG",
+                    "Telcom_SG",
+                    "Telcom_Sup_SG",
+                    "TelecomOutbound_SG",
+                    "Test_SG",
+                    "Transport_Chauffeur_SG"
+                  ],
+                  "availableGroups": []
                 },
                 {
-                  "value": "LASTDAY",
-                  "label": "Yesterday"
-                },
-                {
-                  "value": "THISWK",
-                  "label": "This Week"
-                },
-                {
-                  "value": "LASTWK",
-                  "label": "Last Week"
-                },
-                {
-                  "value": "THISMTH",
-                  "label": "This Month"
-                },
-                {
-                  "value": "LASTMTH",
-                  "label": "Last Month"
-                },
-                {
-                  "value": "THISYR",
-                  "label": "Year to Date"
-                },
-                {
-                  "value": "LASTYR",
-                  "label": "Last Year"
+                  "dataType": "VALUELIST",
+                  "label": "MediaID",
+                  "paramName": "@MediaID",
+                  "paramName2": "",
+                  "storageKey": "@MediaID",
+                  "aliases": [
+                    "@MediaID",
+                    "MediaID"
+                  ],
+                  "isRequired": true,
+                  "type": "cuic_valuelist",
+                  "selectedCount": 1,
+                  "selectedValues": [
+                    "Cisco_Voice"
+                  ],
+                  "availableCount": 1,
+                  "availableNames": [
+                    "Cisco_Voice"
+                  ],
+                  "availableGroups": []
                 }
               ]
             },
-            "step_1": {
-              "DateTime  (DateTime)": "LASTMTH"
+            "@start_date": {
+              "preset": "LASTDAY",
+              "allTime": 2,
+              "time1": "10:00:00",
+              "time2": "13:00:00"
             },
-            "step_2": {
-              "Call Types(CallTypeID)": [
-                "General_IT_CT"
-              ]
-            },
-            "step_3": {}
+            "@SkillGroupID": [
+              "ARB_CLINIC_COMMON_SG",
+              "CCTV",
+              "GENIT_SG",
+              "RTPS_SG",
+              "SAP_SG",
+              "Subsurface_SG",
+              "Telcom_SG"
+            ],
+            "@MediaID": [
+              "Cisco_Voice"
+            ]
           }
         }
       ],

@@ -1,43 +1,232 @@
 scrape_timestamp,data_datetime,source,report_id,report_name,metric_title,category,sub_category,value
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_% Aban,,,3.00%
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_% Aban,General_IT_CT,,3.00%
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_% Queued,,,3.05%
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_% Queued,General_IT_CT,,3.05%
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Abandoned,,,131
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Abandoned,General_IT_CT,,131
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,,,68
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Abandoned Within Service Level,General_IT_CT,,68
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Answer Wait Time,,,21:13:12
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Answer Wait Time,General_IT_CT,,21:13:12
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Answered,,,4234
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Answered,General_IT_CT,,4234
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Assigned From Queue,,,171
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Assigned From Queue,General_IT_CT,,171
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,,,00:01:27
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Average Abandon Delay,General_IT_CT,,00:01:27
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,,,00:00:18
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Avg Speed of Answer,General_IT_CT,,00:00:18
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Calls Error,,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Calls Error,General_IT_CT,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Default_Treatment,,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Default_Treatment,General_IT_CT,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Flow Out,,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Flow Out,General_IT_CT,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Handled,,,4234
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Handled,General_IT_CT,,4234
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Longest Queued,,,00:05:50
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Longest Queued,General_IT_CT,,00:05:50
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Max Queued,,,10
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Max Queued,General_IT_CT,,10
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Network Routed,,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Network Routed,General_IT_CT,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Offered,,,4366
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Offered,General_IT_CT,,4366
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Other,,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Other,General_IT_CT,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Return,,,1
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Return,General_IT_CT,,1
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Service Level,,,88.53%
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Service Level,General_IT_CT,,88.53%
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Short Calls,,,0
-2026-04-03 23:13:13,2026-04-03,cuic,fc19dd919d4a4a948f1e28ba5ca77018,z_call_type_historical_all_fields,CUIC_Short Calls,General_IT_CT,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,GENIT_SG,,5.45%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,GENIT_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,GENIT_SG,"Al Bakri, Ruwaida",3.74%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,GENIT_SG,"Al Ghafri, Hajer",4.58%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,GENIT_SG,"Al Khanbashi, Marwan",16.30%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,Telcom_SG,,0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,Telcom_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,Telcom_SG,"Al Bakri, Ruwaida",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,Telcom_SG,"Al Ghafri, Hajer",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Active,Telcom_SG,"Al Khanbashi, Marwan",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,GENIT_SG,,0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,GENIT_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,GENIT_SG,"Al Bakri, Ruwaida",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,GENIT_SG,"Al Ghafri, Hajer",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,GENIT_SG,"Al Khanbashi, Marwan",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,Telcom_SG,,0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,Telcom_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,Telcom_SG,"Al Bakri, Ruwaida",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,Telcom_SG,"Al Ghafri, Hajer",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Hold,Telcom_SG,"Al Khanbashi, Marwan",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,GENIT_SG,,70.50%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,GENIT_SG,"Aamri, Abdullah",74.02%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,GENIT_SG,"Al Bakri, Ruwaida",80.68%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,GENIT_SG,"Al Ghafri, Hajer",68.52%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,GENIT_SG,"Al Khanbashi, Marwan",49.14%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,Telcom_SG,,70.50%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,Telcom_SG,"Aamri, Abdullah",74.02%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,Telcom_SG,"Al Bakri, Ruwaida",80.68%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,Telcom_SG,"Al Ghafri, Hajer",68.52%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Active,Telcom_SG,"Al Khanbashi, Marwan",49.14%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,GENIT_SG,,23.68%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,GENIT_SG,"Aamri, Abdullah",25.98%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,GENIT_SG,"Al Bakri, Ruwaida",15.51%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,GENIT_SG,"Al Ghafri, Hajer",26.18%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,GENIT_SG,"Al Khanbashi, Marwan",33.76%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,Telcom_SG,,23.68%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,Telcom_SG,"Aamri, Abdullah",25.98%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,Telcom_SG,"Al Bakri, Ruwaida",15.51%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,Telcom_SG,"Al Ghafri, Hajer",26.18%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Not Ready,Telcom_SG,"Al Khanbashi, Marwan",33.76%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,GENIT_SG,,0.12%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,GENIT_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,GENIT_SG,"Al Bakri, Ruwaida",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,GENIT_SG,"Al Ghafri, Hajer",0.26%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,GENIT_SG,"Al Khanbashi, Marwan",0.29%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,Telcom_SG,,0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,Telcom_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,Telcom_SG,"Al Bakri, Ruwaida",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,Telcom_SG,"Al Ghafri, Hajer",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Reserved,Telcom_SG,"Al Khanbashi, Marwan",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,GENIT_SG,,0.24%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,GENIT_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,GENIT_SG,"Al Bakri, Ruwaida",0.07%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,GENIT_SG,"Al Ghafri, Hajer",0.45%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,GENIT_SG,"Al Khanbashi, Marwan",0.49%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,Telcom_SG,,0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,Telcom_SG,"Aamri, Abdullah",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,Telcom_SG,"Al Bakri, Ruwaida",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,Telcom_SG,"Al Ghafri, Hajer",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_%Wrap Up,Telcom_SG,"Al Khanbashi, Marwan",0.00%
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Hold,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Abandon Rings,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Agent Terminated Calls,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,,,00:00:37
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,GENIT_SG,,00:00:37
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,GENIT_SG,"Aamri, Abdullah",00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,GENIT_SG,"Al Bakri, Ruwaida",00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,GENIT_SG,"Al Ghafri, Hajer",00:00:23
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,GENIT_SG,"Al Khanbashi, Marwan",00:00:14
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,Telcom_SG,,00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,Telcom_SG,"Aamri, Abdullah",00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,Telcom_SG,"Al Bakri, Ruwaida",00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,Telcom_SG,"Al Ghafri, Hajer",00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Answer Wait Time,Telcom_SG,"Al Khanbashi, Marwan",00:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,,,00:07:27
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,GENIT_SG,,00:07:27
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,GENIT_SG,"Aamri, Abdullah",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,GENIT_SG,"Al Bakri, Ruwaida",00:15:06
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,GENIT_SG,"Al Ghafri, Hajer",00:03:42
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,GENIT_SG,"Al Khanbashi, Marwan",00:07:22
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,Telcom_SG,,--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,Telcom_SG,"Aamri, Abdullah",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,Telcom_SG,"Al Bakri, Ruwaida",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,Telcom_SG,"Al Ghafri, Hajer",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Handle Time,Telcom_SG,"Al Khanbashi, Marwan",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,,,--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,GENIT_SG,,--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,GENIT_SG,"Aamri, Abdullah",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,GENIT_SG,"Al Bakri, Ruwaida",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,GENIT_SG,"Al Ghafri, Hajer",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,GENIT_SG,"Al Khanbashi, Marwan",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,Telcom_SG,,--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,Telcom_SG,"Aamri, Abdullah",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,Telcom_SG,"Al Bakri, Ruwaida",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,Telcom_SG,"Al Ghafri, Hajer",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Avg Hold Time,Telcom_SG,"Al Khanbashi, Marwan",--
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_External Out,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,GENIT_SG,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,GENIT_SG,"Aamri, Abdullah","Aamri, Abdullah"
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,GENIT_SG,"Al Bakri, Ruwaida","Al Bakri, Ruwaida"
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,GENIT_SG,"Al Ghafri, Hajer","Al Ghafri, Hajer "
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,GENIT_SG,"Al Khanbashi, Marwan","Al Khanbashi, Marwan "
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,Telcom_SG,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,Telcom_SG,"Aamri, Abdullah","Aamri, Abdullah"
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,Telcom_SG,"Al Bakri, Ruwaida","Al Bakri, Ruwaida"
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,Telcom_SG,"Al Ghafri, Hajer","Al Ghafri, Hajer "
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_FullName,Telcom_SG,"Al Khanbashi, Marwan","Al Khanbashi, Marwan "
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,,,5
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,GENIT_SG,,5
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,GENIT_SG,"Al Bakri, Ruwaida",1
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,GENIT_SG,"Al Ghafri, Hajer",2
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,GENIT_SG,"Al Khanbashi, Marwan",2
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Handled,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Held,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,,,16:59:36
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,GENIT_SG,,08:29:48
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,GENIT_SG,"Aamri, Abdullah",01:35:08
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,GENIT_SG,"Al Bakri, Ruwaida",03:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,GENIT_SG,"Al Ghafri, Hajer",02:26:57
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,GENIT_SG,"Al Khanbashi, Marwan",01:27:43
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,Telcom_SG,,08:29:48
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,Telcom_SG,"Aamri, Abdullah",01:35:08
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,Telcom_SG,"Al Bakri, Ruwaida",03:00:00
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,Telcom_SG,"Al Ghafri, Hajer",02:26:57
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Logged On Time,Telcom_SG,"Al Khanbashi, Marwan",01:27:43
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,GENIT_SG,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,GENIT_SG,"Aamri, Abdullah",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,GENIT_SG,"Al Bakri, Ruwaida",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,GENIT_SG,"Al Ghafri, Hajer",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,GENIT_SG,"Al Khanbashi, Marwan",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,Telcom_SG,,
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,Telcom_SG,"Aamri, Abdullah",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,Telcom_SG,"Al Bakri, Ruwaida",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,Telcom_SG,"Al Ghafri, Hajer",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Media,Telcom_SG,"Al Khanbashi, Marwan",
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_RONA,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer In ,Telcom_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,GENIT_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,GENIT_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,GENIT_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,GENIT_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,GENIT_SG,"Al Khanbashi, Marwan",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,Telcom_SG,,0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,Telcom_SG,"Aamri, Abdullah",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,Telcom_SG,"Al Bakri, Ruwaida",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,Telcom_SG,"Al Ghafri, Hajer",0
+2026-04-04 00:27:01,2026-04-04,cuic,752edfea5b934d8e92f2542a664e1ad2,z_agent_skill_group_historical,CUIC_Transfer Out ,Telcom_SG,"Al Khanbashi, Marwan",0

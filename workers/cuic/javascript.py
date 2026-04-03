@@ -97,6 +97,7 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
 
     /* Detect what kind of filter is in this step */
     const result = {
+        schemaVersion: 2,
         type: 'cuic_multistep',
         stepIndex: currentIdx,
         stepTitle: stepTitle,
@@ -190,12 +191,16 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
             /* Special report-linking modes */
             const isMatchField     = !!(dtScope.hcfCtrl?.isMatchField);
             const isMatchDateRange = !!(dtScope.hcfCtrl?.isMatchDateRange);
+            const storageKey = dtField.parameterName || dtField.paramName || dtField.filterName || label;
+            const aliases = Array.from(new Set([storageKey, label].filter(Boolean)));
 
             result.params.push({
                 dataType:         filterType,
                 type:             'cuic_datetime',
                 label:            label,
-                paramName:        label,
+                paramName:        storageKey,
+                storageKey:       storageKey,
+                aliases:          aliases,
                 datePresets:      datePresets,
                 currentPreset:    currentPreset,
                 relativeRange:    relativeRange,
@@ -226,6 +231,8 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
         const labelMatch = rawLabel.match(/^(.+?)\\s*\\(([^)]+)\\)\\s*$/);
         const label = labelMatch ? labelMatch[1].trim() : rawLabel;
         const paramName = labelMatch ? labelMatch[2].trim() : rawLabel;
+        const storageKey = paramName || label || rawLabel;
+        const aliases = Array.from(new Set([storageKey, paramName, label, rawLabel].filter(Boolean)));
 
         const leftPane = vlFilter.querySelector('[cuic-pane="left"]');
         const rightPane = vlFilter.querySelector('[cuic-pane="right"]');
@@ -373,6 +380,8 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
             type: 'cuic_valuelist',
             label: label,
             paramName: paramName,
+            storageKey: storageKey,
+            aliases: aliases,
             isRequired: true,
             totalAvailable: totalAvailable,
             availableCount: allNames.length,
@@ -449,6 +458,8 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
             type:               'cuic_field_filter',
             label:              'Field Filters',
             paramName:          '_field_filters',
+            storageKey:         '_field_filters',
+            aliases:            ['_field_filters', 'Field Filters'],
             availableFields:    availableFields,
             availableOperators: availableOperators,
             selectedFieldIds:   selectedFieldIds,
@@ -505,8 +516,10 @@ CUIC_WIZARD_READ_JS = r'''() => {
         if (!label)     label     = item.displayName || item.filterName || item.name || '';
         if (!paramName) paramName = item.parameterName || item.paramName || '';
 
+        const storageKey = paramName || paramName2 || label;
+        const aliases = Array.from(new Set([storageKey, paramName, paramName2, label].filter(Boolean)));
         const p = {dataType: item.dataType, label, paramName, paramName2,
-                   isRequired: !!item.isRequired};
+               storageKey, aliases, isRequired: !!item.isRequired};
 
         switch (item.dataType) {
             case 'DATETIME':
@@ -609,7 +622,7 @@ CUIC_WIZARD_READ_JS = r'''() => {
         vi++;
     });
 
-    return {type: 'cuic_spab', params, datePresets};
+    return {schemaVersion: 2, type: 'cuic_spab', params, datePresets};
 }'''  # noqa: E501
 
 # Apply saved filter values via Angular scope manipulation.
@@ -625,6 +638,94 @@ CUIC_WIZARD_APPLY_JS = r'''(config) => {
     );
     const results = [];
     let vi = 0;
+
+    function pad2(value) {
+        return String(value).padStart(2, '0');
+    }
+    function parseCuicTimeValue(value) {
+        if (value instanceof Date)
+            return isNaN(value.getTime()) ? null : new Date(value.getTime());
+        const text = String(value || '').trim();
+        if (!text) return null;
+
+        const direct = new Date(text);
+        if (!isNaN(direct.getTime())) return direct;
+
+        const match = text.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+        if (!match) return null;
+
+        let hours = parseInt(match[1], 10);
+        const minutes = parseInt(match[2], 10);
+        const seconds = parseInt(match[3] || '0', 10);
+        const meridiem = (match[4] || '').toUpperCase();
+
+        if (meridiem) {
+            if (hours === 12) hours = 0;
+            if (meridiem === 'PM') hours += 12;
+        }
+        if (hours > 23 || minutes > 59 || seconds > 59) return null;
+
+        const parsed = new Date();
+        parsed.setHours(hours, minutes, seconds, 0);
+        return parsed;
+    }
+    function applyCuicTimeValue(target, value) {
+        if (!target) return false;
+        const parsed = parseCuicTimeValue(value);
+        if (!parsed) return false;
+        target.dateValue = parsed;
+        target.date = pad2(parsed.getHours()) + ':' + pad2(parsed.getMinutes()) + ':' + pad2(parsed.getSeconds());
+        return true;
+    }
+    function flattenCuicList(list) {
+        const out = [];
+        (list || []).forEach(v => {
+            if (v.children && v.children.length)
+                out.push(...flattenCuicList(v.children));
+            else
+                out.push(v);
+        });
+        return out;
+    }
+    function uniqueCuicNames(values) {
+        const seen = new Set();
+        const out = [];
+        (values || []).forEach(value => {
+            const name = String(value || '').trim();
+            if (!name || seen.has(name)) return;
+            seen.add(name);
+            out.push(name);
+        });
+        return out;
+    }
+    function replaceCuicValueListSelection(item, requestedNames) {
+        const targetNames = uniqueCuicNames(requestedNames);
+        const pool = flattenCuicList(item.lvaluelist).concat(flattenCuicList(item.rvaluelist));
+        const itemByName = new Map();
+        pool.forEach(entry => {
+            const name = entry && entry.name ? String(entry.name).trim() : '';
+            if (!name || itemByName.has(name)) return;
+            itemByName.set(name, entry);
+        });
+
+        const selected = [];
+        targetNames.forEach(name => {
+            const entry = itemByName.get(name);
+            if (entry) selected.push(entry);
+        });
+
+        const selectedSet = new Set(targetNames);
+        const available = [];
+        itemByName.forEach((entry, name) => {
+            if (!selectedSet.has(name)) available.push(entry);
+        });
+
+        item.rvaluelist = selected;
+        item.lvaluelist = available;
+        if (item.filterField)
+            item.filterField.value = selected;
+        return selected;
+    }
 
     scope.spab.data.forEach(item => {
         if (item.hardCodedValue) return;
@@ -678,16 +779,10 @@ CUIC_WIZARD_APPLY_JS = r'''(config) => {
                     if (resolvedAllTime === undefined && cfg.allTimeChecked !== undefined)
                         resolvedAllTime = cfg.allTimeChecked === 'false' ? 2 : 1;
                     if (resolvedAllTime !== undefined)
-                        item.allTime = resolvedAllTime;
+                        item.allTime = Number(resolvedAllTime);
                     if (item.allTime === 2) {
-                        if (cfg.time1 && item.time1) {
-                            const t = new Date(cfg.time1);
-                            if (!isNaN(t)) item.time1.dateValue = t;
-                        }
-                        if (cfg.time2 && item.time2) {
-                            const t = new Date(cfg.time2);
-                            if (!isNaN(t)) item.time2.dateValue = t;
-                        }
+                        applyCuicTimeValue(item.time1, cfg.time1);
+                        applyCuicTimeValue(item.time2, cfg.time2);
                     }
                     /* Days of week — only when item.days exists on the model */
                     if (item.days || 'days' in item) {
@@ -713,47 +808,16 @@ CUIC_WIZARD_APPLY_JS = r'''(config) => {
                         const btn = c ? c.querySelector('.icon-right-all') : null;
                         if (btn) { btn.click(); }
                         else {
-                            /* fallback: flatten and move all */
-                            function flattenAll(list) {
-                                const out = [];
-                                (list||[]).forEach(v => {
-                                    if (v.children && v.children.length)
-                                        out.push(...flattenAll(v.children));
-                                    else out.push(v);
-                                });
-                                return out;
-                            }
-                            item.rvaluelist = (item.rvaluelist || [])
-                                .concat(flattenAll(item.lvaluelist));
-                            item.lvaluelist = [];
+                            replaceCuicValueListSelection(
+                                item,
+                                flattenCuicList(item.lvaluelist)
+                                    .concat(flattenCuicList(item.rvaluelist))
+                                    .map(entry => entry && entry.name)
+                            );
                         }
                         results.push({param: paramName, ok: true, value: 'all'});
                     } else if (Array.isArray(val) && val.length) {
-                        /* move specific items by name (search recursively) */
-                        function extractByName(list, names) {
-                            const matched = [], rest = [];
-                            (list||[]).forEach(v => {
-                                if (v.children && v.children.length) {
-                                    const [m, r] = [[], []];
-                                    v.children.forEach(ch => {
-                                        if (names.includes(ch.name)) m.push(ch);
-                                        else r.push(ch);
-                                    });
-                                    matched.push(...m);
-                                    if (r.length) {
-                                        const copy = Object.assign({}, v, {children: r});
-                                        rest.push(copy);
-                                    }
-                                } else {
-                                    if (names.includes(v.name)) matched.push(v);
-                                    else rest.push(v);
-                                }
-                            });
-                            return [matched, rest];
-                        }
-                        const [toMove, remaining] = extractByName(item.lvaluelist, val);
-                        item.lvaluelist = remaining;
-                        item.rvaluelist = (item.rvaluelist || []).concat(toMove);
+                        const toMove = replaceCuicValueListSelection(item, val);
                         results.push({param: paramName, ok: true,
                                       value: toMove.map(v=>v.name)});
                     }
