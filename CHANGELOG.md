@@ -5,7 +5,22 @@ Format: each entry has a **date**, **summary**, **files changed**, and **root ca
 
 ---
 
+## [2026-04-03] — Feature: CUIC Worker Data Extraction & Field Selection
+
+**Files changed:** `workers/cuic/scraper.py`, `ui/js/cuic.js`, `settings_server.py`, `config/settings.json`
+
+**Overview:**
+Completed the extraction and storage of data for the CUIC worker, including advanced filtering and row consolidation.
+
+- **Robust Scraper**: Extracts data directly from the web page’s DOM and saves it to CSV. Handles large reports and ensures reliability across different report types.
+- **Field Selection**: Users can now select specific fields (columns) to extract via the UI.
+- **Row Consolidation**: Added options to extract only the consolidated rows for certain groups (e.g., General_IT_CT, RTPS_CT) or all rows, helping to keep data manageable. By default, extracts consolidated and global consolidated rows (e.g., global summary rows at the end of reports).
+- **Settings Update**: Updated the CUIC settings page to support selection of fields and row consolidation preferences.
+
+---
+
 ## [2026-03-30] — Codebase Organization & Project Conventions
+
 
 ### Added
 - `CHANGELOG.md` — this file; tracks all completed changes going forward

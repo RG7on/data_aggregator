@@ -6,16 +6,89 @@ Move items to `CHANGELOG.md` when completed.
 ---
 
 ## In Progress
-1. CUIC worker as almost working correctly (logging in, navigating to report, settings wizard, but not yet extracting the data), we need to read the data from the web page and save it to a CSV file. the report can have alot of fealds and rows, lets give the user the option to select which fealds they want to extract and whether to extract all rows or only the consaledated ones, for example look at (docs\reference\Z Call Type Historical All Fields-Call Type Historical All Fields.csv) you will see groups like General_IT_CT line NO 19, RTPS_CT line NO 23, Subsurface_CT line NO 40. these groups have a lot of rows, but they are consaledated, so we can give the user the option to extract only the consaledated rows for these groups, or to extract all rows for these groups, and for other fealds that dont have consaledated rows we can just extract all rows. this will help reduce the amount of data extracted and make it more manageable for the user. but by defult only get the consaledated ones and the global consaledated row the one you can see at the end of the report, see line NO 48 in (docs\reference\Z Call Type Historical All Fields-Call Type Historical All Fields.csv).
+1. studing if the curunt CSV file that suppose to store evrything can holdup or we need to change the way we store the data ?
 
-we need to study the how can we extract the data from the web page robustly and in a way that it less likly to break. and it works for all reports, not just the one we are testing with.
+2. we bring clomns and rows slection to SMAX worker as well, and we need to study how to do that in a way that is user friendly and easy to use.
 
-we need to also update the settings accordingly to allow the user to select which fealds they want to extract and whether to extract all rows or only the consaledated ones for the groups that have consaledated rows.
+3. **UI/UX: Move "Add Report" Button & Require "Validate Path"**
 
-2. studing if the curunt CSV file that suppose to store evrything can holdup or we need to change the way we store the data ?
+In the CUIC worker settings, if you want to add a new report, you currently have to go to the bottom of the web screen. It would be much easier to add the report if the "Add Report" button were moved to the top.
 
-3. we bring clomns and rows slection to SMAX worker as well, and we need to study how to do that in a way that is user friendly and easy to use.
+When adding a report, the system currently prompts for a new report path. Once the path is entered, it automatically generates and fills in the label, data type, row mode, and other fields. This should not happen automatically.
 
+Instead, when adding a new report, there is a "Validate Path" button. After the user enters the path, they need to click "Validate Path" for these fields to be generated. The fields should only be generated if the entered path is valid. 
+
+4. **Bug/Logic: Allow Deleting All Reports & Fix Auto-Save for Deletions**
+
+When attempting to remove a report from the CUIC worker, I'm unable to delete the last report. The system states that at least one report must be kept, but I wish to delete all reports and do not want to be blocked from doing so.
+
+The same issue occurs with the SMAX worker; it should not prevent me from deleting all existing reports. Additionally, even with automatic settings save enabled, the settings are not always being saved. For instance, after deleting all SMAX reports shown in the settings, the changes are not reflected.
+
+Upon reloading and returning to the SMAX worker, all the deleted reports reappear, seemingly loaded from the settings JSON file. This needs immediate correction. Any deletion should be saved directly and reflected in the JSON file.
+
+This behavior is unacceptable. When I try to delete all reports in the CUIC worker, it blocks me, even though I have deleted reports previously.
+
+It is now blocking deletions and not saving automatically as expected. It should save automatically, and there is no save button available. I do not want a save button; I want the changes to save automatically. However, when I reload the page, everything reverts as if no deletions occurred. This needs to be fixed.
+
+5. **UI/UX: Hide Worker Connection Settings Behind a Settings Icon**
+
+Regarding the worker settings, I can see you've placed a section for each worker's settings at the top of the worker webpage. I don't want this to be shown. Instead, please add a settings icon on the worker page itself. When the user clicks on it, then display the settings or connection options.
+
+Don't show the settings directly. The user won't need to interact with them frequently, so there's no need for them to be visible all the time. 
+
+6. **Debugging: Open Playwright Browser in Maximized/Full Screen Mode**
+
+There's something that bothers me a lot. When I set the hit list mode to off to see what's happening in the automation, the browser opens in a very weird window size.
+
+When I enlarge it, the website itself is still stuck to some sort of scale that is chopped off from the bottom right. I cannot see everything. Even if I try to scroll within that page, I couldn't.
+
+It's like it's stuck, even if I maximize the window. So why don't you just open the web browser of the automation in full mode automatically whenever it runs? This way, I cannot debug correctly. It's very hard for me to debug. 
+
+7. **Bug: Initial State of "Days" Combo Box in Filter Wizard Settings**
+
+In wizard settings, you can select the date and time. You have options like custom, today, yesterday, this week, and use default. When you select "yesterday," the combo box for "days" should not be shown.
+
+This "days" combo box allows you to choose specific days for your selection. If you choose "yesterday," it should be hidden. However, if you select "this week," it should be visible.
+
+The issue occurs when the website loads. It defaults to "yesterday," but incorrectly displays the "days" combo box. When you then change the selection to "last week" and switch back to "yesterday," the "days" combo box correctly disappears.
+
+The logic appears to be in place, but the system fails to recognize that the date time is set to "yesterday" upon initial load. This prevents the "days" combo box from being hidden as intended. Let's investigate and resolve this issue. 
+
+8. **Data Consistency: Add Report Identifier & Replace Outdated Data on Scrape**
+
+We have some reports that we are scrubbing the data from. So those reports have some filter settings. Whether you want the report of today, whether you want the report of yesterday, whether you want the report of a very specific time interval of a day. You can do that in the filter settings.
+
+And we have this in our interface, the settings interface. So you can just add the report path, validate it, and it will show you the available settings that you can set from our interface, the settings. And it will be applied in the website side itself. Okay. So, by the way, this has some issue.
+
+It's not applying the settings correctly. So we need to work on it. But the thing that I want to talk about right now, what if at some point we wanted to change the filter settings? Of course, the data that is coming from this report, the report will change eventually.
+
+Right? So what about the data that already existing in the database that is from the same source, this report? This can create confusion. Okay. You are getting data from reports. You are just dumping them in the database, then dumping them in the CSV file without any identifier from where did this come.
+
+Okay. We are not replacing the data when we got new data. We are adding on top of it. We are adding them beneath the file. We are just adding.
+
+We are not replacing. So if at some point we change the settings of a filter, it should replace all the data that came from that report. So we need an identifier for each report. So each time or any time this report brings data or generated data, it will replace the old ones, all of them.
+
+For example, if we have 100 rows of data that existing on our database and we got only 50 from the new scrap, replace all the 100 with the 50. This way we can ensure data consistency and the integrity of data. They are getting the data that they want without any irrelevant data that they didn't want.
+
+And regarding if they want to get two different type of data from the same source, they can add it twice. They can add the report twice, each with different settings. 
+
+9. **Bug/Refactor: Filter Wizard Settings Not Applying Correctly in CUIC**
+
+Speaking about the filter settings, we have something in our front-end, in the settings front-end, we have something called filter wizard settings. So when you provide a path of a report, and I'm talking about the worker CUIC, okay, it's trying to get the filters from the actual front-end, from the actual website, and giving them here in our website front-end, okay.
+
+This will allow the user to just provide these settings, and he can just pre-select the settings that they want, instead of every time reselecting them, because when you select the filter settings, and you close that report, and you try to open it again, it will ask you to enter the settings again.
+
+So without this feature of pre-selecting the settings themselves, we cannot scrub the data whenever we want, or we schedule scrubbing data. So this need to work correctly, and unfortunately, it does not work correctly. It has some issues. It does apply some settings correctly, but some settings like, if you want to get some specific time of the day, it's not applying.
+
+For example, I have put that I want the data of yesterday, and I want the data to be from 10 a.m. to 12 p.m. It did select it correctly. I saw it in the UI, and I was running on headless mode off, and it did select it, but it didn't apply to the report itself.
+
+For example, while choosing the default data, and in some other kind of reports, it didn't apply the report settings correctly. For example, while choosing the call types, I think, it did add them twice. It did add those groups that it should add twice. And regarding the time, it didn't even select the time.
+
+It just passes, and it didn't select it, and go to the next step. So this means that our code is not getting the data of filter settings or not getting the filter settings from CUIC dynamically. So if settings somehow changed in some reports, settings changed, and I mean by this, that each report has different settings, different criteria and settings.
+
+Okay, we can set anything or different things. And if this change, our code or our settings scrapper unfortunately breaks, and this will cause us a lot of problems. We want it to work dynamically. So we want to figure out how can we solve this issue.
+
+What is the best solution for this and whether what we are doing is correct or it's over complicated. Let's just study what we can do here. 
 
 ## Backlog
 
