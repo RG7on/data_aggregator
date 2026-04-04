@@ -5,6 +5,7 @@ Wizard field reading, filter application, and discovery for CUIC reports.
 Supports both CUIC-specific (SPAB, multi-step) and generic HTML wizards.
 """
 
+from copy import deepcopy
 from typing import Dict, Any, List
 from . import javascript
 import time
@@ -235,6 +236,219 @@ def _normalize_datetime_expected(value: Any) -> dict:
     return normalized
 
 
+def _normalize_discovery_mode(value: Any) -> str:
+    mode = str(value or '').strip().lower()
+    if mode in ('discover_columns', 'columns', 'column_discovery', 'with_columns'):
+        return 'discover_columns'
+    return 'schema_only'
+
+
+def _normalize_discovery_filters(filters: Any) -> dict:
+    return deepcopy(filters) if isinstance(filters, dict) else {}
+
+
+def _cuic_value_is_configured(value: Any, param_type: str) -> bool:
+    if value is _MISSING or value is None:
+        return False
+
+    if param_type == 'cuic_valuelist':
+        return value == 'all' or (isinstance(value, list) and len(value) > 0)
+
+    if param_type == 'cuic_field_filter':
+        return len(_normalize_field_filter_entries(value)) > 0
+
+    if param_type == 'cuic_datetime':
+        normalized = _normalize_datetime_expected(value)
+        return bool(
+            normalized.get('preset')
+            or normalized.get('currentPreset')
+            or normalized.get('date1')
+            or normalized.get('date2')
+        )
+
+    if isinstance(value, str):
+        return bool(value.strip())
+
+    if isinstance(value, (list, tuple, set, dict)):
+        return len(value) > 0
+
+    return True
+
+
+def _current_datetime_value_from_param(param: dict) -> Any:
+    current_preset = str(param.get('currentPreset') or '').strip()
+    if not current_preset:
+        return _MISSING
+
+    if current_preset != 'CUSTOM':
+        return current_preset
+
+    value = {
+        'preset': current_preset,
+        'date1': str(param.get('currentDate1') or ''),
+        'date2': str(param.get('currentDate2') or ''),
+        'time1': str(param.get('currentTime1') or ''),
+        'time2': str(param.get('currentTime2') or ''),
+        'allTimeChecked': str(param.get('allTimeChecked') or ''),
+        'allDayChecked': str(param.get('allDayChecked') or ''),
+        'days': deepcopy(param.get('days') or {}),
+    }
+    if _cuic_value_is_configured(value, 'cuic_datetime'):
+        return value
+    return _MISSING
+
+
+def _pick_discovery_datetime_value(param: dict) -> tuple[Any, str]:
+    current_value = _current_datetime_value_from_param(param)
+    if current_value is not _MISSING:
+        return current_value, 'used the current CUIC date preset'
+
+    for preset in param.get('datePresets') or []:
+        preset_value = str((preset or {}).get('value') or '').strip()
+        if not preset_value or preset_value == 'CUSTOM':
+            continue
+        return preset_value, f"selected preset {preset_value!r} for discovery"
+
+    return _MISSING, 'no safe non-custom date preset was available'
+
+
+def _summarize_discovery_value(param_type: str, value: Any) -> str:
+    if param_type == 'cuic_valuelist':
+        values = [str(v) for v in (value or [])[:3]]
+        suffix = '...' if isinstance(value, list) and len(value) > 3 else ''
+        return ', '.join(values) + suffix
+
+    if param_type == 'cuic_datetime':
+        normalized = _normalize_datetime_expected(value)
+        return str(normalized.get('preset') or normalized.get('date1') or '')
+
+    if param_type == 'cuic_field_filter':
+        fields = [entry.get('fieldId') or entry.get('id') or '' for entry in _normalize_field_filter_entries(value)]
+        fields = [field for field in fields if field]
+        suffix = '...' if len(fields) > 3 else ''
+        return ', '.join(fields[:3]) + suffix
+
+    return str(value)
+
+
+def _pick_discovery_value(param: dict) -> tuple[Any, str]:
+    param_type = str(param.get('type') or '')
+
+    if param_type == 'cuic_valuelist':
+        selected_values = _unique_nonempty(param.get('selectedValues') or [])
+        if selected_values:
+            return selected_values, 'used the current CUIC selection'
+
+        available_names = _unique_nonempty(param.get('availableNames') or [])
+        if available_names:
+            return [available_names[0]], 'selected the first available value for discovery'
+
+        return _MISSING, 'no available values were exposed by CUIC'
+
+    if param_type == 'cuic_datetime':
+        return _pick_discovery_datetime_value(param)
+
+    if param_type == 'cuic_field_filter':
+        selected_fields = _normalize_field_filter_entries(param.get('selectedFields'))
+        if selected_fields:
+            return selected_fields, 'used the current CUIC field filter selection'
+
+        selected_field_ids = _normalize_field_filter_entries(param.get('selectedFieldIds'))
+        if selected_field_ids:
+            return selected_field_ids, 'used the current CUIC field filter selection'
+
+        return _MISSING, 'required field filters need manual values before discovery can run'
+
+    return _MISSING, 'this required parameter type does not have an automatic discovery fallback'
+
+
+def _record_column_discovery_blocker(blockers: List[dict], param: dict, reason: str, step_key: str = '', step_title: str = ''):
+    blockers.append({
+        'step': step_key,
+        'title': step_title,
+        'label': param.get('label') or _cuic_param_key(param) or param.get('paramName') or 'Unknown parameter',
+        'paramKey': _cuic_param_key(param),
+        'type': param.get('type') or '',
+        'reason': reason,
+    })
+
+
+def _fill_required_discovery_params(container: dict, params: List[dict], auto_filled: List[dict], blockers: List[dict], *, step_key: str = '', step_title: str = ''):
+    for param in params or []:
+        if not param.get('isRequired'):
+            continue
+
+        current_value = _resolve_saved_cuic_value(container, param)
+        param_type = str(param.get('type') or '')
+        if _cuic_value_is_configured(current_value, param_type):
+            continue
+
+        param_key = _cuic_param_key(param)
+        if not param_key:
+            _record_column_discovery_blocker(blockers, param, 'parameter has no stable storage key', step_key, step_title)
+            continue
+
+        discovery_value, reason = _pick_discovery_value(param)
+        if not _cuic_value_is_configured(discovery_value, param_type):
+            _record_column_discovery_blocker(blockers, param, reason, step_key, step_title)
+            continue
+
+        container[param_key] = discovery_value
+        auto_filled.append({
+            'step': step_key,
+            'title': step_title,
+            'label': param.get('label') or param_key,
+            'paramKey': param_key,
+            'type': param_type,
+            'reason': reason,
+            'summary': _summarize_discovery_value(param_type, discovery_value),
+        })
+
+
+def _build_column_discovery_filters(discovery_result: dict, saved_filters: Any) -> tuple[dict, List[dict], List[dict]]:
+    filters = _normalize_discovery_filters(saved_filters)
+    auto_filled: List[dict] = []
+    blockers: List[dict] = []
+    discovery_type = discovery_result.get('type') or ''
+
+    if discovery_type == 'cuic_multistep':
+        if not isinstance(filters.get('_meta'), dict):
+            filters['_meta'] = {
+                'schemaVersion': discovery_result.get('schemaVersion') or 2,
+                'type': 'cuic_multistep',
+                'steps': discovery_result.get('steps') or [],
+                'stepTitles': discovery_result.get('stepTitles') or [],
+            }
+        for step in discovery_result.get('steps') or []:
+            step_number = step.get('step') or ''
+            step_key = f'step_{step_number}' if step_number else ''
+            step_container = filters.get(step_key)
+            if not isinstance(step_container, dict):
+                step_container = {}
+                filters[step_key] = step_container
+            _fill_required_discovery_params(
+                step_container,
+                step.get('params') or [],
+                auto_filled,
+                blockers,
+                step_key=step_key,
+                step_title=step.get('title') or '',
+            )
+        return filters, auto_filled, blockers
+
+    if discovery_type == 'cuic_spab':
+        if not isinstance(filters.get('_meta'), dict):
+            filters['_meta'] = {
+                'schemaVersion': discovery_result.get('schemaVersion') or 2,
+                'type': 'cuic_spab',
+                'params': discovery_result.get('params') or [],
+            }
+        params = discovery_result.get('params') or []
+        _fill_required_discovery_params(filters, params, auto_filled, blockers)
+
+    return filters, auto_filled, blockers
+
+
 def _compare_cuic_datetime(expected: Any, observed: dict) -> tuple[bool, str]:
     expected_cfg = _normalize_datetime_expected(expected)
     observed_cfg = observed or {}
@@ -420,7 +634,7 @@ def click_wizard_button(worker, btn_text: str) -> bool:
     return False
 
 
-def run_filter_wizard(worker, filters: dict = None) -> bool:
+def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -> bool:
     """Walk through the wizard steps, applying saved filter values.
 
     Supported formats:
@@ -446,6 +660,7 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
 
         step = 0
         max_steps = 10
+        run_clicked = False
 
         while step < max_steps:
             step += 1
@@ -497,10 +712,15 @@ def run_filter_wizard(worker, filters: dict = None) -> bool:
                 worker.page.wait_for_timeout(worker.timeout_short)
             elif click_wizard_button(worker, 'Run'):
                 worker.logger.info(f"  Wizard: clicked Run at step {step}")
+                run_clicked = True
                 break
             else:
                 worker.logger.debug(f"  Wizard step {step}: no Next/Run button")
                 break
+
+        if require_run and not run_clicked:
+            worker.logger.error('Filter wizard did not reach the Run button')
+            return False
 
         worker.page.wait_for_timeout(worker.timeout_long)  # Report generation wait after wizard completes
         worker.logger.info("Filter wizard done")
@@ -787,6 +1007,42 @@ def _discover_columns_after_run(worker) -> dict:
     return result
 
 
+def _run_spab_column_discovery(worker, step_info: dict | None, discovery_filters: dict) -> tuple[bool, str]:
+    """Apply SPAB discovery filters on the already open wizard and click Run.
+
+    During schema discovery the SPAB report is already open on its parameter page.
+    Reusing that live wizard is more reliable than closing and reopening the
+    report again before the temporary discovery values are applied.
+    """
+    if not step_info or step_info.get('type') != 'cuic_spab':
+        return False, 'Could not re-use the current CUIC parameter page for column discovery.'
+
+    clean_filters = {
+        key: value
+        for key, value in (discovery_filters or {}).items()
+        if key != '_meta'
+    }
+
+    worker.logger.info('Discovery: applying SPAB filters on the current wizard page...')
+    try:
+        if clean_filters:
+            apply_filters_to_step(worker, step_info, clean_filters)
+            _verify_cuic_step_state(worker, step_info, clean_filters)
+        else:
+            worker.logger.info('Discovery: SPAB report already has runnable defaults; no temporary filters needed')
+    except Exception as e:
+        worker.logger.warning(f'Discovery: SPAB filter apply/verify failed: {e}')
+        return False, f'Could not apply discovery filters on the current parameter page: {e}'
+
+    worker.page.wait_for_timeout(worker.timeout_short)
+    worker.logger.info('Discovery: clicking Run on the current SPAB wizard...')
+    if not click_wizard_button(worker, 'Run'):
+        return False, 'Could not click Run on the current parameter page for column discovery.'
+
+    worker.page.wait_for_timeout(worker.timeout_short)
+    return True, ''
+
+
 def discover_wizard(worker_class, report_config: dict) -> dict:
     """Open a report and read all wizard steps' fields.
     
@@ -803,7 +1059,15 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
     worker._load_config()
     folder = str(report_config.get('folder', '') or '').strip().strip('/')
     name = str(report_config.get('name', '') or '').strip().strip('/')
-    result = {'schemaVersion': 2, 'steps': [], 'error': '', 'type': 'generic'}
+    discovery_mode = _normalize_discovery_mode(report_config.get('discovery_mode'))
+    saved_filters = report_config.get('filters') if isinstance(report_config.get('filters'), dict) else {}
+    result = {
+        'schemaVersion': 2,
+        'steps': [],
+        'error': '',
+        'type': 'generic',
+        'discovery_mode': discovery_mode,
+    }
 
     if not name:
         result['error'] = 'Missing CUIC report name'
@@ -833,11 +1097,13 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
         # Walk through wizard steps reading fields
         step = 0
         max_steps = 10
+        current_step_info = None
         while step < max_steps:
             step += 1
             step_info = read_wizard_step_fields(worker)
 
             if step_info:
+                current_step_info = deepcopy(step_info)
                 stype = step_info.get('type', 'generic')
 
                 if stype == 'cuic_multistep':
@@ -904,20 +1170,58 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
 
         worker.logger.info(f"Discovery: {len(result['steps'])} wizard step(s) found, type={result['type']}")
 
-        # ── Click Run to render the report and discover available columns ──
-        worker.logger.info("Discovery: clicking Run to render the report for column discovery...")
-        run_clicked = click_wizard_button(worker, 'Run')
-        if not run_clicked:
-            worker.logger.warning("Discovery: could not click Run — column discovery skipped")
+        if discovery_mode != 'discover_columns':
+            return result
+
+        if result['type'] in ('cuic_multistep', 'cuic_spab'):
+            discovery_filters, auto_filled, blockers = _build_column_discovery_filters(result, saved_filters)
+            if auto_filled:
+                result['auto_filled_params'] = auto_filled
+            if blockers:
+                result['column_discovery_blockers'] = blockers
+                worker.logger.warning(
+                    'Discovery: column discovery blocked by required params: '
+                    + ', '.join(blocker.get('label', '') for blocker in blockers)
+                )
+                return result
+
+            if result['type'] == 'cuic_spab':
+                discovery_ok, discovery_error = _run_spab_column_discovery(
+                    worker,
+                    current_step_info,
+                    discovery_filters,
+                )
+                if not discovery_ok:
+                    result['column_discovery_error'] = discovery_error
+                    return result
+            else:
+                navigation.close_report_page(worker)
+                frame = navigation.get_reports_frame(worker)
+                if not frame:
+                    result['column_discovery_error'] = 'Reports iframe not found after schema discovery.'
+                    return result
+                if not navigation.open_report(worker, frame, folder, name):
+                    result['column_discovery_error'] = f'Could not reopen {folder}/{name} for column discovery.'
+                    return result
+
+                worker.page.wait_for_timeout(worker.timeout_medium)
+                if not run_filter_wizard(worker, discovery_filters, require_run=True):
+                    result['column_discovery_error'] = 'Could not run the report for column discovery.'
+                    return result
         else:
-            result['_columns_meta'] = _discover_columns_after_run(worker)
-            worker.logger.info(
-                f"Discovery: columns_meta={{"
-                f"columns:{len(result['_columns_meta'].get('available', []))}, "
-                f"datetime_field:{result['_columns_meta'].get('datetime_field')!r}}}"
-            )
-            # Close the report tab so logout can proceed cleanly
-            navigation.close_report_page(worker)
+            worker.logger.info('Discovery: clicking Run to render the report for column discovery...')
+            if not click_wizard_button(worker, 'Run'):
+                worker.logger.warning('Discovery: could not click Run — column discovery skipped')
+                result['column_discovery_error'] = 'Could not click Run for column discovery.'
+                return result
+
+        result['_columns_meta'] = _discover_columns_after_run(worker)
+        worker.logger.info(
+            f"Discovery: columns_meta={{"
+            f"columns:{len(result['_columns_meta'].get('available', []))}, "
+            f"datetime_field:{result['_columns_meta'].get('datetime_field')!r}}}"
+        )
+        navigation.close_report_page(worker)
 
         return result
 

@@ -31,7 +31,7 @@ function getCuicReportPath(report) {
 
 function hasCuicGeneratedFields(report) {
   const filters = report.filters || {};
-  return Boolean(report.label || report._wizard_meta || report._columns_meta || Object.keys(filters).length > 0);
+  return Boolean(report._wizard_meta || report._columns_meta || Object.keys(filters).length > 0);
 }
 
 function resetCuicDiscovery(report) {
@@ -39,6 +39,8 @@ function resetCuicDiscovery(report) {
   report.filters = {};
   delete report._wizard_meta;
   delete report._columns_meta;
+  delete report._column_discovery_blockers;
+  delete report._column_discovery_error;
 }
 
 function cloneCuicData(value) {
@@ -82,6 +84,59 @@ function getCuicSavedValue(container, param) {
     if (Object.prototype.hasOwnProperty.call(source, alias)) return source[alias];
   }
   return undefined;
+}
+
+function getCuicRequiredBadge(param) {
+  if (!param || !param.isRequired) return '';
+  return ' <span class="vl-badge" style="background:rgba(192,57,43,0.12);color:#c0392b">required</span>';
+}
+
+function resetCuicColumnDiscoveryFeedback(report) {
+  delete report._column_discovery_blockers;
+  delete report._column_discovery_error;
+}
+
+function applyCuicDiscoverySchema(report, data) {
+  if (!report || !data || !Array.isArray(data.steps) || data.steps.length === 0) return;
+
+  if (!report.filters || typeof report.filters !== 'object') {
+    report.filters = {};
+  }
+
+  if (data.type === 'cuic_multistep') {
+    const metaObj = {
+      schemaVersion: data.schemaVersion || 2,
+      type: 'cuic_multistep',
+      steps: data.steps,
+      stepTitles: data.stepTitles || data.steps.map(step => step.title || 'Step ' + step.step)
+    };
+    report._wizard_meta = metaObj;
+    report.filters._meta = metaObj;
+    return;
+  }
+
+  if (data.type === 'cuic_spab') {
+    const metaObj = {
+      schemaVersion: data.schemaVersion || 2,
+      type: 'cuic_spab',
+      params: data.params || []
+    };
+    report._wizard_meta = metaObj;
+    report.filters._meta = metaObj;
+    return;
+  }
+
+  const metaObj = { steps: data.steps };
+  report._wizard_meta = metaObj;
+  report.filters._meta = metaObj;
+}
+
+function summarizeCuicDiscoveryItems(items, limit = 3) {
+  const values = (items || [])
+    .map(item => (item && (item.label || item.paramKey || item.title)) || '')
+    .filter(Boolean);
+  if (values.length === 0) return '';
+  return values.slice(0, limit).join(', ') + (values.length > limit ? '...' : '');
 }
 
 function normalizeFieldFilterConfigs(value, fallbackFields) {
@@ -168,10 +223,10 @@ function renderCuicReports() {
         </div>
         <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. AG Test or Test/Z Call Type Historical All Fields" style="grid-column:2"></div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
-          <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
+          <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i}, 'discover_columns', 'discover-btn-${i}')">
             \u25B6 Validate Path
           </button>
-          <span style="font-size:11px;color:var(--muted)">Opens browser to validate the report path and read filters</span>
+          <span style="font-size:11px;color:var(--muted)">Validates the report path and discovers filters and columns</span>
         </div>
       </div>`;
     }
@@ -216,10 +271,10 @@ function renderCuicReports() {
         </div>
       </div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
-        <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
+        <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i}, 'discover_columns', 'discover-btn-${i}')">
           \u25B6 Re-validate Path
         </button>
-        <span style="font-size:11px;color:var(--muted)">Re-open browser to update report filters</span>
+        <span style="font-size:11px;color:var(--muted)">Re-runs validation to refresh filters and columns</span>
       </div>
       ${filterHtml}
       ${renderColumnsPanel(r, i)}
@@ -276,7 +331,7 @@ function renderFilterPanel(report, idx) {
     if (Object.keys(filters).length > 0) {
       return `<details class="filter-panel-collapsible"><summary class="filter-panel-toggle">\uD83C\uDFA8 Saved Filters (raw)</summary><div class="filter-panel">
         <pre style="font-size:11px;color:var(--muted);overflow-x:auto;">${esc(JSON.stringify(filters,null,2))}</pre>
-        <button class="btn-discover" style="margin-top:6px" onclick="discoverFilters(${idx})">\u25B6 Re-discover</button>
+        <button class="btn-discover" style="margin-top:6px" onclick="discoverFilters(${idx}, 'discover_columns')">\u25B6 Re-discover</button>
       </div></details>`;
     }
     return '';
@@ -319,7 +374,7 @@ function renderFilterPanel(report, idx) {
           opts += presets.map(o => `<option value="${attr(o.value)}"${curPreset===o.value?' selected':''}>${esc(o.label)}</option>`).join('');
           const dtId = 'dt-' + idx + '-s' + step.step + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
 
-          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)}</label>
             <select id="${dtId}-preset" onchange="updateMsDatetime(${idx},'${attr(stepKey)}','${attr(paramKey)}','preset',this.value)">${opts}</select></div>`;
 
           if (p.hasDateRange) {
@@ -384,7 +439,7 @@ function renderFilterPanel(report, idx) {
           const ffId  = 'ff-' + idx + '-s' + step.step + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
           const badge = `<span class="vl-badge">${fields.length} fields</span>`;
 
-          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)} ${badge}</label>
             <span id="${ffId}-selcount" style="font-size:12px;color:${selectedConfigs.length>0?'var(--green)':'var(--muted)'}">${selectedConfigs.length} selected</span></div>`;
 
           html += `<div class="ff-selected-list" id="${ffId}-selected" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(paramKey)}">`;
@@ -423,7 +478,7 @@ function renderFilterPanel(report, idx) {
           const selCount  = isAll ? allNames.length : selNames.length;
           const badge     = `<span class="vl-badge">${allNames.length} available</span>`;
 
-          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)} ${badge}</label>
             <span id="${vlId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
           html += `<div class="vl-selected-summary" id="${vlId}-summary" data-type="vl-ms" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(paramKey)}" data-baseid="${vlId}">`;
@@ -467,12 +522,12 @@ function renderFilterPanel(report, idx) {
 
         } else if (p.type === 'checkbox') {
           const checked = savedVal !== undefined ? savedVal : (p.currentValue || false);
-          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)}</label>
             <input type="checkbox" ${checked?'checked':''} style="width:auto;"
               onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(paramKey)}',this.checked)"></div>`;
         } else {
           const val = savedVal !== undefined ? savedVal : (p.currentValue || '');
-          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+          html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)}</label>
             <input type="${p.type==='number'?'number':'text'}" value="${attr(String(val))}"
               onchange="updateMsFilter(${idx},'${attr(stepKey)}','${attr(paramKey)}',this.value)"></div>`;
         }
@@ -498,7 +553,7 @@ function renderFilterPanel(report, idx) {
         opts += presets.map(o => `<option value="${attr(o.value)}"${curPreset===o.value?' selected':''}>${esc(o.label)}</option>`).join('');
         const dtId = 'dt-' + idx + '-' + paramKey.replace(/[^a-zA-Z0-9]/g,'_');
 
-        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)}</label>
           <select id="${dtId}-preset" onchange="updateCuicDatetime(${idx},'${attr(paramKey)}','preset',this.value)">${opts}</select></div>`;
 
         if (p.hasDateRange) {
@@ -541,7 +596,7 @@ function renderFilterPanel(report, idx) {
         const labelMap  = {};
         fields.forEach(f => { labelMap[f.fieldId||f.label] = f.label; });
 
-        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)} ${badge}</label>
           <span id="${ffId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
         html += `<div class="vl-selected-summary" id="${ffId}-summary" data-type="ff" data-ridx="${idx}" data-pn="${attr(paramKey)}" data-baseid="${ffId}"
@@ -581,7 +636,7 @@ function renderFilterPanel(report, idx) {
         const selCount = isAll ? allNames.length : selNames.length;
         const badge    = `<span class="vl-badge">${allNames.length} available</span>`;
 
-        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)} ${badge}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)} ${badge}</label>
           <span id="${vlId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
         html += `<div class="vl-selected-summary" id="${vlId}-summary" data-type="vl" data-ridx="${idx}" data-pn="${attr(paramKey)}" data-baseid="${vlId}">`;
@@ -624,12 +679,12 @@ function renderFilterPanel(report, idx) {
 
       } else if (p.type === 'checkbox') {
         const checked = savedVal !== undefined ? savedVal : (p.currentValue || false);
-        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)}</label>
           <input type="checkbox" ${checked?'checked':''} style="width:auto;"
             onchange="updateCuicFilter(${idx},'${attr(paramKey)}',this.checked)"></div>`;
       } else {
         const val = savedVal !== undefined ? savedVal : (p.currentValue || '');
-        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}</label>
+        html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)}</label>
           <input type="${p.type==='number'?'number':'text'}" value="${attr(String(val))}"
             onchange="updateCuicFilter(${idx},'${attr(paramKey)}',this.value)"></div>`;
       }
@@ -1144,30 +1199,71 @@ function clearFilters(reportIdx) {
 //  DISCOVER FILTERS
 // ══════════════════════════════════════════════════════════════════════════
 
-async function discoverFilters(reportIdx) {
+async function discoverFilters(reportIdx, discoveryMode = 'discover_columns', buttonId = null) {
   const r   = cuicReports[reportIdx];
-  const btn = document.getElementById('discover-btn-' + reportIdx);
+  const btn = buttonId ? document.getElementById(buttonId) : null;
   const parsedPath = splitCuicReportPath(getCuicReportPath(r));
+  const isColumnDiscovery = discoveryMode === 'discover_columns';
 
   if (!parsedPath.name) { showToast('Set the CUIC report path first', 'error'); return; }
 
   r.folder = parsedPath.folder;
   r.name = parsedPath.name;
 
-  const origHtml = btn.innerHTML;
-  btn.innerHTML  = '<span class="spinner"></span> Discovering\u2026';
-  btn.disabled   = true;
-  showToast('Launching browser to discover wizard fields\u2026 This may take 30\u201360s.', 'info');
+  const origHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.innerHTML  = '<span class="spinner"></span> Discovering\u2026';
+    btn.disabled   = true;
+  }
+  showToast('Launching browser to validate the report path and discover filters and columns\u2026 This may take 30\u201360s.', 'info');
 
   try {
     const res  = await fetch('/api/discover-filters', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ folder: r.folder, name: r.name, path: parsedPath.path })
+      body: JSON.stringify({
+        folder: r.folder,
+        name: r.name,
+        path: parsedPath.path,
+        discovery_mode: discoveryMode,
+        filters: cloneCuicData(r.filters || {}) || {}
+      })
     });
     const data = await res.json();
 
     if (!res.ok || data.error) { showToast('Discovery error: ' + (data.error || 'Unknown validation error'), 'error'); return; }
     if (!data.steps || data.steps.length === 0) { showToast('No wizard steps found', 'error'); return; }
+
+    resetCuicColumnDiscoveryFeedback(r);
+    applyCuicDiscoverySchema(r, data);
+    if (!r.label && r.name) r.label = generateLabelFromName(r.name);
+
+    if (isColumnDiscovery) {
+      if (Array.isArray(data.column_discovery_blockers) && data.column_discovery_blockers.length > 0) {
+        r._column_discovery_blockers = data.column_discovery_blockers;
+        renderCuicReports();
+        markDirty();
+        showToast('Column discovery needs manual values for: ' + summarizeCuicDiscoveryItems(data.column_discovery_blockers), 'warning');
+        return;
+      }
+      if (data.column_discovery_error) {
+        r._column_discovery_error = data.column_discovery_error;
+        renderCuicReports();
+        markDirty();
+        showToast('Column discovery failed: ' + data.column_discovery_error, 'error');
+        return;
+      }
+      if (data._columns_meta && (data._columns_meta.available || []).length > 0) {
+        r._columns_meta = data._columns_meta;
+        renderCuicReports();
+        markDirty();
+        showToast(`Discovered ${data._columns_meta.available.length} columns!`, 'success');
+        return;
+      }
+      renderCuicReports();
+      markDirty();
+      showToast('Column discovery completed but no columns were returned.', 'warning');
+      return;
+    }
 
     const isCuic      = data.type === 'cuic_spab';
     const isMultiStep = data.type === 'cuic_multistep';
@@ -1244,8 +1340,10 @@ async function discoverFilters(reportIdx) {
   } catch(e) {
     showToast('Discovery failed: ' + e.message, 'error');
   } finally {
-    btn.innerHTML = origHtml;
-    btn.disabled  = false;
+    if (btn) {
+      btn.innerHTML = origHtml;
+      btn.disabled  = false;
+    }
   }
 }
 
@@ -1261,16 +1359,26 @@ async function discoverFilters(reportIdx) {
  */
 function renderColumnsPanel(report, idx) {
   const meta = report._columns_meta;
+  const blockers = Array.isArray(report._column_discovery_blockers) ? report._column_discovery_blockers : [];
+  const discoveryError = report._column_discovery_error || '';
   if (!meta || !meta.available || meta.available.length === 0) {
     // Only show the hint if wizard has already been discovered (so the user
     // knows what it's for), otherwise stay silent.
     if (report._wizard_meta || (report.filters && report.filters._meta)) {
+      const blockerHtml = blockers.length > 0
+        ? `<div style="margin-bottom:10px;padding:10px 12px;border:1px solid rgba(192,57,43,0.2);background:rgba(192,57,43,0.06);color:#9b2c20;border-radius:10px">Column discovery is blocked until you set: <strong>${esc(blockers.map(item => item.label || item.paramKey || 'Unknown').join(', '))}</strong></div>`
+        : '';
+      const errorHtml = discoveryError
+        ? `<div style="margin-bottom:10px;padding:10px 12px;border:1px solid rgba(192,57,43,0.2);background:rgba(192,57,43,0.06);color:#9b2c20;border-radius:10px">${esc(discoveryError)}</div>`
+        : '';
       return `<details class="filter-panel-collapsible">
         <summary class="filter-panel-toggle">⚙ Column Selection
-          <span style="font-size:11px;font-weight:normal;color:var(--muted);margin-left:8px">Re-run Validate Path to discover columns</span>
+          <span style="font-size:11px;font-weight:normal;color:var(--muted);margin-left:8px">Run Validate Path to discover columns</span>
         </summary>
         <div class="filter-panel" style="padding:10px 14px;color:var(--muted);font-size:12px">
-          No column data yet. Click <strong>Re-validate Path</strong> above to discover available columns.
+          ${blockerHtml}
+          ${errorHtml}
+          No column data yet. Click <strong>Validate Path</strong> or <strong>Re-validate Path</strong> above to discover columns.
         </div>
       </details>`;
     }

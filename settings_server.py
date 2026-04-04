@@ -57,6 +57,13 @@ _scrape_running = False
 _scrape_thread = None
 
 
+def _normalize_cuic_discovery_mode(value):
+    mode = str(value or '').strip().lower()
+    if mode in ('discover_columns', 'columns', 'column_discovery', 'with_columns'):
+        return 'discover_columns'
+    return 'schema_only'
+
+
 def _normalize_cuic_report_config(report_config):
     folder = str(report_config.get('folder', '') or '').replace('\\', '/').strip().strip('/')
     name = str(report_config.get('name', '') or '').strip().strip('/')
@@ -71,11 +78,21 @@ def _normalize_cuic_report_config(report_config):
             folder = '/'.join(parts[:-1])
             name = parts[-1]
 
-    return {
+    normalized = {
         'folder': folder,
         'name': name,
         'path': f"{folder}/{name}" if folder and name else name,
     }
+
+    if isinstance(report_config.get('filters'), dict):
+        normalized['filters'] = report_config.get('filters')
+
+    normalized['discovery_mode'] = _normalize_cuic_discovery_mode(
+        report_config.get('discovery_mode') or (
+            'discover_columns' if report_config.get('include_columns') else 'schema_only'
+        )
+    )
+    return normalized
 
 
 def _validate_cuic_report_config(report_config):
