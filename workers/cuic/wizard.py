@@ -808,9 +808,6 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
     if not name:
         result['error'] = 'Missing CUIC report name'
         return result
-    if not folder:
-        result['error'] = 'Invalid CUIC report path. Use the full Folder/Report Name path.'
-        return result
 
     try:
         worker.setup_browser(ignore_https_errors=True)

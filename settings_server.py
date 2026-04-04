@@ -64,7 +64,10 @@ def _normalize_cuic_report_config(report_config):
 
     if raw_path and (not folder or not name):
         parts = [part.strip() for part in raw_path.split('/') if part.strip()]
-        if len(parts) >= 2:
+        if len(parts) == 1:
+            name = parts[0]
+            folder = ''
+        elif len(parts) >= 2:
             folder = '/'.join(parts[:-1])
             name = parts[-1]
 
@@ -78,9 +81,7 @@ def _normalize_cuic_report_config(report_config):
 def _validate_cuic_report_config(report_config):
     normalized = _normalize_cuic_report_config(report_config)
     if not normalized['name']:
-        raise ValueError('Missing report name. Enter the full CUIC report path before validation.')
-    if not normalized['folder']:
-        raise ValueError('Invalid report path. Use the full CUIC report path, for example Folder/Report Name.')
+        raise ValueError('Missing report name. Enter a CUIC report name or path before validation.')
     return normalized
 
 

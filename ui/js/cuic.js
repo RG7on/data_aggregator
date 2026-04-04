@@ -166,7 +166,7 @@ function renderCuicReports() {
           <span class="label-tag" style="color:var(--muted);font-style:italic">New Report</span>
           <button class="btn btn-icon" onclick="removeCuicReport(${i})" title="Remove"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/><path d='M9 6V4h6v2'/></svg></button>
         </div>
-        <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields" style="grid-column:2"></div>
+        <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. AG Test or Test/Z Call Type Historical All Fields" style="grid-column:2"></div>
         <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
           <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i})">
             \u25B6 Validate Path
@@ -201,7 +201,7 @@ function renderCuicReports() {
           <button class="btn btn-icon" onclick="removeCuicReport(${i})" title="Remove"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/><path d='M9 6V4h6v2'/></svg></button>
         </div>
       </div>
-      <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. Test/Z Call Type Historical All Fields"></div>
+      <div class="inline-row"><label>Report Path</label><input data-report-field="path" value="${attr(reportPath)}" onchange="updateCuicReportPath(${i}, this.value)" placeholder="e.g. AG Test or Test/Z Call Type Historical All Fields"></div>
       <div class="inline-row"><label>Label</label><input data-report-field="label" value="${attr(r.label)}" onchange="cuicReports[${i}].label=this.value;markDirty()" placeholder="Auto-generated from report name"></div>
       <div class="inline-row"><label>Data Type</label>
         <select onchange="cuicReports[${i}].data_type=this.value;renderCuicReports();markDirty()">
@@ -1150,7 +1150,6 @@ async function discoverFilters(reportIdx) {
   const parsedPath = splitCuicReportPath(getCuicReportPath(r));
 
   if (!parsedPath.name) { showToast('Set the CUIC report path first', 'error'); return; }
-  if (!parsedPath.folder) { showToast('Use the full CUIC report path, for example Folder/Report Name', 'error'); return; }
 
   r.folder = parsedPath.folder;
   r.name = parsedPath.name;

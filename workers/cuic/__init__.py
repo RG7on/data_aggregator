@@ -303,7 +303,10 @@ class Worker(BaseWorker):
         name = str(report_config.get('name', '') or '').strip().strip('/')
         if path and (not folder or not name):
             parts = [part.strip() for part in path.split('/') if part.strip()]
-            if len(parts) >= 2:
+            if len(parts) == 1:
+                folder = ''
+                name = parts[0]
+            elif len(parts) >= 2:
                 folder = '/'.join(parts[:-1])
                 name = parts[-1]
         report_config = dict(report_config)
