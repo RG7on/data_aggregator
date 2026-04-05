@@ -373,13 +373,33 @@ def _record_column_discovery_blocker(blockers: List[dict], param: dict, reason: 
     })
 
 
-def _fill_required_discovery_params(container: dict, params: List[dict], auto_filled: List[dict], blockers: List[dict], *, step_key: str = '', step_title: str = ''):
+def _remove_unconfigured_field_filter_values(container: dict, params: List[dict]):
+    if not isinstance(container, dict):
+        return
+
     for param in params or []:
-        if not param.get('isRequired'):
+        if str(param.get('type') or '') != 'cuic_field_filter':
             continue
 
         current_value = _resolve_saved_cuic_value(container, param)
+        if _cuic_value_is_configured(current_value, 'cuic_field_filter'):
+            continue
+
+        for alias in _cuic_param_aliases(param):
+            container.pop(alias, None)
+
+
+def _fill_required_discovery_params(container: dict, params: List[dict], auto_filled: List[dict], blockers: List[dict], *, step_key: str = '', step_title: str = ''):
+    for param in params or []:
         param_type = str(param.get('type') or '')
+        current_value = _resolve_saved_cuic_value(container, param)
+
+        if param_type == 'cuic_field_filter' and not _cuic_value_is_configured(current_value, param_type):
+            continue
+
+        if not param.get('isRequired'):
+            continue
+
         if _cuic_value_is_configured(current_value, param_type):
             continue
 
@@ -426,6 +446,7 @@ def _build_column_discovery_filters(discovery_result: dict, saved_filters: Any) 
             if not isinstance(step_container, dict):
                 step_container = {}
                 filters[step_key] = step_container
+            _remove_unconfigured_field_filter_values(step_container, step.get('params') or [])
             _fill_required_discovery_params(
                 step_container,
                 step.get('params') or [],
@@ -444,9 +465,69 @@ def _build_column_discovery_filters(discovery_result: dict, saved_filters: Any) 
                 'params': discovery_result.get('params') or [],
             }
         params = discovery_result.get('params') or []
+        _remove_unconfigured_field_filter_values(filters, params)
         _fill_required_discovery_params(filters, params, auto_filled, blockers)
 
     return filters, auto_filled, blockers
+
+
+def _build_discovery_step_values(step_info: dict, saved_values: Any) -> tuple[dict, List[dict], List[dict]]:
+    step_values = deepcopy(saved_values) if isinstance(saved_values, dict) else {}
+    auto_filled: List[dict] = []
+    blockers: List[dict] = []
+
+    params = step_info.get('params') or []
+    _remove_unconfigured_field_filter_values(step_values, params)
+    _fill_required_discovery_params(
+        step_values,
+        params,
+        auto_filled,
+        blockers,
+        step_key=str(step_info.get('step') or ''),
+        step_title=step_info.get('stepTitle') or step_info.get('title') or '',
+    )
+    return step_values, auto_filled, blockers
+
+
+def _wizard_step_signature(step_info: dict | None) -> tuple:
+    if not isinstance(step_info, dict):
+        return ('missing',)
+
+    stype = str(step_info.get('type') or '')
+    if stype == 'cuic_multistep':
+        return (
+            stype,
+            str(step_info.get('stepIndex') or ''),
+            str(step_info.get('stepTitle') or ''),
+            tuple(_cuic_param_key(param) or param.get('paramName') or '' for param in (step_info.get('params') or [])),
+        )
+    if stype == 'cuic_spab':
+        return (
+            stype,
+            tuple(_cuic_param_key(param) or param.get('paramName') or '' for param in (step_info.get('params') or [])),
+        )
+    return (
+        stype,
+        tuple((field.get('id') or field.get('name') or field.get('label') or '') for field in (step_info.get('fields') or [])),
+    )
+
+
+def _wizard_has_run_without_next(worker) -> bool:
+    has_run = False
+    has_next = False
+    for frame in worker.page.frames:
+        try:
+            for sel in ['button:has-text("Run")', 'input[type="button"][value="Run"]']:
+                if frame.query_selector(sel):
+                    has_run = True
+                    break
+            for sel in ['button:has-text("Next")', 'input[type="button"][value="Next"]']:
+                if frame.query_selector(sel):
+                    has_next = True
+                    break
+        except Exception:
+            pass
+    return has_run and not has_next
 
 
 def _compare_cuic_datetime(expected: Any, observed: dict) -> tuple[bool, str]:
@@ -567,6 +648,73 @@ def _verify_cuic_step_state(worker, expected_step_info: dict, saved_values: dict
         raise ValueError('CUIC step verification failed: ' + '; '.join(mismatches))
 
 
+def _discovery_filters_match_observed_steps(discovery_result: dict, discovery_filters: dict) -> bool:
+    if discovery_result.get('type') != 'cuic_multistep':
+        return False
+
+    clean_filters = {
+        key: value
+        for key, value in (discovery_filters or {}).items()
+        if key != '_meta'
+    }
+    if not clean_filters:
+        return True
+
+    for step in discovery_result.get('steps') or []:
+        step_number = step.get('step') or ''
+        step_key = f'step_{step_number}' if step_number else ''
+        expected_values = clean_filters.get(step_key, {})
+        if not isinstance(expected_values, dict) or not expected_values:
+            continue
+
+        observed_params = {}
+        for observed_param in step.get('params') or []:
+            for alias in _cuic_param_aliases(observed_param):
+                observed_params[alias] = observed_param
+
+        for param in step.get('params') or []:
+            expected_value = _resolve_saved_cuic_value(expected_values, param)
+            if expected_value is _MISSING:
+                continue
+
+            param_type = str(param.get('type') or '')
+            if not _cuic_value_is_configured(expected_value, param_type):
+                continue
+
+            observed_param = None
+            for alias in _cuic_param_aliases(param):
+                if alias in observed_params:
+                    observed_param = observed_params[alias]
+                    break
+
+            if not observed_param:
+                return False
+
+            if param_type == 'cuic_datetime':
+                ok, _ = _compare_cuic_datetime(expected_value, observed_param)
+            elif param_type == 'cuic_valuelist':
+                ok, _ = _compare_cuic_valuelist(expected_value, observed_param)
+            elif param_type == 'cuic_field_filter':
+                ok, _ = _compare_cuic_field_filter(expected_value, observed_param)
+            else:
+                ok = observed_param.get('currentValue') == expected_value
+
+            if not ok:
+                return False
+
+    return True
+
+
+def _run_multistep_column_discovery_on_current_wizard(worker) -> tuple[bool, str]:
+    worker.page.wait_for_timeout(worker.timeout_short)
+    worker.logger.info('Discovery: current wizard already has runnable values; clicking Run without reopening...')
+    if not _click_run_with_retries(worker, attempts=3, wait_ms=worker.timeout_short):
+        return False, 'Could not click Run on the current parameter page for column discovery.'
+
+    worker.page.wait_for_timeout(worker.timeout_short)
+    return True, ''
+
+
 def find_wizard_frame(worker):
     """Find the frame containing the wizard Next/Run buttons."""
     for f in worker.page.frames:
@@ -634,7 +782,35 @@ def click_wizard_button(worker, btn_text: str) -> bool:
     return False
 
 
-def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -> bool:
+def _step_has_only_unconfigured_field_filters(step_info: dict, saved_values: dict) -> bool:
+    params = step_info.get('params') or []
+    if not params:
+        return False
+
+    has_field_filters = False
+    for param in params:
+        if str(param.get('type') or '') != 'cuic_field_filter':
+            return False
+        has_field_filters = True
+        current_value = _resolve_saved_cuic_value(saved_values, param)
+        if _cuic_value_is_configured(current_value, 'cuic_field_filter'):
+            return False
+
+    return has_field_filters
+
+
+def _click_run_with_retries(worker, attempts: int = 3, wait_ms: int | None = None) -> bool:
+    delay = worker.timeout_short if wait_ms is None else wait_ms
+    for attempt in range(1, attempts + 1):
+        if click_wizard_button(worker, 'Run'):
+            return True
+        if attempt != attempts:
+            worker.logger.info(f"  Wizard: Run not ready yet (attempt {attempt}/{attempts})")
+            worker.page.wait_for_timeout(delay)
+    return False
+
+
+def run_filter_wizard(worker, filters: dict = None, require_run: bool = False, *, discovery_mode: bool = False) -> bool:
     """Walk through the wizard steps, applying saved filter values.
 
     Supported formats:
@@ -667,6 +843,7 @@ def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -
 
             # Read current step's field structure
             step_info = read_wizard_step_fields(worker)
+            prefer_run = False
 
             if step_info:
                 stype = step_info.get('type', 'generic')
@@ -680,7 +857,12 @@ def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -
                     worker.logger.info(f"  Wizard step {step} '{step_title}' (CUIC multi): params={pnames}")
                     worker.logger.info(f"    Saved filter values for {step_key}: {step_vals}")
                     if step_vals:
-                        apply_filters_to_step(worker, step_info, step_vals)
+                        apply_filters_to_step(worker, step_info, step_vals, discovery_mode=discovery_mode)
+                    elif discovery_mode and _step_has_only_unconfigured_field_filters(step_info, step_vals):
+                        worker.logger.info(
+                            "    Discovery: Field Filters has no configured values; proceeding with CUIC defaults"
+                        )
+                        prefer_run = True
                     else:
                         worker.logger.info(f"    No saved values for {step_key} — using CUIC defaults")
 
@@ -688,7 +870,7 @@ def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -
                     pnames = [p.get('paramName','') for p in step_info.get('params',[])]
                     worker.logger.info(f"  Wizard step {step} (CUIC SPAB): {pnames}")
                     # CUIC SPAB uses flat param-name keys
-                    apply_filters_to_step(worker, step_info, clean)
+                    apply_filters_to_step(worker, step_info, clean, discovery_mode=discovery_mode)
 
                 elif is_stepped:
                     step_vals = clean.get(f'step_{step}', {})
@@ -696,15 +878,24 @@ def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -
                     labels = [f.get('label') or f.get('id') for f in fields]
                     worker.logger.info(f"  Wizard step {step}: {len(fields)} field(s) — {labels}")
                     if step_vals:
-                        apply_filters_to_step(worker, step_info, step_vals)
+                        apply_filters_to_step(worker, step_info, step_vals, discovery_mode=discovery_mode)
                 else:
                     fields = step_info.get('fields', [])
                     labels = [f.get('label') or f.get('id') for f in fields]
                     worker.logger.info(f"  Wizard step {step}: {len(fields)} field(s) — {labels}")
                     if clean:
-                        apply_filters_to_step(worker, step_info, clean)
+                        apply_filters_to_step(worker, step_info, clean, discovery_mode=discovery_mode)
 
-                worker.page.wait_for_timeout(800)  # Post-filter-apply settle time
+                worker.page.wait_for_timeout(worker.timeout_short if prefer_run else 800)
+
+            if discovery_mode and prefer_run:
+                if _click_run_with_retries(worker, attempts=3, wait_ms=worker.timeout_short):
+                    worker.logger.info(f"  Wizard: clicked Run at step {step}")
+                    run_clicked = True
+                    break
+                worker.logger.warning(
+                    '  Wizard: Field Filters step did not expose Run quickly; falling back to standard button scan'
+                )
 
             # Try Next first (middle steps), then Run (last step)
             if click_wizard_button(worker, 'Next'):
@@ -732,7 +923,7 @@ def run_filter_wizard(worker, filters: dict = None, require_run: bool = False) -
         return False
 
 
-def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
+def apply_filters_to_step(worker, step_info: dict, saved_values: dict, *, discovery_mode: bool = False):
     """Apply filter values. Routes to CUIC Angular path or generic DOM path.
     
     Due to the complexity of CUIC filter application (especially multi-step
@@ -759,6 +950,9 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict):
                 continue
             if param.get('type') == 'cuic_field_filter':
                 resolved = _normalize_field_filter_entries(resolved)
+                if not resolved:
+                    worker.logger.info(f"    {_cuic_param_key(param) or param_name}: no field filters to apply")
+                    continue
             cuic_params[param_name] = resolved
         if not cuic_params:
             return
@@ -1101,6 +1295,7 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
         while step < max_steps:
             step += 1
             step_info = read_wizard_step_fields(worker)
+            step_signature = _wizard_step_signature(step_info)
 
             if step_info:
                 current_step_info = deepcopy(step_info)
@@ -1125,6 +1320,34 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
                     if 'stepTitles' not in result:
                         result['stepTitles'] = step_info.get('stepTitles', [])
 
+                    if discovery_mode == 'discover_columns':
+                        step_key = f'step_{step}'
+                        saved_step_values = saved_filters.get(step_key, {}) if isinstance(saved_filters, dict) else {}
+                        temp_step_values, step_auto_filled, step_blockers = _build_discovery_step_values(
+                            step_info,
+                            saved_step_values,
+                        )
+                        if step_auto_filled:
+                            worker.logger.info(
+                                'Discovery: temporary schema values for '
+                                + (step_title or step_key)
+                                + ': '
+                                + ', '.join(
+                                    f"{entry.get('label')}: {entry.get('summary')}"
+                                    for entry in step_auto_filled
+                                )
+                            )
+                        if step_blockers:
+                            result['column_discovery_blockers'] = step_blockers
+                            worker.logger.warning(
+                                'Discovery: current step is blocked by required params: '
+                                + ', '.join(blocker.get('label', '') for blocker in step_blockers)
+                            )
+                            return result
+                        if temp_step_values:
+                            apply_filters_to_step(worker, step_info, temp_step_values, discovery_mode=True)
+                            worker.page.wait_for_timeout(worker.timeout_short)
+
                 elif stype == 'cuic_spab':
                     # SPAB single-step wizard — all params on one page
                     result['type'] = 'cuic_spab'
@@ -1136,6 +1359,30 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
                         'type': 'cuic_spab',
                         'params': step_info.get('params', [])
                     })
+
+                    if discovery_mode == 'discover_columns':
+                        temp_step_values, step_auto_filled, step_blockers = _build_discovery_step_values(
+                            step_info,
+                            saved_filters,
+                        )
+                        if step_auto_filled:
+                            worker.logger.info(
+                                'Discovery: temporary schema values for Parameters: '
+                                + ', '.join(
+                                    f"{entry.get('label')}: {entry.get('summary')}"
+                                    for entry in step_auto_filled
+                                )
+                            )
+                        if step_blockers:
+                            result['column_discovery_blockers'] = step_blockers
+                            worker.logger.warning(
+                                'Discovery: current step is blocked by required params: '
+                                + ', '.join(blocker.get('label', '') for blocker in step_blockers)
+                            )
+                            return result
+                        if temp_step_values:
+                            apply_filters_to_step(worker, step_info, temp_step_values, discovery_mode=True)
+                            worker.page.wait_for_timeout(worker.timeout_short)
                 else:
                     # Generic HTML fields
                     result['steps'].append({
@@ -1144,29 +1391,27 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
                         'fields': step_info.get('fields', [])
                     })
 
-            # Check for Run (last step) — but NOT Next+Run (intermediate)
-            has_run = False
-            has_next = False
-            for f in worker.page.frames:
-                try:
-                    for sel in ['button:has-text("Run")', 'input[type="button"][value="Run"]']:
-                        if f.query_selector(sel):
-                            has_run = True
-                            break
-                    for sel in ['button:has-text("Next")', 'input[type="button"][value="Next"]']:
-                        if f.query_selector(sel):
-                            has_next = True
-                            break
-                except Exception:
-                    pass
-
-            if has_run and not has_next:
+            if _wizard_has_run_without_next(worker):
                 break
 
             if not click_wizard_button(worker, 'Next'):
                 break
 
             worker.page.wait_for_timeout(worker.timeout_short)
+            if _wizard_has_run_without_next(worker):
+                break
+
+            next_step_info = read_wizard_step_fields(worker)
+            next_signature = _wizard_step_signature(next_step_info)
+            if next_signature == step_signature:
+                worker.page.wait_for_timeout(worker.timeout_medium)
+                next_step_info = read_wizard_step_fields(worker)
+                next_signature = _wizard_step_signature(next_step_info)
+                if next_signature == step_signature:
+                    worker.logger.warning(
+                        'Discovery: wizard did not advance after Next; stopping schema traversal on the current step'
+                    )
+                    break
 
         worker.logger.info(f"Discovery: {len(result['steps'])} wizard step(s) found, type={result['type']}")
 
@@ -1195,19 +1440,25 @@ def discover_wizard(worker_class, report_config: dict) -> dict:
                     result['column_discovery_error'] = discovery_error
                     return result
             else:
-                navigation.close_report_page(worker)
-                frame = navigation.get_reports_frame(worker)
-                if not frame:
-                    result['column_discovery_error'] = 'Reports iframe not found after schema discovery.'
-                    return result
-                if not navigation.open_report(worker, frame, folder, name):
-                    result['column_discovery_error'] = f'Could not reopen {folder}/{name} for column discovery.'
-                    return result
+                if _discovery_filters_match_observed_steps(result, discovery_filters):
+                    discovery_ok, discovery_error = _run_multistep_column_discovery_on_current_wizard(worker)
+                    if not discovery_ok:
+                        result['column_discovery_error'] = discovery_error
+                        return result
+                else:
+                    navigation.close_report_page(worker)
+                    frame = navigation.get_reports_frame(worker)
+                    if not frame:
+                        result['column_discovery_error'] = 'Reports iframe not found after schema discovery.'
+                        return result
+                    if not navigation.open_report(worker, frame, folder, name):
+                        result['column_discovery_error'] = f'Could not reopen {folder}/{name} for column discovery.'
+                        return result
 
-                worker.page.wait_for_timeout(worker.timeout_medium)
-                if not run_filter_wizard(worker, discovery_filters, require_run=True):
-                    result['column_discovery_error'] = 'Could not run the report for column discovery.'
-                    return result
+                    worker.page.wait_for_timeout(worker.timeout_medium)
+                    if not run_filter_wizard(worker, discovery_filters, require_run=True, discovery_mode=True):
+                        result['column_discovery_error'] = 'Could not run the report for column discovery.'
+                        return result
         else:
             worker.logger.info('Discovery: clicking Run to render the report for column discovery...')
             if not click_wizard_button(worker, 'Run'):
