@@ -6,9 +6,13 @@ Supports both CUIC-specific (SPAB, multi-step) and generic HTML wizards.
 """
 
 from copy import deepcopy
+import re
 from typing import Dict, Any, List
 from . import javascript
 import time
+
+
+_CUIC_FIELD_ID_PATTERN = re.compile(r'^\s*(?P<label>.+?)\s*\((?P<field_id>[^()]+)\)\s*$')
 
 
 def read_wizard_step_fields(worker) -> dict | None:
@@ -155,6 +159,53 @@ def _scroll_collect_valuelist(worker, frame, param: dict):
 _MISSING = object()
 
 
+def _parse_cuic_field_reference(value: Any) -> dict:
+    text = str(value or '').strip()
+    if not text:
+        return {'fieldId': '', 'label': '', 'combined': ''}
+
+    match = _CUIC_FIELD_ID_PATTERN.match(text)
+    if not match:
+        return {'fieldId': text, 'label': text, 'combined': text}
+
+    label = match.group('label').strip()
+    field_id = match.group('field_id').strip()
+    return {
+        'fieldId': field_id or text,
+        'label': label or field_id or text,
+        'combined': text,
+    }
+
+
+def _cuic_field_filter_identity(item: Any) -> dict:
+    if isinstance(item, dict):
+        parsed = _parse_cuic_field_reference(
+            item.get('fieldId')
+            or item.get('id')
+            or item.get('combined')
+            or item.get('combinedName')
+            or item.get('label')
+            or ''
+        )
+        field_id = parsed.get('fieldId', '')
+        label = str(item.get('label') or parsed.get('label') or field_id).strip()
+        combined = str(
+            item.get('combined')
+            or item.get('combinedName')
+            or parsed.get('combined')
+            or ''
+        ).strip()
+        if not combined and label and field_id and label != field_id:
+            combined = f"{label} ({field_id})"
+        return {
+            'fieldId': field_id,
+            'label': label or field_id,
+            'combined': combined or field_id,
+        }
+
+    return _parse_cuic_field_reference(item)
+
+
 def _unique_nonempty(values: List[Any]) -> List[str]:
     seen = set()
     result: List[str] = []
@@ -196,12 +247,15 @@ def _normalize_field_filter_entries(value: Any) -> List[dict]:
     normalized: List[dict] = []
     for item in value:
         if isinstance(item, str):
-            field_id = item.strip()
+            identity = _cuic_field_filter_identity(item)
+            field_id = identity.get('fieldId', '')
             if not field_id:
                 continue
             normalized.append({
                 'id': field_id,
                 'fieldId': field_id,
+                'label': identity.get('label') or field_id,
+                'combined': identity.get('combined') or field_id,
                 'operator': '',
                 'value1': '',
                 'value2': '',
@@ -210,13 +264,16 @@ def _normalize_field_filter_entries(value: Any) -> List[dict]:
             continue
         if not isinstance(item, dict):
             continue
-        field_id = str(item.get('fieldId') or item.get('id') or item.get('label') or '').strip()
+        identity = _cuic_field_filter_identity(item)
+        field_id = identity.get('fieldId', '')
         if not field_id:
             continue
         normalized.append({
             **item,
             'id': field_id,
             'fieldId': field_id,
+            'label': identity.get('label') or field_id,
+            'combined': identity.get('combined') or field_id,
             'operator': str(item.get('operator') or ''),
             'value1': str(item.get('value1')) if item.get('value1') is not None else '',
             'value2': str(item.get('value2')) if item.get('value2') is not None else '',
@@ -582,13 +639,18 @@ def _compare_cuic_valuelist(expected: Any, observed: dict) -> tuple[bool, str]:
 def _compare_cuic_field_filter(expected: Any, observed: dict) -> tuple[bool, str]:
     expected_fields = _normalize_field_filter_entries(expected)
     observed_fields = {
-        entry.get('fieldId') or entry.get('id'): entry
+        (_cuic_field_filter_identity(entry).get('fieldId') or entry.get('fieldId') or entry.get('id')): entry
         for entry in _normalize_field_filter_entries((observed or {}).get('selectedFields'))
+        if (_cuic_field_filter_identity(entry).get('fieldId') or entry.get('fieldId') or entry.get('id'))
     }
-    observed_ids = set((observed or {}).get('selectedFieldIds') or [])
+    observed_ids = {
+        _cuic_field_filter_identity(field_id).get('fieldId')
+        for field_id in ((observed or {}).get('selectedFieldIds') or [])
+        if _cuic_field_filter_identity(field_id).get('fieldId')
+    }
 
     for expected_field in expected_fields:
-        field_id = expected_field.get('fieldId') or expected_field.get('id')
+        field_id = _cuic_field_filter_identity(expected_field).get('fieldId')
         if not field_id:
             continue
         if field_id not in observed_ids and field_id not in observed_fields:
@@ -606,46 +668,62 @@ def _compare_cuic_field_filter(expected: Any, observed: dict) -> tuple[bool, str
 
 
 def _verify_cuic_step_state(worker, expected_step_info: dict, saved_values: dict):
-    observed_step = read_wizard_step_fields(worker)
-    if not observed_step or observed_step.get('type') != expected_step_info.get('type'):
-        raise ValueError('Could not re-read the current CUIC wizard step for verification')
+    has_field_filters = any(
+        str(param.get('type') or '') == 'cuic_field_filter'
+        and _resolve_saved_cuic_value(saved_values, param) is not _MISSING
+        for param in expected_step_info.get('params', [])
+    )
 
-    observed_params = {}
-    for observed_param in observed_step.get('params', []):
-        for alias in _cuic_param_aliases(observed_param):
-            observed_params[alias] = observed_param
+    attempts = 4 if has_field_filters else 1
+    last_mismatches: List[str] = []
 
-    mismatches = []
-    for param in expected_step_info.get('params', []):
-        expected_value = _resolve_saved_cuic_value(saved_values, param)
-        if expected_value is _MISSING:
-            continue
-        observed_param = None
-        for alias in _cuic_param_aliases(param):
-            if alias in observed_params:
-                observed_param = observed_params[alias]
-                break
-        if not observed_param:
-            mismatches.append(f"{_cuic_param_key(param) or param.get('label')}: not found during verification")
-            continue
-
-        param_type = param.get('type', '')
-        if param_type == 'cuic_datetime':
-            ok, detail = _compare_cuic_datetime(expected_value, observed_param)
-        elif param_type == 'cuic_valuelist':
-            ok, detail = _compare_cuic_valuelist(expected_value, observed_param)
-        elif param_type == 'cuic_field_filter':
-            ok, detail = _compare_cuic_field_filter(expected_value, observed_param)
+    for attempt in range(attempts):
+        observed_step = read_wizard_step_fields(worker)
+        if not observed_step or observed_step.get('type') != expected_step_info.get('type'):
+            last_mismatches = ['Could not re-read the current CUIC wizard step for verification']
         else:
-            observed_value = observed_param.get('currentValue')
-            ok = observed_value == expected_value
-            detail = f"expected {expected_value!r}, observed {observed_value!r}" if not ok else ''
+            observed_params = {}
+            for observed_param in observed_step.get('params', []):
+                for alias in _cuic_param_aliases(observed_param):
+                    observed_params[alias] = observed_param
 
-        if not ok:
-            mismatches.append(f"{_cuic_param_key(param) or param.get('label')}: {detail}")
+            mismatches = []
+            for param in expected_step_info.get('params', []):
+                expected_value = _resolve_saved_cuic_value(saved_values, param)
+                if expected_value is _MISSING:
+                    continue
+                observed_param = None
+                for alias in _cuic_param_aliases(param):
+                    if alias in observed_params:
+                        observed_param = observed_params[alias]
+                        break
+                if not observed_param:
+                    mismatches.append(f"{_cuic_param_key(param) or param.get('label')}: not found during verification")
+                    continue
 
-    if mismatches:
-        raise ValueError('CUIC step verification failed: ' + '; '.join(mismatches))
+                param_type = param.get('type', '')
+                if param_type == 'cuic_datetime':
+                    ok, detail = _compare_cuic_datetime(expected_value, observed_param)
+                elif param_type == 'cuic_valuelist':
+                    ok, detail = _compare_cuic_valuelist(expected_value, observed_param)
+                elif param_type == 'cuic_field_filter':
+                    ok, detail = _compare_cuic_field_filter(expected_value, observed_param)
+                else:
+                    observed_value = observed_param.get('currentValue')
+                    ok = observed_value == expected_value
+                    detail = f"expected {expected_value!r}, observed {observed_value!r}" if not ok else ''
+
+                if not ok:
+                    mismatches.append(f"{_cuic_param_key(param) or param.get('label')}: {detail}")
+
+            last_mismatches = mismatches
+            if not mismatches:
+                return
+
+        if attempt < attempts - 1:
+            worker.page.wait_for_timeout(250)
+
+    raise ValueError('CUIC step verification failed: ' + '; '.join(last_mismatches))
 
 
 def _discovery_filters_match_observed_steps(discovery_result: dict, discovery_filters: dict) -> bool:
@@ -1054,6 +1132,8 @@ def apply_filters_to_step(worker, step_info: dict, saved_values: dict, *, discov
                             f"(count={result2.get('count', '?')})")
                 except Exception as e:
                     worker.logger.warning(f"    {_cuic_param_key(p) or pn} pass2 error: {e}")
+
+                worker.page.wait_for_timeout(300)
 
         if applied_any:
             _verify_cuic_step_state(worker, step_info, saved_values)

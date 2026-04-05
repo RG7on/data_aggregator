@@ -415,42 +415,142 @@ CUIC_MULTISTEP_READ_JS = r'''() => {
         let selectedFields     = []; /* full detail: {fieldId, label, operator, value1, value2} */
         let availableOperators = []; /* operator options read from the first operator csSelect */
         try {
-            const iffScope = angular.element(iffFields).scope();
-            if (iffScope && iffScope.vm && iffScope.vm.selectedList) {
+            const selectedFieldMap = new Map();
+
+            function pushOperatorOptions(opts) {
+                (opts || []).forEach(o => {
+                    const value = o.operator || o.value || o.id || '';
+                    const label = o.label || o.name || '';
+                    if (!value && !label) return;
+                    if (!availableOperators.some(op => op.value === value && op.label === label)) {
+                        availableOperators.push({value, label});
+                    }
+                });
+            }
+
+            function mergeSelectedField(f) {
+                if (!f) return;
+                const cn  = (f.combinedName || '').trim();
+                const pm  = cn.match(/^(.+?)\\s*\\(([^)]+)\\)\\s*$/);
+                const fid = String(pm ? pm[2].trim() : (f.fieldId || f.id || f.name || f.fieldName || cn || '')).trim();
+                if (!fid) return;
+                const lbl = String(pm ? pm[1].trim() : (f.label || f.name || cn || fid)).trim();
+                let op = f.operator;
+                if (!op && f.selected) op = f.selected;
+                if (op && typeof op === 'object') op = op.operator || op.value || op.id || op.label || String(op);
+
+                if (!selectedFieldIds.includes(fid)) selectedFieldIds.push(fid);
+
+                const existing = selectedFieldMap.get(fid) || {
+                    fieldId: fid,
+                    label: lbl,
+                    operator: '',
+                    value1: '',
+                    value2: '',
+                    showInput2: false
+                };
+
+                if (lbl) existing.label = lbl;
+                if (op) existing.operator = String(op);
+                if (f.value1 !== undefined && String(f.value1) !== '') existing.value1 = String(f.value1);
+                if (f.value2 !== undefined && String(f.value2) !== '') existing.value2 = String(f.value2);
+                if (f.showInput2 !== undefined) existing.showInput2 = !!f.showInput2;
+
+                selectedFieldMap.set(fid, existing);
+            }
+
+            function findVmScope(rootEl) {
+                const scopes = [];
+                try { scopes.push(angular.element(rootEl).scope()); } catch(e) {}
+                try { scopes.push(angular.element(rootEl).isolateScope()); } catch(e) {}
+                for (let i = 0; i < scopes.length; i++) {
+                    let s = scopes[i];
+                    for (let d = 0; s && d < 8; d++, s = s.$parent) {
+                        if (s.vm && Array.isArray(s.vm.selectedList)) return s;
+                    }
+                }
+                return null;
+            }
+
+            const iffScope = findVmScope(iffFields);
+            if (iffScope && iffScope.vm && Array.isArray(iffScope.vm.selectedList)) {
                 /* Try to collect operator options from operator csSelect (isolateScope) */
                 const opSelEls = iffFields.querySelectorAll('.csSelect-container');
                 const opSelEl = opSelEls.length > 1 ? opSelEls[1] : opSelEls[0];
                 if (opSelEl) {
                     try {
                         const opSelIso = angular.element(opSelEl).isolateScope();
-                        const opts = opSelIso?.csSelect?.options || [];
-                        opts.forEach(o => availableOperators.push({
-                            value: o.operator || o.value || o.id || '',
-                            label: o.label || o.name || ''
-                        }));
+                        const opSelScope = angular.element(opSelEl).scope();
+                        pushOperatorOptions(opSelIso?.csSelect?.options || opSelScope?.sel?.options || []);
                     } catch(e) {}
                 }
-                iffScope.vm.selectedList.forEach(f => {
-                    const cn  = (f.combinedName || '').trim();
-                    const pm  = cn.match(/^(.+?)\\s*\\(([^)]+)\\)\\s*$/);
-                    const fid = pm ? pm[2].trim() : (f.id || f.name || f.fieldName || cn);
-                    const lbl = pm ? pm[1].trim() : cn;
-                    selectedFieldIds.push(fid);
-                    /* operator may be in f.operator (string/object) or f.selected
-                       (the csSelect ng-model stores the full option object there) */
-                    let op = f.operator;
-                    if (!op && f.selected) op = f.selected;
-                    if (op && typeof op === 'object') op = op.operator || op.value || op.id || String(op);
-                    selectedFields.push({
-                        fieldId:    fid,
-                        label:      lbl,
-                        operator:   op   || '',
-                        value1:     f.value1  !== undefined ? String(f.value1)  : '',
-                        value2:     f.value2  !== undefined ? String(f.value2)  : '',
-                        showInput2: !!f.showInput2
-                    });
-                });
+                iffScope.vm.selectedList.forEach(mergeSelectedField);
             }
+
+            const cfEls = iffFields.querySelectorAll('cuic-filter');
+            cfEls.forEach(cfEl => {
+                try {
+                    let cfScope = angular.element(cfEl).scope();
+                    let fc = cfScope && cfScope.filterCtrl;
+                    if (!fc) {
+                        const iso = angular.element(cfEl).isolateScope();
+                        fc = iso && iso.filterCtrl;
+                    }
+                    if (!fc) {
+                        let cs = cfScope && cfScope.$$childHead;
+                        for (let d = 0; !fc && cs && d < 8; d++, cs = cs.$$nextSibling) {
+                            fc = cs.filterCtrl;
+                            if (!fc && cs.$$childHead) {
+                                let cs2 = cs.$$childHead;
+                                for (let d2 = 0; !fc && cs2 && d2 < 5; d2++, cs2 = cs2.$$nextSibling) {
+                                    fc = cs2.filterCtrl;
+                                }
+                            }
+                        }
+                    }
+                    if (!fc || !fc.filterField) return;
+                    const ft = fc.filterField.filterType;
+                    if (fc.options && ft) pushOperatorOptions(fc.options[ft] || []);
+                    mergeSelectedField(fc.filterField);
+                } catch(e) {}
+            });
+
+            const rowEls = iffFields.querySelectorAll('.accordion--cuic-accordion');
+            rowEls.forEach(rowEl => {
+                try {
+                    const headingEl = rowEl.querySelector('a[cs-accordion-transclude="heading"]');
+                    const headingText = headingEl
+                        ? String(headingEl.title || headingEl.textContent || '').replace(/\s+/g, ' ').trim()
+                        : '';
+                    const headingMatch = headingText.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+                    const rowFieldId = headingMatch ? headingMatch[2].trim() : headingText;
+                    const rowLabel = headingMatch ? headingMatch[1].trim() : headingText;
+                    if (!rowFieldId) return;
+
+                    const operatorSelect = rowEl.querySelector('.indFilter_select select.hidden-select, .indFilter_select select');
+                    if (operatorSelect) {
+                        pushOperatorOptions(Array.from(operatorSelect.options || []).map(o => ({
+                            value: o.value || '',
+                            label: (o.textContent || '').trim()
+                        })));
+                    }
+
+                    const value1Input = rowEl.querySelector('input[ng-model="filterCtrl.filterField.value1"], input[ng-model*="value1"]');
+                    const value2Input = rowEl.querySelector('input[ng-model="filterCtrl.filterField.value2"], input[ng-model*="value2"]');
+
+                    mergeSelectedField({
+                        fieldId: rowFieldId,
+                        label: rowLabel,
+                        combinedName: headingText,
+                        operator: operatorSelect ? String(operatorSelect.value || '').trim() : '',
+                        value1: value1Input ? String(value1Input.value || '').trim() : '',
+                        value2: value2Input ? String(value2Input.value || '').trim() : '',
+                        showInput2: !!value2Input
+                    });
+                } catch(e) {}
+            });
+
+            selectedFields = Array.from(selectedFieldMap.values());
         } catch(e) {}
 
         result.params.push({

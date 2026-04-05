@@ -40,6 +40,18 @@ def _normalize_cuic_path(value: str) -> str:
     return str(value or '').replace('\\', '/').strip().strip('/')
 
 
+def _normalize_string_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        items = value.split(',')
+    elif isinstance(value, list):
+        items = value
+    else:
+        return []
+    return [str(item).strip() for item in items if str(item).strip()]
+
+
 def normalize_report_config(worker_name: str, report: dict) -> Tuple[dict, bool]:
     """Return a normalized report config and whether it changed."""
     normalized = dict(report or {})
@@ -53,11 +65,35 @@ def normalize_report_config(worker_name: str, report: dict) -> Tuple[dict, bool]
     if worker_name == 'cuic':
         folder = _normalize_cuic_path(normalized.get('folder', ''))
         name = str(normalized.get('name', '') or '').strip().strip('/')
+        structure_mode = str(normalized.get('structure_mode', 'auto') or 'auto').strip().lower()
+        if structure_mode not in {'auto', 'grouped', 'wide'}:
+            structure_mode = 'auto'
+        dimension_columns = _normalize_string_list(normalized.get('dimension_columns'))
+        ignored_columns = _normalize_string_list(normalized.get('ignored_columns'))
+        datetime_column = str(normalized.get('datetime_column', '') or '').strip()
+        selected_columns = normalized.get('columns')
+        if selected_columns is not None:
+            selected_columns = _normalize_string_list(selected_columns)
         if normalized.get('folder', '') != folder:
             normalized['folder'] = folder
             changed = True
         if normalized.get('name', '') != name:
             normalized['name'] = name
+            changed = True
+        if normalized.get('structure_mode', 'auto') != structure_mode:
+            normalized['structure_mode'] = structure_mode
+            changed = True
+        if normalized.get('dimension_columns') != dimension_columns:
+            normalized['dimension_columns'] = dimension_columns
+            changed = True
+        if normalized.get('ignored_columns') != ignored_columns:
+            normalized['ignored_columns'] = ignored_columns
+            changed = True
+        if normalized.get('datetime_column', '') != datetime_column:
+            normalized['datetime_column'] = datetime_column
+            changed = True
+        if normalized.get('columns') != selected_columns:
+            normalized['columns'] = selected_columns
             changed = True
     elif worker_name == 'smax':
         url = str(normalized.get('url', '') or '').strip()
@@ -119,6 +155,10 @@ def get_report_definition_hash(worker_name: str, report: Dict[str, Any]) -> str:
             'filters': report.get('filters') or {},
             'row_mode': report.get('row_mode', 'consolidated_only'),
             'columns': report.get('columns'),
+            'structure_mode': str(report.get('structure_mode', 'auto') or 'auto').strip().lower(),
+            'dimension_columns': _normalize_string_list(report.get('dimension_columns')),
+            'ignored_columns': _normalize_string_list(report.get('ignored_columns')),
+            'datetime_column': str(report.get('datetime_column', '') or '').strip(),
         }
     elif worker_name == 'smax':
         payload = {

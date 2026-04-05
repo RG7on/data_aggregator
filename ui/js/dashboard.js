@@ -35,48 +35,6 @@ function renderScrapeLog(log) {
   </tr>`).join('');
 }
 
-// ── renderAgentInsights ───────────────────────────────────────────────────
-function renderAgentInsights(payload) {
-  const body = document.getElementById('agent-insights-body');
-  const summary = document.getElementById('agent-insights-summary');
-  if (!body || !summary) return;
-
-  if (!payload || !Array.isArray(payload.insights)) {
-    summary.textContent = 'Unavailable';
-    body.innerHTML = '<div class="agent-empty">AI insights are currently unavailable.</div>';
-    return;
-  }
-
-  const s = payload.summary || {};
-  const total = payload.insights.length;
-  summary.textContent = `${s.high || 0} high · ${s.medium || 0} medium · ${s.low || 0} low`;
-
-  if (total === 0) {
-    body.innerHTML = '<div class="agent-empty">No active issues detected from recent scrape history.</div>';
-    return;
-  }
-
-  body.innerHTML = payload.insights.slice(0, 6).map(i => {
-    const sev = esc(i.severity || 'low');
-    const conf = Math.round((i.confidence || 0) * 100);
-    const title = esc((i.source || '?') + ' / ' + (i.report_label || '?'));
-    const why = esc(i.why || 'No explanation provided.');
-    const actions = (i.recommended_actions || []).slice(0, 2)
-      .map(a => `<li>${esc(a)}</li>`).join('');
-    return `<div class="agent-item severity-${sev}">
-      <div class="agent-item-head">
-        <div class="agent-item-title">${title}</div>
-        <div class="agent-meta">
-          <span class="agent-severity ${sev}">${sev.toUpperCase()}</span>
-          <span class="agent-confidence">${conf}%</span>
-        </div>
-      </div>
-      <div class="agent-item-why">${why}</div>
-      <ul class="agent-actions">${actions}</ul>
-    </div>`;
-  }).join('');
-}
-
 // ── startManualScrape ─────────────────────────────────────────────────────
 async function startManualScrape() {
   const btn      = document.getElementById('manual-scrape-btn');
@@ -147,12 +105,11 @@ const _scrapeRunBtnHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="15" he
 // ── loadFromServer (init) ─────────────────────────────────────────────────
 async function loadFromServer() {
   try {
-    const [sRes, cRes, statusRes, logRes, agentRes] = await Promise.all([
+    const [sRes, cRes, statusRes, logRes] = await Promise.all([
       fetch('/api/settings'),
       fetch('/api/credentials'),
       fetch('/api/scrape-status').catch(() => null),
-      fetch('/api/scrape-log?limit=50').catch(() => null),
-      fetch('/api/agent/insights?lookback=400&max_reports=20').catch(() => null)
+      fetch('/api/scrape-log?limit=50').catch(() => null)
     ]);
 
     if (sRes.ok) populateSettings(await sRes.json());
@@ -171,8 +128,6 @@ async function loadFromServer() {
     }
 
     if (logRes?.ok) renderScrapeLog(await logRes.json());
-    if (agentRes?.ok) renderAgentInsights(await agentRes.json());
-    else renderAgentInsights(null);
 
     // Mark as connected
     const si = document.getElementById('server-status');
@@ -189,6 +144,5 @@ async function loadFromServer() {
     const st = document.getElementById('server-status-text');
     if (st) st.textContent = 'Offline';
     resetDefaults();
-    renderAgentInsights(null);
   }
 }

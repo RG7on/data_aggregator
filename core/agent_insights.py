@@ -130,6 +130,23 @@ def _rule_diagnose(source: str, report_id: str, label: str, events: List[Dict[st
                 "evidence": evidence,
             }
 
+        if _contains_any(msg_l, ["verification failed", "missing field", "field filter", "selectedfieldids", "selectedfields"]):
+            return {
+                "source": source,
+                "report_id": report_id,
+                "report_label": label,
+                "severity": "medium",
+                "confidence": 0.88,
+                "suspected_root_cause": "filter_schema_or_saved_config_mismatch",
+                "why": "The report opened, but the saved filter configuration does not match the current wizard state.",
+                "recommended_actions": [
+                    "Open the report in the control panel and re-save the filter settings.",
+                    "Re-discover filters/properties if the wizard schema changed.",
+                    "Check field-filter IDs and selected values against the current report definition.",
+                ],
+                "evidence": evidence,
+            }
+
         if _contains_any(msg_l, ["could not open", "filter wizard failed", "reports iframe not found", "tab failed"]):
             return {
                 "source": source,

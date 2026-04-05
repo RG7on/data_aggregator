@@ -139,22 +139,55 @@ function summarizeCuicDiscoveryItems(items, limit = 3) {
   return values.slice(0, limit).join(', ') + (values.length > limit ? '...' : '');
 }
 
+function parseCuicFieldIdentity(value) {
+  const text = String(value || '').trim();
+  if (!text) return { fieldId: '', label: '', combined: '' };
+  const match = text.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
+  if (!match) return { fieldId: text, label: text, combined: text };
+  return {
+    fieldId: match[2].trim(),
+    label: match[1].trim(),
+    combined: text
+  };
+}
+
+function getCuicFieldIdentity(item) {
+  if (!item || typeof item !== 'object') return parseCuicFieldIdentity(item);
+  const parsed = parseCuicFieldIdentity(item.fieldId || item.id || item.combined || item.combinedName || item.label || '');
+  const fieldId = parsed.fieldId;
+  const label = String(item.label || parsed.label || fieldId).trim();
+  let combined = String(item.combined || item.combinedName || parsed.combined || '').trim();
+  if (!combined && label && fieldId && label !== fieldId) combined = `${label} (${fieldId})`;
+  return {
+    fieldId,
+    label: label || fieldId,
+    combined: combined || fieldId
+  };
+}
+
+function getCuicFieldId(item) {
+  return getCuicFieldIdentity(item).fieldId;
+}
+
 function normalizeFieldFilterConfigs(value, fallbackFields) {
   const fields = Array.isArray(fallbackFields) ? fallbackFields : [];
-  const toFieldId = item => {
-    if (!item || typeof item !== 'object') return '';
-    return String(item.fieldId || item.id || item.label || '').trim();
-  };
+  const fieldLookup = new Map(
+    fields
+      .map(field => [getCuicFieldId(field), field])
+      .filter(([fieldId]) => Boolean(fieldId))
+  );
 
   if (value === 'all') {
     return fields
       .map(field => {
-        const id = toFieldId(field);
+        const identity = getCuicFieldIdentity(field);
+        const id = identity.fieldId;
         if (!id) return null;
         return {
           id,
           fieldId: id,
-          label: field.label || id,
+          label: identity.label || id,
+          combined: identity.combined || id,
           operator: '',
           value1: '',
           value2: '',
@@ -169,13 +202,16 @@ function normalizeFieldFilterConfigs(value, fallbackFields) {
   return value
     .map(item => {
       if (typeof item === 'string') {
-        const id = item.trim();
+        const identity = parseCuicFieldIdentity(item);
+        const id = identity.fieldId;
         if (!id) return null;
-        const field = fields.find(f => toFieldId(f) === id);
+        const field = fieldLookup.get(id);
+        const fieldIdentity = field ? getCuicFieldIdentity(field) : null;
         return {
           id,
           fieldId: id,
-          label: field?.label || id,
+          label: fieldIdentity?.label || identity.label || id,
+          combined: fieldIdentity?.combined || identity.combined || id,
           operator: '',
           value1: '',
           value2: '',
@@ -183,14 +219,17 @@ function normalizeFieldFilterConfigs(value, fallbackFields) {
         };
       }
       if (!item || typeof item !== 'object') return null;
-      const id = toFieldId(item);
+      const identity = getCuicFieldIdentity(item);
+      const id = identity.fieldId;
       if (!id) return null;
-      const field = fields.find(f => toFieldId(f) === id);
+      const field = fieldLookup.get(id);
+      const fieldIdentity = field ? getCuicFieldIdentity(field) : null;
       return {
         ...cloneCuicData(item),
         id,
         fieldId: id,
-        label: item.label || field?.label || id,
+        label: item.label || fieldIdentity?.label || identity.label || id,
+        combined: item.combined || fieldIdentity?.combined || identity.combined || id,
         operator: item.operator || '',
         value1: item.value1 !== undefined ? String(item.value1) : '',
         value2: item.value2 !== undefined ? String(item.value2) : '',
@@ -198,6 +237,10 @@ function normalizeFieldFilterConfigs(value, fallbackFields) {
       };
     })
     .filter(Boolean);
+}
+
+function normalizeStoredFieldFilterList(value) {
+  return normalizeFieldFilterConfigs(Array.isArray(value) ? value : [], []);
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -270,6 +313,15 @@ function renderCuicReports() {
           <button type="button" class="${r.row_mode==='all'?'active':''}" onclick="cuicReports[${i}].row_mode='all';renderCuicReports();markDirty()">🔢 All rows</button>
         </div>
       </div>
+      <div class="inline-row"><label>Structure</label>
+        <select onchange="cuicReports[${i}].structure_mode=this.value;markDirty()">
+          <option value="auto" ${(r.structure_mode||'auto')==='auto'?'selected':''}>Auto-detect</option>
+          <option value="grouped" ${r.structure_mode==='grouped'?'selected':''}>Grouped report</option>
+          <option value="wide" ${r.structure_mode==='wide'?'selected':''}>Wide row report</option>
+        </select>
+      </div>
+      <div class="inline-row"><label>Dimensions</label><input value="${attr(Array.isArray(r.dimension_columns) ? r.dimension_columns.join(', ') : '')}" onchange="cuicReports[${i}].dimension_columns=this.value.split(',').map(v=>v.trim()).filter(Boolean);markDirty()" placeholder="Optional: Agent, Skill Group Name, Media ID"></div>
+      <div class="inline-row"><label>Date/Time Col</label><input value="${attr(r.datetime_column || '')}" onchange="cuicReports[${i}].datetime_column=this.value.trim();markDirty()" placeholder="Optional: Interval or DateTime"></div>
       <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
         <button class="btn-discover" id="discover-btn-${i}" onclick="discoverFilters(${i}, 'discover_columns', 'discover-btn-${i}')">
           \u25B6 Re-validate Path
@@ -286,7 +338,7 @@ function renderCuicReports() {
 function addCuicReport() {
   const hasEmpty = cuicReports.some(r => !r.folder && !r.name);
   if (hasEmpty) { showToast('Please fill in the existing empty report first', 'warning'); return; }
-  cuicReports.unshift({ report_id: '', label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', filters: {} });
+  cuicReports.unshift({ report_id: '', label: '', folder: '', name: '', enabled: true, data_type: 'ongoing', row_mode: 'consolidated_only', structure_mode: 'auto', dimension_columns: [], datetime_column: '', filters: {} });
   renderCuicReports();
   markDirty();
   setTimeout(() => {
@@ -445,10 +497,10 @@ function renderFilterPanel(report, idx) {
           html += `<div class="ff-selected-list" id="${ffId}-selected" data-ridx="${idx}" data-stepkey="${attr(stepKey)}" data-pn="${attr(paramKey)}">`;
           if (selectedConfigs.length > 0) {
             selectedConfigs.forEach(cfg => {
-              const field  = fields.find(f => (f.fieldId||f.label) === cfg.id);
+              const field  = fields.find(f => getCuicFieldId(f) === cfg.id);
               if (!field) return;
               const op = cfg.operator||'', v1 = cfg.value1||'', v2 = cfg.value2||'';
-              html += _ffSelectedItemHtml(idx, stepKey, paramKey, cfg.id, field.label||cfg.id, op, v1, v2, false);
+              html += _ffSelectedItemHtml(idx, stepKey, paramKey, cfg.id, getCuicFieldIdentity(field).label || cfg.id, op, v1, v2, false);
             });
           } else {
             html += '<p class="ff-empty-msg">No fields selected. Choose fields below to add criteria.</p>';
@@ -461,11 +513,12 @@ function renderFilterPanel(report, idx) {
             <button onclick="ffMsUncheckAll(${idx},'${attr(stepKey)}','${attr(paramKey)}','${ffId}')">\u2610 None</button>
           </div><div class="ff-checklist" id="${ffId}-list" onchange="ffToggleItem(${idx},'${attr(stepKey)}','${attr(paramKey)}','${ffId}',event)">`;
           fields.forEach(f => {
-            const fid     = f.fieldId || f.label;
+            const identity = getCuicFieldIdentity(f);
+            const fid     = identity.fieldId || f.label;
             const checked = selectedConfigs.some(c => c.id === fid) ? 'checked' : '';
-            html += `<label data-name="${attr((f.combined||f.label||'').toLowerCase())}" data-label="${attr(f.label)}">
+            html += `<label data-name="${attr((identity.combined||identity.label||'').toLowerCase())}" data-label="${attr(identity.label)}">
               <input type="checkbox" value="${attr(fid)}" ${checked}>
-              <span>${esc(f.label)}</span><span class="ff-field-id">${esc(f.fieldId)}</span></label>`;
+              <span>${esc(identity.label)}</span><span class="ff-field-id">${esc(identity.fieldId)}</span></label>`;
           });
           html += `</div></div>`;
 
@@ -594,19 +647,23 @@ function renderFilterPanel(report, idx) {
         const selCount  = selIds.length;
         const badge     = `<span class="vl-badge">${fields.length} fields</span>`;
         const labelMap  = {};
-        fields.forEach(f => { labelMap[f.fieldId||f.label] = f.label; });
+        fields.forEach(f => {
+          const identity = getCuicFieldIdentity(f);
+          if (identity.fieldId) labelMap[identity.fieldId] = identity.label;
+        });
 
         html += `<div class="filter-field"><label title="${attr(paramKey)}">${esc(label)}${getCuicRequiredBadge(p)} ${badge}</label>
           <span id="${ffId}-selcount" style="font-size:12px;color:${selCount>0?'var(--green)':'var(--muted)'}">${selCount} selected</span></div>`;
 
         html += `<div class="vl-selected-summary" id="${ffId}-summary" data-type="ff" data-ridx="${idx}" data-pn="${attr(paramKey)}" data-baseid="${ffId}"
           data-labelmap='${JSON.stringify(labelMap).replace(/'/g,"&#39;")}'>`;
-        const showFields = fields.filter(f => selIds.includes(f.fieldId||f.label));
+        const showFields = fields.filter(f => selIds.includes(getCuicFieldId(f) || f.label));
         if (showFields.length > 0) {
           html += `<span class="vl-sel-label">\u2705 Selected:</span>`;
           showFields.slice(0,20).forEach(f => {
-            const fid = f.fieldId||f.label;
-            html += `<span class="vl-sel-tag">${esc(f.label)}<span class="vl-sel-x" onclick="deselectAndRefresh('${ffId}','${attr(fid)}')">&times;</span></span>`;
+            const identity = getCuicFieldIdentity(f);
+            const fid = identity.fieldId || f.label;
+            html += `<span class="vl-sel-tag">${esc(identity.label)}<span class="vl-sel-x" onclick="deselectAndRefresh('${ffId}','${attr(fid)}')">&times;</span></span>`;
           });
           if (showFields.length > 20) html += `<span class="vl-sel-more">+${showFields.length-20} more</span>`;
         }
@@ -619,11 +676,12 @@ function renderFilterPanel(report, idx) {
           <span class="ff-count" id="${ffId}-count">${selCount} / ${fields.length}</span>
         </div><div class="ff-checklist" id="${ffId}-list">`;
         fields.forEach(f => {
-          const fid     = f.fieldId||f.label;
+          const identity = getCuicFieldIdentity(f);
+          const fid     = identity.fieldId || f.label;
           const checked = selIds.includes(fid) ? 'checked' : '';
-          html += `<label data-name="${attr((f.combined||f.label||'').toLowerCase())}" data-label="${attr(f.label)}">
+          html += `<label data-name="${attr((identity.combined||identity.label||'').toLowerCase())}" data-label="${attr(identity.label)}">
             <input type="checkbox" value="${attr(fid)}" ${checked} onchange="ffSpabToggleItem(${idx},'${attr(paramKey)}','${ffId}')">
-            <span>${esc(f.label)}</span><span class="ff-field-id">${esc(f.fieldId)}</span></label>`;
+            <span>${esc(identity.label)}</span><span class="ff-field-id">${esc(identity.fieldId)}</span></label>`;
         });
         html += `</div></div>`;
 
@@ -1036,10 +1094,9 @@ function ffToggleItem(reportIdx, stepKey, paramName, ffId, event) {
   const r = cuicReports[reportIdx];
   if (!r.filters) r.filters = {};
   if (!r.filters[stepKey]) r.filters[stepKey] = {};
-  let configs = r.filters[stepKey][paramName] || [];
-  if (!Array.isArray(configs)) configs = [];
-  configs = configs.map(c => typeof c === 'string' ? {id:c} : c);
-  if (cb.checked) { if (!configs.find(c => c.id === cb.value)) configs.push({id:cb.value, operator:'', value1:''}); }
+  let configs = normalizeStoredFieldFilterList(r.filters[stepKey][paramName] || []);
+  const label = cb.closest('label')?.getAttribute('data-label') || cb.value;
+  if (cb.checked) { if (!configs.find(c => c.id === cb.value)) configs.push({id:cb.value, fieldId:cb.value, label, operator:'', value1:''}); }
   else configs = configs.filter(c => c.id !== cb.value);
   r.filters[stepKey][paramName] = configs;
   _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId);
@@ -1050,15 +1107,14 @@ function ffMsCheckAll(reportIdx, stepKey, paramName, ffId) {
   const r = cuicReports[reportIdx];
   if (!r.filters) r.filters = {};
   if (!r.filters[stepKey]) r.filters[stepKey] = {};
-  let configs = r.filters[stepKey][paramName] || [];
-  if (!Array.isArray(configs)) configs = [];
-  configs = configs.map(c => typeof c === 'string' ? {id:c} : c);
+  let configs = normalizeStoredFieldFilterList(r.filters[stepKey][paramName] || []);
   const listEl = document.getElementById(ffId + '-list');
   if (!listEl) return;
   listEl.querySelectorAll('label').forEach(l => {
     if (l.style.display !== 'none') {
       const cb = l.querySelector('input[type=checkbox]');
-      if (cb && !cb.checked) { cb.checked = true; if (!configs.find(c => c.id === cb.value)) configs.push({id:cb.value, operator:'', value1:''}); }
+      const label = l.getAttribute('data-label') || cb?.value || '';
+      if (cb && !cb.checked) { cb.checked = true; if (!configs.find(c => c.id === cb.value)) configs.push({id:cb.value, fieldId:cb.value, label, operator:'', value1:''}); }
     }
   });
   r.filters[stepKey][paramName] = configs;
@@ -1070,7 +1126,7 @@ function ffMsUncheckAll(reportIdx, stepKey, paramName, ffId) {
   const r = cuicReports[reportIdx];
   if (!r.filters) r.filters = {};
   if (!r.filters[stepKey]) r.filters[stepKey] = {};
-  let configs = (r.filters[stepKey][paramName] || []).map(c => typeof c === 'string' ? {id:c} : c);
+  let configs = normalizeStoredFieldFilterList(r.filters[stepKey][paramName] || []);
   const listEl = document.getElementById(ffId + '-list');
   if (!listEl) return;
   const visIds = [];
@@ -1085,7 +1141,7 @@ function ffMsUncheckAll(reportIdx, stepKey, paramName, ffId) {
 function ffRemoveField(reportIdx, stepKey, paramName, fieldId) {
   const r = cuicReports[reportIdx];
   if (!r.filters?.[stepKey]) return;
-  let configs = (r.filters[stepKey][paramName] || []).map(c => typeof c === 'string' ? {id:c} : c);
+  let configs = normalizeStoredFieldFilterList(r.filters[stepKey][paramName] || []);
   r.filters[stepKey][paramName] = configs.filter(c => c.id !== fieldId);
   const ffId  = `ff-${reportIdx}-s${stepKey.replace('step_','')}-${paramName.replace(/[^a-zA-Z0-9]/g,'_')}`;
   const listEl = document.getElementById(ffId + '-list');
@@ -1097,7 +1153,7 @@ function ffRemoveField(reportIdx, stepKey, paramName, fieldId) {
 function ffUpdateField(reportIdx, stepKey, paramName, fieldId, prop, val) {
   const r = cuicReports[reportIdx];
   if (!r.filters?.[stepKey]) return;
-  let configs = (r.filters[stepKey][paramName] || []).map(c => typeof c === 'string' ? {id:c} : c);
+  let configs = normalizeStoredFieldFilterList(r.filters[stepKey][paramName] || []);
   const cfg = configs.find(c => c.id === fieldId);
   if (cfg) {
     cfg[prop] = val;
@@ -1112,7 +1168,7 @@ function ffUpdateField(reportIdx, stepKey, paramName, fieldId, prop, val) {
 
 function _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId) {
   const r       = cuicReports[reportIdx];
-  const configs = ((r.filters?.[stepKey]?.[paramName]) || []).map(c => typeof c === 'string' ? {id:c} : c);
+  const configs = normalizeStoredFieldFilterList((r.filters?.[stepKey]?.[paramName]) || []);
 
   const ce = document.getElementById(ffId + '-selcount');
   if (ce) { ce.textContent = configs.length + ' selected'; ce.style.color = configs.length > 0 ? 'var(--green)' : 'var(--muted)'; }
@@ -1129,8 +1185,8 @@ function _refreshFieldFilterSelected(reportIdx, stepKey, paramName, ffId) {
   let html = '';
   if (configs.length > 0) {
     configs.forEach(cfg => {
-      const field  = fields.find(f => (f.fieldId||f.label) === cfg.id);
-      const fLabel = field?.label || cfg.id;
+      const field  = fields.find(f => getCuicFieldId(f) === cfg.id);
+      const fLabel = field ? getCuicFieldIdentity(field).label : cfg.label || cfg.id;
       const op = cfg.operator||'', v1 = cfg.value1||'', v2 = cfg.value2||'';
       html += _ffSelectedItemHtml(reportIdx, stepKey, paramName, cfg.id, fLabel, op, v1, v2, false);
     });
@@ -1353,9 +1409,9 @@ async function discoverFilters(reportIdx, discoveryMode = 'discover_columns', bu
 
 /**
  * Renders a collapsible panel for selecting which report columns to extract.
- * The first column (category/key) is always included and not shown.
- * report.columns = null  → all columns extracted
- * report.columns = []    → array of selected headerName strings
+ * report.columns = null  → all metric columns extracted
+ * report.columns = []    → no metric columns extracted
+ * Identifier columns are inferred at scrape time and kept automatically.
  */
 function renderColumnsPanel(report, idx) {
   const meta = report._columns_meta;
@@ -1385,8 +1441,7 @@ function renderColumnsPanel(report, idx) {
     return '';
   }
 
-  // available[0] is the category column — skipped in the picker (always included)
-  const pickable = meta.available.slice(1);
+  const pickable = meta.available.slice();
   const selCols  = report.columns;  // null = all, array = selected names
   const isAll    = selCols === null || selCols === undefined;
   const selSet   = isAll ? null : new Set(selCols);
@@ -1402,7 +1457,7 @@ function renderColumnsPanel(report, idx) {
     </summary>
     <div class="filter-panel">
       <div style="font-size:11px;color:var(--muted);margin-bottom:8px">
-        The first column (${esc(meta.available[0].headerName || 'Category')}) is always included as the row identifier.
+        Select which columns should be emitted as metrics. Identifier columns are inferred automatically or can be overridden below.
       </div>
       <div class="vl-toolbar" style="margin-bottom:6px">
         <input type="text" id="${cpId}-search" placeholder="🔍 Filter columns…" oninput="filterCpChecklist('${cpId}',this.value)" style="flex:1;min-width:120px">

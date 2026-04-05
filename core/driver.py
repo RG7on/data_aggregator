@@ -29,11 +29,37 @@ from core.common_utils import process_worker_result, process_worker_result_long,
 from core.config import get_global_settings, get_worker_settings, get_log_dir, PROJECT_ROOT as CFG_ROOT
 from core.database import init_db, export_csv, cleanup_old_data, migrate_csv_to_db
 
+
+class _ConsoleSafeStream:
+    def __init__(self, stream):
+        self._stream = stream
+        self.encoding = getattr(stream, 'encoding', None) or 'utf-8'
+
+    def write(self, message):
+        if not message:
+            return 0
+        text = str(message)
+        if hasattr(self._stream, 'buffer'):
+            self._stream.buffer.write(text.encode(self.encoding, errors='backslashreplace'))
+            return len(text)
+        safe_text = text.encode(self.encoding, errors='backslashreplace').decode(self.encoding)
+        return self._stream.write(safe_text)
+
+    def flush(self):
+        self._stream.flush()
+
+    def isatty(self):
+        return getattr(self._stream, 'isatty', lambda: False)()
+
+    def writable(self):
+        return True
+
 # Configure logging
 LOG_DIR = get_log_dir()
 os.makedirs(LOG_DIR, exist_ok=True)
 
 log_filename = os.path.join(LOG_DIR, f"driver_{datetime.now().strftime('%Y%m%d')}.log")
+console_stream = _ConsoleSafeStream(sys.stdout)
 
 # Configure root logger explicitly (force=True ensures it works even if
 # basicConfig was already called by an imported module like base_worker)
@@ -41,8 +67,8 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler(log_filename),
-        logging.StreamHandler(sys.stdout)
+        logging.FileHandler(log_filename, encoding='utf-8'),
+        logging.StreamHandler(console_stream)
     ],
     force=True
 )

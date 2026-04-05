@@ -22,11 +22,6 @@ except ImportError:
     def get_output_dir(): return PROJECT_ROOT
     def get_docs_dir(): return PROJECT_ROOT
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 logger = logging.getLogger('common_utils')
 
 # Configuration

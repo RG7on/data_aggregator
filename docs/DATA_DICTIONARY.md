@@ -71,3 +71,87 @@ Use the table below to find the exact name of the metric you want to display.
 | **CUIC_RONA** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
 | **CUIC_Transfer In ** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
 | **CUIC_Transfer Out ** | cuic | Report from cuic. [Add description] | 2026-04-03 16:33:29 |
+| **CUIC_%Busy Other** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_%Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_%Wrapup** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Abandon Ring** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Abandon Ring Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Available Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Busy Other Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Logged On Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Not Ready** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Out Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Out Calls On Hold** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Out Calls On Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Out Calls Talk Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Agent Skill Target ID** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Auto Out** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Auto Out On Hold** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Auto Out On Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Auto Out Talk Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Auto Out Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Barge In Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Callback Messages** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Callback Messages Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Conference In Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Conference Out Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Conferenced In Calls Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Conferenced Out Calls Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Consults** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Consults Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Database DateTime** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Emergency Assists** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Handle Talk Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Handle Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Inbound On Hold** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Inbound On Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Intercept** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Internal** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Internal On Hold** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Internal On Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Internal Received** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Internal Received Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Internal Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Interrupted Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Interval** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Media ID** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Monitor Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Network Conferenced Out Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Network Conferenced Out Calls Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Network Consultative Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Network Consultative Calls Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Network Transferred Out Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Out Extension Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Preview Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Preview Calls On Hold** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Preview Calls On Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Preview Calls Talk Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Preview Calls Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Redirect** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Redirect Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Reservation Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Reservation Calls On Hold** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Reservation Calls On Hold Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Reservation Calls Talk Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Reservation Calls Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Reserved Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Skill Group ID** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Skill Group Name** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Supervisor Assist** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Supervisor Assist Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Talk Auto Out Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Talk Other Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Talk Out Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Talk Preview Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Talk Reserve Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Talk Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Time Zone** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Transfer In** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Transfer In Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Transfer Out** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Whisper Calls** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Work Ready Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_Wrap Up Time** | cuic | Report from cuic. [Add description] | 2026-04-05 11:32:00 |
+| **CUIC_%Active Time** | cuic | Report from cuic. [Add description] | 2026-04-05 13:21:04 |

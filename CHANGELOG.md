@@ -5,6 +5,24 @@ Format: each entry has a **date**, **summary**, **files changed**, and **root ca
 
 ---
 
+## [2026-04-05] — Feature: CUIC Pattern-Aware Normalization for Wide and Grouped Reports
+
+**Files changed:** `workers/cuic/scraper.py`, `core/config.py`, `ui/js/cuic.js`
+
+**Overview:**
+Started the long-term CUIC normalization refactor so reports are no longer forced through a first-column-is-the-key assumption.
+
+- **Pattern-aware normalization:** CUIC rows are now classified as grouped or wide reports before metrics are emitted.
+- **Role inference:** The scraper now infers dimension, datetime, and metric columns from report structure and row values.
+- **Better datetime parsing:** Common CUIC date/time formats such as `Interval`, `Date`, and `Database DateTime` can now be parsed into `data_datetime`.
+- **Config overrides:** CUIC reports now support `structure_mode`, `dimension_columns`, `ignored_columns`, and `datetime_column` settings.
+- **UI support:** The CUIC settings page no longer claims the first discovered column is always the row identifier and now exposes basic structure and dimension overrides.
+
+**Root cause / fix:**
+- Some CUIC reports are wide row-wise reports where identifier columns like `Agent` or `Skill Group Name` are visible data columns rather than hidden ag-grid group fields.
+- The previous scraper always treated the first visible column as the row key and emitted every later column as a metric, which detached metrics from the entity they belonged to.
+- The new logic classifies report shape first, infers column roles, and keeps identifier columns separate from emitted metrics.
+
 ## [2026-04-03] — UI/UX + Fix: Worker Settings Validation, Auto-Save, and Hidden Connection Panels
 
 **Files changed:** `ui/index.html`, `ui/css/main.css`, `ui/js/app.js`, `ui/js/settings-io.js`, `ui/js/cuic.js`, `ui/js/smax.js`

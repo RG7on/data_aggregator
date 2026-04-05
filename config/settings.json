@@ -1,6 +1,6 @@
 {
   "global": {
-    "headless": false,
+    "headless": true,
     "use_system_chrome": true,
     "screenshot_steps": true,
     "screenshot_errors": true,
@@ -16,6 +16,610 @@
       "url": "https://148.151.32.77:8444/cuicui/Main.jsp",
       "reports": [
         {
+          "report_id": "db1a10fe2e0c4df1aab6a41e16c1d8fe",
+          "label": "first_line_full_report",
+          "folder": "Test/First LIne IT helpdesk",
+          "name": "First line full report",
+          "enabled": true,
+          "data_type": "ongoing",
+          "row_mode": "all",
+          "columns": null,
+          "_columns_meta": {
+            "available": [
+              {
+                "field": "perActiveTime",
+                "headerName": "%Active Time"
+              },
+              {
+                "field": "perBusyOther",
+                "headerName": "%Busy Other"
+              },
+              {
+                "field": "perHoldTime",
+                "headerName": "%Hold Time"
+              },
+              {
+                "field": "perNotActive",
+                "headerName": "%Not Active"
+              },
+              {
+                "field": "perNotReady",
+                "headerName": "%Not Ready"
+              },
+              {
+                "field": "perReserved",
+                "headerName": "%Reserved"
+              },
+              {
+                "field": "perWrapup",
+                "headerName": "%Wrapup"
+              },
+              {
+                "field": "AbandonHoldCalls",
+                "headerName": "Abandon Hold"
+              },
+              {
+                "field": "AbandRingCalls",
+                "headerName": "Abandon Ring"
+              },
+              {
+                "field": "AbandRingCallsTime",
+                "headerName": "Abandon Ring Time"
+              },
+              {
+                "field": "FullName",
+                "headerName": "Agent"
+              },
+              {
+                "field": "AgentAvailTime",
+                "headerName": "Agent Available Time"
+              },
+              {
+                "field": "AgentBusyOtherTime",
+                "headerName": "Agent Busy Other Time"
+              },
+              {
+                "field": "AgentLoggedOnTime",
+                "headerName": "Agent Logged On Time"
+              },
+              {
+                "field": "AgentSGLoggedOnTime",
+                "headerName": "Agent Logged On Time"
+              },
+              {
+                "field": "AgentNotReady",
+                "headerName": "Agent Not Ready"
+              },
+              {
+                "field": "AgentOutCalls",
+                "headerName": "Agent Out Calls"
+              },
+              {
+                "field": "AgentOutCallsOnHold",
+                "headerName": "Agent Out Calls On Hold"
+              },
+              {
+                "field": "AgentOutCallsOnHoldTime",
+                "headerName": "Agent Out Calls On Hold Time"
+              },
+              {
+                "field": "AgentOutCallsTalkTime",
+                "headerName": "Agent Out Calls Talk Time"
+              },
+              {
+                "field": "AgentSkillID",
+                "headerName": "Agent Skill Target ID"
+              },
+              {
+                "field": "AgentTerminatedCalls",
+                "headerName": "Agent Terminated Calls"
+              },
+              {
+                "field": "AnswerWaitTime",
+                "headerName": "Answer Wait Time"
+              },
+              {
+                "field": "CallsAnswered",
+                "headerName": "Answered"
+              },
+              {
+                "field": "AutoOutCalls",
+                "headerName": "Auto Out"
+              },
+              {
+                "field": "AutoOutCallsOnHold",
+                "headerName": "Auto Out On Hold"
+              },
+              {
+                "field": "AutoOutCallsOnHoldTime",
+                "headerName": "Auto Out On Hold Time"
+              },
+              {
+                "field": "AutoOutCallsTalkTime",
+                "headerName": "Auto Out Talk Time"
+              },
+              {
+                "field": "AutoOutCallsTime",
+                "headerName": "Auto Out Time"
+              },
+              {
+                "field": "AHT",
+                "headerName": "Avg Handle Time"
+              },
+              {
+                "field": "AHoldT",
+                "headerName": "Avg Hold Time"
+              },
+              {
+                "field": "BargeInCalls",
+                "headerName": "Barge In Calls"
+              },
+              {
+                "field": "CallbackMessages",
+                "headerName": "Callback Messages"
+              },
+              {
+                "field": "CallbackMessagesTime",
+                "headerName": "Callback Messages Time"
+              },
+              {
+                "field": "ConferenceInCalls",
+                "headerName": "Conference In Calls"
+              },
+              {
+                "field": "ConferenceOutCalls",
+                "headerName": "Conference Out Calls"
+              },
+              {
+                "field": "ConferencedInCallsTime",
+                "headerName": "Conferenced In Calls Time"
+              },
+              {
+                "field": "ConferencedOutCallsTime",
+                "headerName": "Conferenced Out Calls Time"
+              },
+              {
+                "field": "ConsultativeCalls",
+                "headerName": "Consults"
+              },
+              {
+                "field": "ConsultativeCallsTime",
+                "headerName": "Consults Time"
+              },
+              {
+                "field": "DbDateTime",
+                "headerName": "Database DateTime"
+              },
+              {
+                "field": "Date",
+                "headerName": "Date"
+              },
+              {
+                "field": "EmergencyAssistCalls",
+                "headerName": "Emergency Assists"
+              },
+              {
+                "field": "HandledCallsTalkTime",
+                "headerName": "Handle Talk Time"
+              },
+              {
+                "field": "HandledCallsTime",
+                "headerName": "Handle Time"
+              },
+              {
+                "field": "CallsHandled",
+                "headerName": "Handled"
+              },
+              {
+                "field": "HoldTime",
+                "headerName": "Hold Time"
+              },
+              {
+                "field": "InCallsOnHold",
+                "headerName": "Inbound On Hold"
+              },
+              {
+                "field": "InCallsOnHoldTime",
+                "headerName": "Inbound On Hold Time"
+              },
+              {
+                "field": "InterceptCalls",
+                "headerName": "Intercept"
+              },
+              {
+                "field": "InternalCalls",
+                "headerName": "Internal"
+              },
+              {
+                "field": "IntCallsOnHold",
+                "headerName": "Internal On Hold"
+              },
+              {
+                "field": "IntCallsOnHoldTime",
+                "headerName": "Internal On Hold Time"
+              },
+              {
+                "field": "InternalCallsRcvd",
+                "headerName": "Internal Received"
+              },
+              {
+                "field": "InternalCallsRcvdTime",
+                "headerName": "Internal Received Time"
+              },
+              {
+                "field": "InternalCallsTime",
+                "headerName": "Internal Time"
+              },
+              {
+                "field": "InterruptedTime",
+                "headerName": "Interrupted Time"
+              },
+              {
+                "field": "Interval",
+                "headerName": "Interval"
+              },
+              {
+                "field": "Media",
+                "headerName": "Media"
+              },
+              {
+                "field": "MediaID",
+                "headerName": "Media ID"
+              },
+              {
+                "field": "MonitorCalls",
+                "headerName": "Monitor Calls"
+              },
+              {
+                "field": "NetConferencedOutCalls",
+                "headerName": "Network Conferenced Out Calls"
+              },
+              {
+                "field": "NetConfOutCallsTime",
+                "headerName": "Network Conferenced Out Calls Time"
+              },
+              {
+                "field": "NetConsultativeCalls",
+                "headerName": "Network Consultative Calls"
+              },
+              {
+                "field": "NetConsultativeCallsTime",
+                "headerName": "Network Consultative Calls Time"
+              },
+              {
+                "field": "NetTransferredOutCalls",
+                "headerName": "Network Transferred Out Calls"
+              },
+              {
+                "field": "OutExtnCalls",
+                "headerName": "Out Extension Calls"
+              },
+              {
+                "field": "PreviewCalls",
+                "headerName": "Preview Calls"
+              },
+              {
+                "field": "PreviewCallsOnHold",
+                "headerName": "Preview Calls On Hold"
+              },
+              {
+                "field": "PreviewCallsOnHoldTime",
+                "headerName": "Preview Calls On Hold Time"
+              },
+              {
+                "field": "PreviewCallsTalkTime",
+                "headerName": "Preview Calls Talk Time"
+              },
+              {
+                "field": "PreviewCallsTime",
+                "headerName": "Preview Calls Time"
+              },
+              {
+                "field": "RedirectCalls",
+                "headerName": "Redirect"
+              },
+              {
+                "field": "RedirectCallsTime",
+                "headerName": "Redirect Time"
+              },
+              {
+                "field": "ReserveCalls",
+                "headerName": "Reservation Calls"
+              },
+              {
+                "field": "ReserveCallsOnHold",
+                "headerName": "Reservation Calls On Hold"
+              },
+              {
+                "field": "ReserveCallsOnHoldTime",
+                "headerName": "Reservation Calls On Hold Time"
+              },
+              {
+                "field": "ReserveCallsTalkTime",
+                "headerName": "Reservation Calls Talk Time"
+              },
+              {
+                "field": "ReserveCallsTime",
+                "headerName": "Reservation Calls Time"
+              },
+              {
+                "field": "ReservedTime",
+                "headerName": "Reserved Time"
+              },
+              {
+                "field": "ShortCalls",
+                "headerName": "Short Calls"
+              },
+              {
+                "field": "SkillGroupID",
+                "headerName": "Skill Group ID"
+              },
+              {
+                "field": "SkillGroupName",
+                "headerName": "Skill Group Name"
+              },
+              {
+                "field": "SupAssistCalls",
+                "headerName": "Supervisor Assist"
+              },
+              {
+                "field": "SupAssistCallsTime",
+                "headerName": "Supervisor Assist Time"
+              },
+              {
+                "field": "TalkAutoOutTime",
+                "headerName": "Talk Auto Out Time"
+              },
+              {
+                "field": "TalkOtherTime",
+                "headerName": "Talk Other Time"
+              },
+              {
+                "field": "TalkOutTime",
+                "headerName": "Talk Out Time"
+              },
+              {
+                "field": "TalkPreviewTime",
+                "headerName": "Talk Preview Time"
+              },
+              {
+                "field": "TalkReserveTime",
+                "headerName": "Talk Reserve Time"
+              },
+              {
+                "field": "TalkTime",
+                "headerName": "Talk Time"
+              },
+              {
+                "field": "TimeZone",
+                "headerName": "Time Zone"
+              },
+              {
+                "field": "TransferInCalls",
+                "headerName": "Transfer In"
+              },
+              {
+                "field": "TransferredInCallsTime",
+                "headerName": "Transfer In Time"
+              },
+              {
+                "field": "TransferOutCalls",
+                "headerName": "Transfer Out"
+              },
+              {
+                "field": "WhisperCalls",
+                "headerName": "Whisper Calls"
+              },
+              {
+                "field": "WorkReadyTime",
+                "headerName": "Work Ready Time"
+              },
+              {
+                "field": "WrapTime",
+                "headerName": "Wrap Up Time"
+              },
+              {
+                "field": "WorkNotReadyTime",
+                "headerName": "Wrap Up Time"
+              }
+            ],
+            "datetime_field": "Date",
+            "discovered_at": "2026-04-05T13:40:37"
+          },
+          "filters": {
+            "_meta": {
+              "schemaVersion": 2,
+              "type": "cuic_spab",
+              "params": [
+                {
+                  "dataType": "DATETIME",
+                  "label": "DateTime",
+                  "paramName": "@start_date",
+                  "paramName2": "@end_date",
+                  "storageKey": "@start_date",
+                  "aliases": [
+                    "@start_date",
+                    "@end_date",
+                    "DateTime"
+                  ],
+                  "isRequired": true,
+                  "type": "cuic_datetime",
+                  "datePresets": [
+                    {
+                      "value": "CUSTOM",
+                      "label": "Custom"
+                    },
+                    {
+                      "value": "THISDAY",
+                      "label": "Today"
+                    },
+                    {
+                      "value": "LASTDAY",
+                      "label": "Yesterday"
+                    },
+                    {
+                      "value": "THISWK",
+                      "label": "This Week"
+                    },
+                    {
+                      "value": "LASTWK",
+                      "label": "Last Week"
+                    },
+                    {
+                      "value": "THISMTH",
+                      "label": "This Month"
+                    },
+                    {
+                      "value": "LASTMTH",
+                      "label": "Last Month"
+                    },
+                    {
+                      "value": "THISYR",
+                      "label": "Year to Date"
+                    },
+                    {
+                      "value": "LASTYR",
+                      "label": "Last Year"
+                    }
+                  ],
+                  "currentPreset": "THISDAY",
+                  "relativeRange": "THISDAY",
+                  "hasDateRange": true,
+                  "enablePicker": false,
+                  "isRelativeDate": "yes",
+                  "displayFormat": "",
+                  "currentDate1": "04/05/2026",
+                  "currentDate2": "04/05/2026",
+                  "allTime": 1,
+                  "hasTimeRange": true,
+                  "allTimeChecked": "true",
+                  "currentTime1": "12:00:00 AM",
+                  "currentTime2": "11:59:59 PM",
+                  "hasDays": false,
+                  "showDays": false,
+                  "allDayChecked": "true",
+                  "days": {
+                    "mon": "checked",
+                    "tue": "checked",
+                    "wed": "checked",
+                    "thu": "checked",
+                    "fri": "checked",
+                    "sat": "checked",
+                    "sun": "checked"
+                  }
+                },
+                {
+                  "dataType": "VALUELIST",
+                  "label": "Skill Groups",
+                  "paramName": "@SkillGroupID",
+                  "paramName2": "",
+                  "storageKey": "@SkillGroupID",
+                  "aliases": [
+                    "@SkillGroupID",
+                    "Skill Groups"
+                  ],
+                  "isRequired": true,
+                  "type": "cuic_valuelist",
+                  "selectedCount": 0,
+                  "selectedValues": [],
+                  "availableCount": 61,
+                  "availableNames": [
+                    "ARB_CLINIC_COMMON_SG",
+                    "ARB_GENERAL_SG",
+                    "ARB_LABORATORY_SG",
+                    "ARB_OUTPATIENT_SG",
+                    "ARB_Pension_SG",
+                    "ARB_VACCINATION_SG",
+                    "CCTV",
+                    "EDM_Application_SG",
+                    "EDM_IT_SG",
+                    "EDM_Workflow_SG",
+                    "ENG_CLINIC_COMMON_SG",
+                    "ENG_GENERAL_SG",
+                    "ENG_LABORATORY_SG",
+                    "ENG_OUTPATIENT_SG",
+                    "ENG_Pension_SG",
+                    "ENG_VACCINATION_SG",
+                    "EOB_SG",
+                    "Flight_Booking_SG",
+                    "GENIT_SG",
+                    "GENIT_Sup_SG",
+                    "GENIT_WIN_SG",
+                    "GenITOutbound_SG",
+                    "HR_Facility_SG",
+                    "HR_Logistics_App_SG",
+                    "HR_Logistics_Services_SG",
+                    "IFMOutbound_SG",
+                    "IMMG_SG",
+                    "Interior_Coorprate_SG",
+                    "MED_ANTI_VACCINE_SG",
+                    "MED_GENERAL_APT_SG",
+                    "MED_LABORATORY_SG",
+                    "MED_OUT_PATIENT_SG",
+                    "Medical_HD",
+                    "Outbound.SG",
+                    "PDO_CUCM_PIM1.Cisco_Voice..88101",
+                    "PDO_HR_MAIN_SG",
+                    "PDO_TEST_SG",
+                    "PDOTEST1",
+                    "Pool_Car_SG",
+                    "RTMOutbound_SG",
+                    "RTPS_SG",
+                    "RTPS_Sup_SG",
+                    "SAP_CPL_Sec_SG",
+                    "SAP_CPL_SG",
+                    "SAP_FIN_sec_SG",
+                    "SAP_FIN_SG",
+                    "SAP_SAPHIRE_sec_SG",
+                    "SAP_SAPHIRE_SG",
+                    "SAP_SG",
+                    "SAP_Supervisor_SG",
+                    "SAP_WM_sec_SG",
+                    "SAP_WM_SG",
+                    "SAPoutbound_SG",
+                    "SUBOutbound_SG",
+                    "Subsurface_SG",
+                    "Subsurface_Sup_SG",
+                    "Telcom_SG",
+                    "Telcom_Sup_SG",
+                    "TelecomOutbound_SG",
+                    "Test_SG",
+                    "Transport_Chauffeur_SG"
+                  ],
+                  "availableGroups": []
+                },
+                {
+                  "dataType": "VALUELIST",
+                  "label": "MediaID",
+                  "paramName": "@MediaID",
+                  "paramName2": "",
+                  "storageKey": "@MediaID",
+                  "aliases": [
+                    "@MediaID",
+                    "MediaID"
+                  ],
+                  "isRequired": true,
+                  "type": "cuic_valuelist",
+                  "selectedCount": 0,
+                  "selectedValues": [],
+                  "availableCount": 1,
+                  "availableNames": [
+                    "Cisco_Voice"
+                  ],
+                  "availableGroups": []
+                }
+              ]
+            },
+            "@SkillGroupID": [
+              "GENIT_SG"
+            ],
+            "@MediaID": "all",
+            "@start_date": "LASTDAY"
+          },
+          "dimension_columns": [],
+          "ignored_columns": []
+        },
+        {
           "report_id": "89155719789549c5a694b03b66590974",
           "label": "z_call_type_historical_all_fields",
           "folder": "Test",
@@ -23,7 +627,28 @@
           "enabled": false,
           "data_type": "ongoing",
           "row_mode": "consolidated_only",
-          "columns": null,
+          "columns": [
+            "Call Type",
+            "DateTime",
+            "Service Level",
+            "Abandoned Within Service Level",
+            "Avg Speed of Answer",
+            "Offered",
+            "Assigned From Queue",
+            "Answered",
+            "Answer Wait Time",
+            "Handled",
+            "Abandoned",
+            "Return",
+            "Default_Treatment",
+            "Network Routed",
+            "Flow Out",
+            "Calls Error",
+            "Other",
+            "Short Calls",
+            "Max Queued",
+            "Longest Queued"
+          ],
           "_columns_meta": {
             "available": [
               {
@@ -1150,8 +1775,16 @@
                 "Key Criteria",
                 "Field Filters"
               ]
+            },
+            "step_1": {
+              "DateTime  (DateTime)": {
+                "preset": "THISDAY",
+                "allTime": 2
+              }
             }
-          }
+          },
+          "dimension_columns": [],
+          "ignored_columns": []
         },
         {
           "report_id": "39b93f8084844e55a1dd171692ea97b6",
@@ -1452,611 +2085,16 @@
                 }
               ]
             }
-          }
-        },
-        {
-          "report_id": "8e9178828d5442eea8cfe71a7a638a6b",
-          "label": "first_line_full_report",
-          "folder": "Test/First LIne IT helpdesk",
-          "name": "First line full report",
-          "enabled": false,
-          "data_type": "ongoing",
-          "row_mode": "consolidated_only",
-          "columns": null,
-          "_columns_meta": {
-            "available": [
-              {
-                "field": "perActiveTime",
-                "headerName": "%Active Time"
-              },
-              {
-                "field": "perBusyOther",
-                "headerName": "%Busy Other"
-              },
-              {
-                "field": "perHoldTime",
-                "headerName": "%Hold Time"
-              },
-              {
-                "field": "perNotActive",
-                "headerName": "%Not Active"
-              },
-              {
-                "field": "perNotReady",
-                "headerName": "%Not Ready"
-              },
-              {
-                "field": "perReserved",
-                "headerName": "%Reserved"
-              },
-              {
-                "field": "perWrapup",
-                "headerName": "%Wrapup"
-              },
-              {
-                "field": "AbandonHoldCalls",
-                "headerName": "Abandon Hold"
-              },
-              {
-                "field": "AbandRingCalls",
-                "headerName": "Abandon Ring"
-              },
-              {
-                "field": "AbandRingCallsTime",
-                "headerName": "Abandon Ring Time"
-              },
-              {
-                "field": "FullName",
-                "headerName": "Agent"
-              },
-              {
-                "field": "AgentAvailTime",
-                "headerName": "Agent Available Time"
-              },
-              {
-                "field": "AgentBusyOtherTime",
-                "headerName": "Agent Busy Other Time"
-              },
-              {
-                "field": "AgentLoggedOnTime",
-                "headerName": "Agent Logged On Time"
-              },
-              {
-                "field": "AgentSGLoggedOnTime",
-                "headerName": "Agent Logged On Time"
-              },
-              {
-                "field": "AgentNotReady",
-                "headerName": "Agent Not Ready"
-              },
-              {
-                "field": "AgentOutCalls",
-                "headerName": "Agent Out Calls"
-              },
-              {
-                "field": "AgentOutCallsOnHold",
-                "headerName": "Agent Out Calls On Hold"
-              },
-              {
-                "field": "AgentOutCallsOnHoldTime",
-                "headerName": "Agent Out Calls On Hold Time"
-              },
-              {
-                "field": "AgentOutCallsTalkTime",
-                "headerName": "Agent Out Calls Talk Time"
-              },
-              {
-                "field": "AgentSkillID",
-                "headerName": "Agent Skill Target ID"
-              },
-              {
-                "field": "AgentTerminatedCalls",
-                "headerName": "Agent Terminated Calls"
-              },
-              {
-                "field": "AnswerWaitTime",
-                "headerName": "Answer Wait Time"
-              },
-              {
-                "field": "CallsAnswered",
-                "headerName": "Answered"
-              },
-              {
-                "field": "AutoOutCalls",
-                "headerName": "Auto Out"
-              },
-              {
-                "field": "AutoOutCallsOnHold",
-                "headerName": "Auto Out On Hold"
-              },
-              {
-                "field": "AutoOutCallsOnHoldTime",
-                "headerName": "Auto Out On Hold Time"
-              },
-              {
-                "field": "AutoOutCallsTalkTime",
-                "headerName": "Auto Out Talk Time"
-              },
-              {
-                "field": "AutoOutCallsTime",
-                "headerName": "Auto Out Time"
-              },
-              {
-                "field": "AHT",
-                "headerName": "Avg Handle Time"
-              },
-              {
-                "field": "AHoldT",
-                "headerName": "Avg Hold Time"
-              },
-              {
-                "field": "BargeInCalls",
-                "headerName": "Barge In Calls"
-              },
-              {
-                "field": "CallbackMessages",
-                "headerName": "Callback Messages"
-              },
-              {
-                "field": "CallbackMessagesTime",
-                "headerName": "Callback Messages Time"
-              },
-              {
-                "field": "ConferenceInCalls",
-                "headerName": "Conference In Calls"
-              },
-              {
-                "field": "ConferenceOutCalls",
-                "headerName": "Conference Out Calls"
-              },
-              {
-                "field": "ConferencedInCallsTime",
-                "headerName": "Conferenced In Calls Time"
-              },
-              {
-                "field": "ConferencedOutCallsTime",
-                "headerName": "Conferenced Out Calls Time"
-              },
-              {
-                "field": "ConsultativeCalls",
-                "headerName": "Consults"
-              },
-              {
-                "field": "ConsultativeCallsTime",
-                "headerName": "Consults Time"
-              },
-              {
-                "field": "DbDateTime",
-                "headerName": "Database DateTime"
-              },
-              {
-                "field": "Date",
-                "headerName": "Date"
-              },
-              {
-                "field": "EmergencyAssistCalls",
-                "headerName": "Emergency Assists"
-              },
-              {
-                "field": "HandledCallsTalkTime",
-                "headerName": "Handle Talk Time"
-              },
-              {
-                "field": "HandledCallsTime",
-                "headerName": "Handle Time"
-              },
-              {
-                "field": "CallsHandled",
-                "headerName": "Handled"
-              },
-              {
-                "field": "HoldTime",
-                "headerName": "Hold Time"
-              },
-              {
-                "field": "InCallsOnHold",
-                "headerName": "Inbound On Hold"
-              },
-              {
-                "field": "InCallsOnHoldTime",
-                "headerName": "Inbound On Hold Time"
-              },
-              {
-                "field": "InterceptCalls",
-                "headerName": "Intercept"
-              },
-              {
-                "field": "InternalCalls",
-                "headerName": "Internal"
-              },
-              {
-                "field": "IntCallsOnHold",
-                "headerName": "Internal On Hold"
-              },
-              {
-                "field": "IntCallsOnHoldTime",
-                "headerName": "Internal On Hold Time"
-              },
-              {
-                "field": "InternalCallsRcvd",
-                "headerName": "Internal Received"
-              },
-              {
-                "field": "InternalCallsRcvdTime",
-                "headerName": "Internal Received Time"
-              },
-              {
-                "field": "InternalCallsTime",
-                "headerName": "Internal Time"
-              },
-              {
-                "field": "InterruptedTime",
-                "headerName": "Interrupted Time"
-              },
-              {
-                "field": "Interval",
-                "headerName": "Interval"
-              },
-              {
-                "field": "Media",
-                "headerName": "Media"
-              },
-              {
-                "field": "MediaID",
-                "headerName": "Media ID"
-              },
-              {
-                "field": "MonitorCalls",
-                "headerName": "Monitor Calls"
-              },
-              {
-                "field": "NetConferencedOutCalls",
-                "headerName": "Network Conferenced Out Calls"
-              },
-              {
-                "field": "NetConfOutCallsTime",
-                "headerName": "Network Conferenced Out Calls Time"
-              },
-              {
-                "field": "NetConsultativeCalls",
-                "headerName": "Network Consultative Calls"
-              },
-              {
-                "field": "NetConsultativeCallsTime",
-                "headerName": "Network Consultative Calls Time"
-              },
-              {
-                "field": "NetTransferredOutCalls",
-                "headerName": "Network Transferred Out Calls"
-              },
-              {
-                "field": "OutExtnCalls",
-                "headerName": "Out Extension Calls"
-              },
-              {
-                "field": "PreviewCalls",
-                "headerName": "Preview Calls"
-              },
-              {
-                "field": "PreviewCallsOnHold",
-                "headerName": "Preview Calls On Hold"
-              },
-              {
-                "field": "PreviewCallsOnHoldTime",
-                "headerName": "Preview Calls On Hold Time"
-              },
-              {
-                "field": "PreviewCallsTalkTime",
-                "headerName": "Preview Calls Talk Time"
-              },
-              {
-                "field": "PreviewCallsTime",
-                "headerName": "Preview Calls Time"
-              },
-              {
-                "field": "RedirectCalls",
-                "headerName": "Redirect"
-              },
-              {
-                "field": "RedirectCallsTime",
-                "headerName": "Redirect Time"
-              },
-              {
-                "field": "ReserveCalls",
-                "headerName": "Reservation Calls"
-              },
-              {
-                "field": "ReserveCallsOnHold",
-                "headerName": "Reservation Calls On Hold"
-              },
-              {
-                "field": "ReserveCallsOnHoldTime",
-                "headerName": "Reservation Calls On Hold Time"
-              },
-              {
-                "field": "ReserveCallsTalkTime",
-                "headerName": "Reservation Calls Talk Time"
-              },
-              {
-                "field": "ReserveCallsTime",
-                "headerName": "Reservation Calls Time"
-              },
-              {
-                "field": "ReservedTime",
-                "headerName": "Reserved Time"
-              },
-              {
-                "field": "ShortCalls",
-                "headerName": "Short Calls"
-              },
-              {
-                "field": "SkillGroupID",
-                "headerName": "Skill Group ID"
-              },
-              {
-                "field": "SkillGroupName",
-                "headerName": "Skill Group Name"
-              },
-              {
-                "field": "SupAssistCalls",
-                "headerName": "Supervisor Assist"
-              },
-              {
-                "field": "SupAssistCallsTime",
-                "headerName": "Supervisor Assist Time"
-              },
-              {
-                "field": "TalkAutoOutTime",
-                "headerName": "Talk Auto Out Time"
-              },
-              {
-                "field": "TalkOtherTime",
-                "headerName": "Talk Other Time"
-              },
-              {
-                "field": "TalkOutTime",
-                "headerName": "Talk Out Time"
-              },
-              {
-                "field": "TalkPreviewTime",
-                "headerName": "Talk Preview Time"
-              },
-              {
-                "field": "TalkReserveTime",
-                "headerName": "Talk Reserve Time"
-              },
-              {
-                "field": "TalkTime",
-                "headerName": "Talk Time"
-              },
-              {
-                "field": "TimeZone",
-                "headerName": "Time Zone"
-              },
-              {
-                "field": "TransferInCalls",
-                "headerName": "Transfer In"
-              },
-              {
-                "field": "TransferredInCallsTime",
-                "headerName": "Transfer In Time"
-              },
-              {
-                "field": "TransferOutCalls",
-                "headerName": "Transfer Out"
-              },
-              {
-                "field": "WhisperCalls",
-                "headerName": "Whisper Calls"
-              },
-              {
-                "field": "WorkReadyTime",
-                "headerName": "Work Ready Time"
-              },
-              {
-                "field": "WrapTime",
-                "headerName": "Wrap Up Time"
-              },
-              {
-                "field": "WorkNotReadyTime",
-                "headerName": "Wrap Up Time"
-              }
-            ],
-            "datetime_field": "Date",
-            "discovered_at": "2026-04-05T10:40:26"
           },
-          "filters": {
-            "_meta": {
-              "schemaVersion": 2,
-              "type": "cuic_spab",
-              "params": [
-                {
-                  "dataType": "DATETIME",
-                  "label": "DateTime",
-                  "paramName": "@start_date",
-                  "paramName2": "@end_date",
-                  "storageKey": "@start_date",
-                  "aliases": [
-                    "@start_date",
-                    "@end_date",
-                    "DateTime"
-                  ],
-                  "isRequired": true,
-                  "type": "cuic_datetime",
-                  "datePresets": [
-                    {
-                      "value": "CUSTOM",
-                      "label": "Custom"
-                    },
-                    {
-                      "value": "THISDAY",
-                      "label": "Today"
-                    },
-                    {
-                      "value": "LASTDAY",
-                      "label": "Yesterday"
-                    },
-                    {
-                      "value": "THISWK",
-                      "label": "This Week"
-                    },
-                    {
-                      "value": "LASTWK",
-                      "label": "Last Week"
-                    },
-                    {
-                      "value": "THISMTH",
-                      "label": "This Month"
-                    },
-                    {
-                      "value": "LASTMTH",
-                      "label": "Last Month"
-                    },
-                    {
-                      "value": "THISYR",
-                      "label": "Year to Date"
-                    },
-                    {
-                      "value": "LASTYR",
-                      "label": "Last Year"
-                    }
-                  ],
-                  "currentPreset": "THISDAY",
-                  "relativeRange": "THISDAY",
-                  "hasDateRange": true,
-                  "enablePicker": false,
-                  "isRelativeDate": "yes",
-                  "displayFormat": "",
-                  "currentDate1": "04/05/2026",
-                  "currentDate2": "04/05/2026",
-                  "allTime": 1,
-                  "hasTimeRange": true,
-                  "allTimeChecked": "true",
-                  "currentTime1": "12:00:00 AM",
-                  "currentTime2": "11:59:59 PM",
-                  "hasDays": false,
-                  "showDays": false,
-                  "allDayChecked": "true",
-                  "days": {
-                    "mon": "checked",
-                    "tue": "checked",
-                    "wed": "checked",
-                    "thu": "checked",
-                    "fri": "checked",
-                    "sat": "checked",
-                    "sun": "checked"
-                  }
-                },
-                {
-                  "dataType": "VALUELIST",
-                  "label": "Skill Groups",
-                  "paramName": "@SkillGroupID",
-                  "paramName2": "",
-                  "storageKey": "@SkillGroupID",
-                  "aliases": [
-                    "@SkillGroupID",
-                    "Skill Groups"
-                  ],
-                  "isRequired": true,
-                  "type": "cuic_valuelist",
-                  "selectedCount": 0,
-                  "selectedValues": [],
-                  "availableCount": 61,
-                  "availableNames": [
-                    "ARB_CLINIC_COMMON_SG",
-                    "ARB_GENERAL_SG",
-                    "ARB_LABORATORY_SG",
-                    "ARB_OUTPATIENT_SG",
-                    "ARB_Pension_SG",
-                    "ARB_VACCINATION_SG",
-                    "CCTV",
-                    "EDM_Application_SG",
-                    "EDM_IT_SG",
-                    "EDM_Workflow_SG",
-                    "ENG_CLINIC_COMMON_SG",
-                    "ENG_GENERAL_SG",
-                    "ENG_LABORATORY_SG",
-                    "ENG_OUTPATIENT_SG",
-                    "ENG_Pension_SG",
-                    "ENG_VACCINATION_SG",
-                    "EOB_SG",
-                    "Flight_Booking_SG",
-                    "GENIT_SG",
-                    "GENIT_Sup_SG",
-                    "GENIT_WIN_SG",
-                    "GenITOutbound_SG",
-                    "HR_Facility_SG",
-                    "HR_Logistics_App_SG",
-                    "HR_Logistics_Services_SG",
-                    "IFMOutbound_SG",
-                    "IMMG_SG",
-                    "Interior_Coorprate_SG",
-                    "MED_ANTI_VACCINE_SG",
-                    "MED_GENERAL_APT_SG",
-                    "MED_LABORATORY_SG",
-                    "MED_OUT_PATIENT_SG",
-                    "Medical_HD",
-                    "Outbound.SG",
-                    "PDO_CUCM_PIM1.Cisco_Voice..88101",
-                    "PDO_HR_MAIN_SG",
-                    "PDO_TEST_SG",
-                    "PDOTEST1",
-                    "Pool_Car_SG",
-                    "RTMOutbound_SG",
-                    "RTPS_SG",
-                    "RTPS_Sup_SG",
-                    "SAP_CPL_Sec_SG",
-                    "SAP_CPL_SG",
-                    "SAP_FIN_sec_SG",
-                    "SAP_FIN_SG",
-                    "SAP_SAPHIRE_sec_SG",
-                    "SAP_SAPHIRE_SG",
-                    "SAP_SG",
-                    "SAP_Supervisor_SG",
-                    "SAP_WM_sec_SG",
-                    "SAP_WM_SG",
-                    "SAPoutbound_SG",
-                    "SUBOutbound_SG",
-                    "Subsurface_SG",
-                    "Subsurface_Sup_SG",
-                    "Telcom_SG",
-                    "Telcom_Sup_SG",
-                    "TelecomOutbound_SG",
-                    "Test_SG",
-                    "Transport_Chauffeur_SG"
-                  ],
-                  "availableGroups": []
-                },
-                {
-                  "dataType": "VALUELIST",
-                  "label": "MediaID",
-                  "paramName": "@MediaID",
-                  "paramName2": "",
-                  "storageKey": "@MediaID",
-                  "aliases": [
-                    "@MediaID",
-                    "MediaID"
-                  ],
-                  "isRequired": true,
-                  "type": "cuic_valuelist",
-                  "selectedCount": 0,
-                  "selectedValues": [],
-                  "availableCount": 1,
-                  "availableNames": [
-                    "Cisco_Voice"
-                  ],
-                  "availableGroups": []
-                }
-              ]
-            }
-          }
+          "dimension_columns": [],
+          "ignored_columns": []
         },
         {
           "report_id": "6b57220bc7df475a881079f635b2ea34",
           "label": "yest_call_type_hist_all_fields",
           "folder": "Test",
           "name": "Yest Call Type Hist All Fields",
-          "enabled": true,
+          "enabled": false,
           "data_type": "ongoing",
           "row_mode": "consolidated_only",
           "columns": null,
@@ -3189,7 +3227,7 @@
             },
             "step_1": {
               "DateTime  (DateTime)": {
-                "preset": "THISWK",
+                "preset": "LASTDAY",
                 "allDayChecked": "false",
                 "days": {
                   "mon": "",
@@ -3207,15 +3245,11 @@
               ]
             },
             "step_3": {
-              "_field_filters": [
-                {
-                  "id": "% Abandon (per_aban)",
-                  "operator": "G",
-                  "value1": "1"
-                }
-              ]
+              "_field_filters": []
             }
-          }
+          },
+          "dimension_columns": [],
+          "ignored_columns": []
         }
       ],
       "timeout_nav_ms": 60000,
@@ -3226,7 +3260,336 @@
     "smax": {
       "enabled": false,
       "base_url": "https://smax.corp.pdo.om",
-      "reports": [],
+      "reports": [
+        {
+          "report_id": "6eabf8f45a6041fc99add2ae356cda8b",
+          "label": "isc_first_touch_response_1_hour",
+          "url": "https://smax.corp.pdo.om/reports/report/69808de7e4b05f4efa3fa48f",
+          "enabled": true,
+          "data_type": "historical",
+          "properties": {
+            "error": "",
+            "report_name": "ISC: First Touch Response <1 hour",
+            "display_label": "",
+            "record_type": "Request",
+            "filters": [
+              {
+                "field_id": "ServiceDeskGroup",
+                "field_label": "Service desk group",
+                "negated": false,
+                "operator": "Is",
+                "type": "text",
+                "display_value": "SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access"
+              },
+              {
+                "field_id": "CloseTime",
+                "field_label": "Closed time",
+                "negated": false,
+                "operator": "Is",
+                "type": "date",
+                "display_value": "Previous month",
+                "date_presets": []
+              },
+              {
+                "field_id": "PhaseId",
+                "field_label": "Phase Id",
+                "negated": false,
+                "operator": "Is",
+                "type": "dropdown",
+                "display_value": "Close",
+                "selected_values": [
+                  "Close"
+                ],
+                "value_ids": "Close"
+              },
+              {
+                "field_id": "CurrentAssignment",
+                "field_label": "Current assignment",
+                "negated": false,
+                "operator": "Is",
+                "type": "enum",
+                "display_value": "Service Desk",
+                "enum_options": [
+                  {
+                    "id": "Unassigned",
+                    "label": "Unassigned",
+                    "checked": false
+                  },
+                  {
+                    "id": "ServiceDesk",
+                    "label": "Service Desk",
+                    "checked": true
+                  },
+                  {
+                    "id": "ExpertGroup",
+                    "label": "Expert Group",
+                    "checked": false
+                  },
+                  {
+                    "id": "Incident",
+                    "label": "Incident",
+                    "checked": false
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Service Desk"
+                ]
+              },
+              {
+                "field_id": "CreationSource",
+                "field_label": "Creation source",
+                "negated": true,
+                "operator": "Is not",
+                "type": "enum",
+                "display_value": "Self service portal, Other, Virtual Agent",
+                "enum_options": [
+                  {
+                    "id": "CreationSourceEss",
+                    "label": "Self service portal",
+                    "checked": true
+                  },
+                  {
+                    "id": "CreationSourceEssChat",
+                    "label": "Live chat",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceLiveSupport",
+                    "label": "Live support",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceOther",
+                    "label": "Other",
+                    "checked": true
+                  },
+                  {
+                    "id": "CreationSourceEmail",
+                    "label": "Email",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceExternal",
+                    "label": "External",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceMobile",
+                    "label": "Mobile",
+                    "checked": false
+                  },
+                  {
+                    "id": "CreationSourceVA",
+                    "label": "Virtual Agent",
+                    "checked": true
+                  },
+                  {
+                    "id": "CreationSourceSAM",
+                    "label": "Software Asset Management",
+                    "checked": false
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Self service portal",
+                  "Other",
+                  "Virtual Agent"
+                ]
+              }
+            ],
+            "group_by": [
+              "First touch"
+            ],
+            "func": {
+              "main": "Percent",
+              "secondary": "Count"
+            },
+            "chart_function": "Percent by Count",
+            "chart_legend": [
+              {
+                "label": "false",
+                "value": "10.24"
+              },
+              {
+                "label": "true",
+                "value": "89.76"
+              }
+            ]
+          }
+        },
+        {
+          "report_id": "b2a3ed0eeaa74371bf9096341393beb1",
+          "label": "bia_requests",
+          "url": "https://smax.corp.pdo.om/reports/report/684a818ae4b07b034c72581b",
+          "enabled": true,
+          "data_type": "ongoing",
+          "properties": {
+            "error": "",
+            "report_name": "BIA Requests",
+            "display_label": "",
+            "record_type": "Request",
+            "filters": [
+              {
+                "field_id": "RequestsOffering",
+                "field_label": "Offering",
+                "negated": false,
+                "operator": "Is",
+                "type": "text",
+                "display_value": "Business Impact Assessment (BIA)"
+              }
+            ],
+            "group_by": [
+              "Phase Id"
+            ],
+            "func": {
+              "main": "Count",
+              "secondary": ""
+            },
+            "chart_function": "Count",
+            "chart_legend": [
+              {
+                "label": "Close",
+                "value": "159"
+              },
+              {
+                "label": "Abandon",
+                "value": "39"
+              },
+              {
+                "label": "Log",
+                "value": "10"
+              },
+              {
+                "label": "Approve",
+                "value": "2"
+              }
+            ]
+          }
+        },
+        {
+          "report_id": "240e5c84a98c48ac8b90630b9eb4a9fc",
+          "label": "aging_requests",
+          "url": "https://smax.corp.pdo.om/reports/report/6472f4b8e4b0636a776f1640",
+          "enabled": true,
+          "data_type": "ongoing",
+          "properties": {
+            "error": "",
+            "report_name": "Aging Requests",
+            "display_label": "",
+            "record_type": "Request",
+            "filters": [
+              {
+                "field_id": "ServiceDeskGroup",
+                "field_label": "Service desk group",
+                "negated": false,
+                "operator": "Is",
+                "type": "text",
+                "display_value": "SMX-HELPDESK-CALLOFF, SMX-Helpdesk-ISC-FAULT-REPLACEMENT, SMX-Helpdesk-ISC-REG-DATA, SMX-Helpdesk-ISC-SOUTH, SMX-IT-HELPDESK, SMX-IT-ISC-SFAD, SMX-IT-ISC-SAP, SMX-IT-ISC-HELPDESK, SMX-IT-ISC-SUBSURFACE, SMX-Helpdesk-ISC-NORTH, SMX-IT-ISC-Home Access"
+              },
+              {
+                "field_id": "PhaseId",
+                "field_label": "Phase Id",
+                "negated": false,
+                "operator": "Is",
+                "type": "dropdown",
+                "display_value": "First line support, Fulfill, Review, Escalate",
+                "selected_values": [
+                  "First line support",
+                  "Fulfill",
+                  "Review",
+                  "Escalate"
+                ],
+                "value_ids": "FirstLineSupport,Fulfill,Review,Escalate"
+              },
+              {
+                "field_id": "CurrentAssignment",
+                "field_label": "Current assignment",
+                "negated": false,
+                "operator": "Is",
+                "type": "enum",
+                "display_value": "Service Desk, Expert Group, Incident",
+                "enum_options": [
+                  {
+                    "id": "Unassigned",
+                    "label": "Unassigned",
+                    "checked": false
+                  },
+                  {
+                    "id": "ServiceDesk",
+                    "label": "Service Desk",
+                    "checked": true
+                  },
+                  {
+                    "id": "ExpertGroup",
+                    "label": "Expert Group",
+                    "checked": true
+                  },
+                  {
+                    "id": "Incident",
+                    "label": "Incident",
+                    "checked": true
+                  },
+                  {
+                    "id": "<No Value>",
+                    "label": "<No Value>",
+                    "checked": false
+                  }
+                ],
+                "selected_values": [
+                  "Service Desk",
+                  "Expert Group",
+                  "Incident"
+                ]
+              },
+              {
+                "field_id": "CreateTime",
+                "field_label": "Created time",
+                "negated": false,
+                "operator": "Is",
+                "type": "date",
+                "display_value": "Past year",
+                "date_presets": []
+              }
+            ],
+            "group_by": [
+              "Created time",
+              "Phase Id"
+            ],
+            "func": {
+              "main": "Count",
+              "secondary": ""
+            },
+            "chart_function": "Count",
+            "chart_legend": [
+              {
+                "label": "First line support",
+                "value": null
+              },
+              {
+                "label": "Escalate",
+                "value": null
+              },
+              {
+                "label": "Fulfill",
+                "value": null
+              },
+              {
+                "label": "Review",
+                "value": null
+              }
+            ]
+          }
+        }
+      ],
       "page_load_timeout_ms": 120000,
       "element_wait_timeout_ms": 30000,
       "tab_stagger_delay_ms": 2000,
